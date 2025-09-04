@@ -1,7 +1,5 @@
-const Drive = () => {
-  return (
-    <div>Drive</div>
-  )
-}
+const Driver = () => {
+  return <div>Driver</div>;
+};
 
-export default Drive
+export default Driver;
