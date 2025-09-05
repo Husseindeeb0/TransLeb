@@ -8,7 +8,6 @@ import {
   MapPin,
   Navigation,
   Clock,
-  Users,
   ArrowRight,
   Crosshair,
   Share2,
