@@ -1,7 +1,5 @@
 export interface LocationMarkerProps {
-  setUserLocation: React.Dispatch<
-    React.SetStateAction<{ lat: number; lng: number } | null>
-  >;
+  handleSetLocation: (lat?: number, lng?: number) => void;
 }
 
 // Props type for Recenter component

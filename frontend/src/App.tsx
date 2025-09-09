@@ -5,9 +5,11 @@ import Signin from "./pages/Signin";
 import Signup from "./pages/Signup";
 import Landing from "./pages/Landing";
 import Navbar from "./components/Navbar";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
+    <>
     <BrowserRouter>
       <Navbar />
       <Routes>
@@ -18,6 +20,8 @@ function App() {
         <Route path="/drive" element={<Drive />} />
       </Routes>
     </BrowserRouter>
+    <Toaster />
+    </>
   );
 }
 

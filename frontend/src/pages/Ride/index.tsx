@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import { useMapEvents } from "react-leaflet";
+import { v4 as uuidv4 } from "uuid";
 import type { LocationMarkerProps } from "../../types/rideTypes";
 import { Recenter } from "../../helpers";
 import {
@@ -12,6 +13,11 @@ import {
   Crosshair,
   Share2,
 } from "lucide-react";
+import toast from "react-hot-toast";
+import {
+  useAddCoordinateMutation,
+  useEditCoordinateMutation,
+} from "../../state/services/coordinates/coordinatesAPI";
 
 const personIcon = L.icon({
   iconUrl: "/person_locator.webp",
@@ -21,13 +27,10 @@ const personIcon = L.icon({
 });
 
 // Component to handle manual clicks on map
-function LocationMarker({ setUserLocation }: LocationMarkerProps) {
+function LocationMarker({ handleSetLocation }: LocationMarkerProps) {
   useMapEvents({
     click(e) {
-      setUserLocation({
-        lat: e.latlng.lat,
-        lng: e.latlng.lng,
-      });
+      handleSetLocation(e.latlng.lat, e.latlng.lng);
     },
   });
   return null;
@@ -39,56 +42,74 @@ const Ride: React.FC = () => {
     lng: number;
   } | null>(null);
   const [isLocating, setIsLocating] = useState<boolean>(false);
-  const [locationStatus, setLocationStatus] = useState<
-    "idle" | "locating" | "success" | "error"
-  >("idle");
+  const [addCoordinate, addStatus] = useAddCoordinateMutation();
+  const [editCoordinate, editStatus] = useEditCoordinateMutation();
 
-  // Get user location when user clicks button
-  const handleSetLocation = (): void => {
+  const handleSetLocation = (lat?: number, lng?: number): void => {
     setIsLocating(true);
-    setLocationStatus("locating");
 
+    // Used for Manual locating by clicking on the map
+    if (lat !== undefined && lng !== undefined) {
+      setUserLocation({
+        lat: Number(lat.toFixed(5)),
+        lng: Number(lng.toFixed(5)),
+      });
+      toast.success("Location Set");
+      setIsLocating(false);
+      return;
+    }
+
+    // Used for auto locating user
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           setUserLocation({
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
+            lat: Number(pos.coords.latitude.toFixed(5)),
+            lng: Number(pos.coords.longitude.toFixed(5)),
           });
+          toast.success("Location Set");
           setIsLocating(false);
-          setLocationStatus("success");
-          setTimeout(() => setLocationStatus("idle"), 3000);
         },
         (err) => {
           console.error(err);
+          toast.error("Setting location failed");
           setIsLocating(false);
-          setLocationStatus("error");
-          setTimeout(() => setLocationStatus("idle"), 3000);
         },
         { enableHighAccuracy: true }
       );
     } else {
-      alert("Geolocation not supported by this browser.");
+      toast.error("Geolocation not supported by this browser");
       setIsLocating(false);
-      setLocationStatus("error");
-      setTimeout(() => setLocationStatus("idle"), 3000);
     }
   };
 
-  const handleShareLocation = (): void => {
-    if (userLocation) {
-      const locationUrl = `https://maps.google.com/?q=${userLocation.lat},${userLocation.lng}`;
-      navigator.clipboard
-        .writeText(locationUrl)
-        .then(() => {
-          setLocationStatus("success");
-          setTimeout(() => setLocationStatus("idle"), 2000);
-        })
-        .catch(() => {
-          alert("Failed to copy location to clipboard");
-        });
-    } else {
-      alert("Please set your location first");
+  const handleShareLocation = async () => {
+    if (!userLocation) {
+      toast.error("Location is not set yet!");
+      return;
+    }
+
+    try {
+      const userId = localStorage.getItem("userId");
+      if (userId) {
+        await editCoordinate({
+          lat: userLocation.lat,
+          lng: userLocation.lng,
+          userId,
+        }).unwrap();
+      } else {
+        const id = uuidv4();
+        localStorage.setItem("userId", id);
+        await addCoordinate({
+          lat: userLocation.lat,
+          lng: userLocation.lng,
+          userId: id,
+        }).unwrap();
+      }
+      toast.success("Your location is shared with drivers");
+    } catch (err) {
+      console.error("Failed to share location:", err);
+      toast.error("Sharing location failed");
     }
   };
 
@@ -110,22 +131,6 @@ const Ride: React.FC = () => {
                   Set your pickup location to get started
                 </p>
               </div>
-            </div>
-
-            {/* Status Indicator */}
-            <div className="flex items-center space-x-2">
-              {locationStatus === "success" && (
-                <div className="flex items-center space-x-2 text-green-600 bg-green-50 px-4 py-2 rounded-lg border border-green-200 animate-in fade-in duration-300">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-medium">Location Set</span>
-                </div>
-              )}
-              {locationStatus === "error" && (
-                <div className="flex items-center space-x-2 text-red-600 bg-red-50 px-4 py-2 rounded-lg border border-red-200 animate-in fade-in duration-300">
-                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                  <span className="text-sm font-medium">Location Error</span>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -164,7 +169,7 @@ const Ride: React.FC = () => {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
 
-                  <LocationMarker setUserLocation={setUserLocation} />
+                  <LocationMarker handleSetLocation={handleSetLocation} />
 
                   {userLocation && (
                     <>
@@ -187,9 +192,12 @@ const Ride: React.FC = () => {
                         <Navigation className="h-4 w-4 text-green-600" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-900">Current Location</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          Current Location
+                        </p>
                         <p className="text-xs text-gray-600">
-                          {userLocation.lat.toFixed(4)}, {userLocation.lng.toFixed(4)}
+                          {userLocation.lat.toFixed(5)},{" "}
+                          {userLocation.lng.toFixed(5)}
                         </p>
                       </div>
                     </div>
@@ -197,11 +205,17 @@ const Ride: React.FC = () => {
                 )}
 
                 {/* Loading Overlay */}
-                {isLocating && (
-                  <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-xl flex items-center justify-center z-50">
+                {(isLocating ||
+                  addStatus.isLoading ||
+                  editStatus.isLoading) && (
+                  <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-xl flex items-center justify-center z-1">
                     <div className="text-center">
                       <div className="animate-spin rounded-full  border-4 w-12 h-12 border-red-700 border-t-transparent mx-auto mb-4"></div>
-                      <p className="text-gray-700 font-medium">Finding your location...</p>
+                      <p className="text-gray-700 font-medium">
+                        {isLocating
+                          ? "Finding your location..."
+                          : "Sharing your location with drivers..."}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -220,12 +234,12 @@ const Ride: React.FC = () => {
               <div className="space-y-4">
                 {/* Auto Location Button */}
                 <button
-                  onClick={handleSetLocation}
+                  onClick={() => handleSetLocation()}
                   disabled={isLocating}
                   className={`w-full relative overflow-hidden group flex items-center justify-center space-x-3 px-6 py-4 rounded-xl font-medium transition-all duration-300 ${
                     isLocating
                       ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-gradient-to-r from-red-700 to-green-600 hover:shadow-xl transform hover:-translate-y-1"
+                      : "bg-gradient-to-r from-red-700 to-green-600 hover:shadow-xl transform cursor-pointer hover:-translate-y-1"
                   } text-white`}
                 >
                   <div className="absolute inset-0 w-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 group-hover:w-full transition-all duration-700 ease-out"></div>
@@ -247,7 +261,7 @@ const Ride: React.FC = () => {
                   onClick={handleShareLocation}
                   className={`w-full flex items-center justify-center space-x-3 px-6 py-4 rounded-xl font-medium transition-all duration-300 border-2 ${
                     userLocation
-                      ? "border-gray-300 text-gray-700 hover:border-green-500 hover:text-green-600 hover:bg-green-50 transform hover:-translate-y-1"
+                      ? "border-gray-300 text-gray-700 hover:border-green-500 hover:text-green-600 hover:bg-green-50 transform cursor-pointer hover:-translate-y-1"
                       : "border-gray-200 text-gray-400 cursor-not-allowed"
                   }`}
                   disabled={!userLocation}
@@ -311,8 +325,12 @@ const Ride: React.FC = () => {
               </h4>
               <ul className="text-xs text-blue-800 space-y-1">
                 <li>• Click "Auto Locate Me" for GPS location</li>
-                <li>• Or manually locate yourself by clicking anywhere on the map</li>
-                <li>• Share your location so drivers could see your location now</li>
+                <li>
+                  • Or manually locate yourself by clicking anywhere on the map
+                </li>
+                <li>
+                  • Share your location so drivers could see your location now
+                </li>
                 <li>• Or find nearby available drivers</li>
               </ul>
             </div>
