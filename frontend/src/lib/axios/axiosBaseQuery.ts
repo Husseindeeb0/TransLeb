@@ -13,7 +13,7 @@ export const axiosBaseQuery =
       const result = await axiosInstance({
         url,
         method,
-        data: { coordinate: data },
+        data, // passing objects directly {...}
       });
       return { data: result.data };
     } catch (axiosError) {

@@ -12,11 +12,13 @@ import {
   ArrowRight,
   Crosshair,
   Share2,
+  Info,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import {
   useAddCoordinateMutation,
   useEditCoordinateMutation,
+  useDeleteCoordinateMutation,
 } from "../../state/services/coordinates/coordinatesAPI";
 
 const personIcon = L.icon({
@@ -41,9 +43,11 @@ const Ride: React.FC = () => {
     lat: number;
     lng: number;
   } | null>(null);
+  const [showTooltip, setShowTooltip] = useState(false);
   const [isLocating, setIsLocating] = useState<boolean>(false);
   const [addCoordinate, addStatus] = useAddCoordinateMutation();
   const [editCoordinate, editStatus] = useEditCoordinateMutation();
+  const [deleteCoordinate, deleteStatus] = useDeleteCoordinateMutation();
 
   const handleSetLocation = (lat?: number, lng?: number): void => {
     setIsLocating(true);
@@ -111,6 +115,18 @@ const Ride: React.FC = () => {
       console.error("Failed to share location:", err);
       toast.error("Sharing location failed");
     }
+  };
+
+  const handleDeleteLocation = async () => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      setUserLocation(null);
+      return;
+    }
+    await deleteCoordinate({ userId }).unwrap();
+    setUserLocation(null);
+    localStorage.removeItem("userId");
+    toast.success("Your location is deleted");
   };
 
   return (
@@ -207,13 +223,16 @@ const Ride: React.FC = () => {
                 {/* Loading Overlay */}
                 {(isLocating ||
                   addStatus.isLoading ||
-                  editStatus.isLoading) && (
+                  editStatus.isLoading ||
+                  deleteStatus.isLoading) && (
                   <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-xl flex items-center justify-center z-1">
                     <div className="text-center">
                       <div className="animate-spin rounded-full  border-4 w-12 h-12 border-red-700 border-t-transparent mx-auto mb-4"></div>
                       <p className="text-gray-700 font-medium">
                         {isLocating
                           ? "Finding your location..."
+                          : deleteStatus.isLoading
+                          ? "Deleting your location..."
                           : "Sharing your location with drivers..."}
                       </p>
                     </div>
@@ -256,22 +275,66 @@ const Ride: React.FC = () => {
                   )}
                 </button>
 
-                {/* Share Location Button */}
-                <button
-                  onClick={handleShareLocation}
-                  className={`w-full flex items-center justify-center space-x-3 px-6 py-4 rounded-xl font-medium transition-all duration-300 border-2 ${
-                    userLocation
-                      ? "border-gray-300 text-gray-700 hover:border-green-500 hover:text-green-600 hover:bg-green-50 transform cursor-pointer hover:-translate-y-1"
-                      : "border-gray-200 text-gray-400 cursor-not-allowed"
-                  }`}
-                  disabled={!userLocation}
-                >
-                  <Share2 className="h-5 w-5" />
-                  <span>Share Location</span>
-                </button>
+                {/* Share Location Button with Tooltip */}
+                <div className="relative">
+                  <button
+                    onClick={handleShareLocation}
+                    onMouseEnter={() => setShowTooltip(true)}
+                    onMouseLeave={() => setShowTooltip(false)}
+                    className={`w-full flex items-center justify-center space-x-3 px-6 py-4 rounded-xl font-medium transition-all duration-300 border-2 ${
+                      userLocation
+                        ? "border-gray-300 text-gray-700 hover:border-green-500 hover:text-green-600 hover:bg-green-50 transform cursor-pointer hover:-translate-y-1"
+                        : "border-gray-200 text-gray-400 cursor-not-allowed"
+                    }`}
+                    disabled={!userLocation}
+                  >
+                    <Share2 className="h-5 w-5" />
+                    <span>Share Location</span>
+                    {userLocation && (
+                      <Info className="h-4 w-4 ml-2 opacity-60" />
+                    )}
+                  </button>
+
+                  {/* Tooltip */}
+                  {showTooltip && userLocation && (
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-50">
+                      <div className="bg-red-700 text-white text-sm rounded-lg px-4 py-3 shadow-xl max-w-xs w-64">
+                        <div className="flex items-start space-x-2">
+                          <Info className="h-4 w-4 mt-0.5 flex-shrink-0 text-green-600" />
+                          <div>
+                            <p className="font-medium mb-1">
+                              Make yourself visible to drivers
+                            </p>
+                            <p className="text-white text-xs leading-relaxed">
+                              Sharing your location will make you visible to
+                              nearby drivers who can offer you a ride. Please
+                              confirm you're ready to be picked up.
+                            </p>
+                          </div>
+                        </div>
+                        {/* Tooltip arrow */}
+                        <div className="absolute top-full left-1/2 transform -translate-x-1/2">
+                          <div className="border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-red-700"></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
+            {/* ToDo: after adding slice coordinate data add it here as a condition */}
+            {userLocation && (addStatus.isSuccess || editStatus.isSuccess) && (
+              <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+                <p className="text-sm">Delete your location from the map</p>
+                <button
+                  onClick={handleDeleteLocation}
+                  className="px-5 py-2 mt-5 w-full cursor-pointer text-white bg-red-700 rounded-2xl hover:bg-red-800 transition-all"
+                >
+                  Delete
+                </button>
+              </div>
+            )}
             {/* Quick Stats */}
             {/* <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">

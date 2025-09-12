@@ -3,20 +3,20 @@ import Coordinates from "../models/Coordinates";
 
 const addCoordinate = async (req: Request, res: Response) => {
   try {
-    const { coordinate } = req.body;
+    const { lat, lng, userId } = req.body;
 
-    if (!coordinate.lat || !coordinate.lng) {
+    if (!lat || !lng) {
       return res.status(500).json({ message: "Coordinates are Required" });
     }
 
-    if (!coordinate.userId) {
+    if (!userId) {
       return res.status(500).json({ message: "User Id is Required" });
     }
 
     const newCoordinate = new Coordinates({
-      userId: coordinate.userId,
-      lat: coordinate.lat,
-      lng: coordinate.lng,
+      userId: userId,
+      lat: lat,
+      lng: lng,
     });
 
     await newCoordinate.save();
@@ -33,22 +33,21 @@ const addCoordinate = async (req: Request, res: Response) => {
 
 const editCoordinate = async (req: Request, res: Response) => {
   try {
-    const { coordinate } = req.body;
-
-    if (!coordinate.lat || !coordinate.lng) {
+    const { lat, lng, userId} = req.body;
+    if (!lat || !lng) {
       return res.status(400).json({ message: "Coordinates are required" });
     }
 
-    if (!coordinate.userId) {
+    if (!userId) {
       return res.status(400).json({ message: "User ID is required" });
     }
 
     const updatedCoordinate = await Coordinates.findOneAndUpdate(
-      { userId: coordinate.userId },
+      { userId: userId },
       {
-        userId: coordinate.userId,
-        lat: coordinate.lat,
-        lng: coordinate.lng,
+        userId: userId,
+        lat: lat,
+        lng: lng,
       },
       { new: true, upsert: true }
     );
@@ -71,7 +70,7 @@ const deleteCoordinate = async (req: Request, res: Response) => {
     const { userId } = req.body;
 
     if (!userId) {
-      res.status(500).json({ message: "User Id is required" });
+      return res.status(500).json({ message: "User Id is required" });
     }
 
     Coordinates.findByIdAndDelete({ userId: userId });

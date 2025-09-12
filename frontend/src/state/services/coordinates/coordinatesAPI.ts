@@ -9,30 +9,30 @@ export const coordinatesApi = createApi({
       { success: boolean },
       { lat: number; lng: number; userId: string }
     >({
-      query: (coord) => ({
+      query: (coordinate) => ({
         url: "/coordinates/addCoordinate",
         method: "POST",
-        data: coord,
+        data: coordinate,
       }),
     }),
     editCoordinate: builder.mutation<
       { success: boolean },
       { lat: number; lng: number; userId: string }
     >({
-      query: (coord) => ({
+      query: (coordinate) => ({
         url: "/coordinates/editCoordinate",
         method: "PATCH",
-        data: coord,
+        data: coordinate,
       }),
     }),
     deleteCoordinate: builder.mutation<
       { success: boolean },
       { userId: string }
     >({
-      query: (coord) => ({
+      query: (userId) => ({
         url: "/coordinates/deleteCoordinate",
         method: "DELETE",
-        data: coord,
+        data: userId,
       }),
     }),
   }),
