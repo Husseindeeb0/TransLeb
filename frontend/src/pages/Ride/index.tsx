@@ -1,10 +1,6 @@
-import React, { useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet";
-import { useMapEvents } from "react-leaflet";
+import React, { useState, useCallback, useRef, useEffect } from "react";
+import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
 import { v4 as uuidv4 } from "uuid";
-import type { LocationMarkerProps } from "../../types/rideTypes";
-import { Recenter } from "../../helpers";
 import {
   MapPin,
   Navigation,
@@ -21,22 +17,34 @@ import {
   useDeleteCoordinateMutation,
 } from "../../state/services/coordinates/coordinatesAPI";
 
-const personIcon = L.icon({
-  iconUrl: "/person_locator.webp",
-  iconSize: [40, 40],
-  iconAnchor: [16, 32],
-  popupAnchor: [0, -32],
-});
+const mapContainerStyle = {
+  width: "100%",
+  height: "100%",
+};
 
-// Component to handle manual clicks on map
-function LocationMarker({ handleSetLocation }: LocationMarkerProps) {
-  useMapEvents({
-    click(e) {
-      handleSetLocation(e.latlng.lat, e.latlng.lng);
+const center = {
+  lat: 33.5938,
+  lng: 35.5018,
+};
+
+const mapOptions = {
+  restriction: {
+    latLngBounds: {
+      north: 34.7,
+      south: 33.0,
+      west: 34.8,
+      east: 36.7,
     },
-  });
-  return null;
-}
+    strictBounds: true,
+  },
+  minZoom: 9,
+  maxZoom: 18,
+  disableDefaultUI: false,
+  zoomControl: true,
+  mapTypeControl: false,
+  streetViewControl: false,
+  fullscreenControl: true,
+};
 
 const Ride: React.FC = () => {
   const [userLocation, setUserLocation] = useState<{
@@ -48,6 +56,32 @@ const Ride: React.FC = () => {
   const [addCoordinate, addStatus] = useAddCoordinateMutation();
   const [editCoordinate, editStatus] = useEditCoordinateMutation();
   const [deleteCoordinate, deleteStatus] = useDeleteCoordinateMutation();
+
+  const mapRef = useRef<google.maps.Map | null>(null);
+
+  const { isLoaded, loadError } = useJsApiLoader({
+    googleMapsApiKey:
+      import.meta.env.VITE_GOOGLE_MAPS_KEY,
+    libraries: ["places"],
+  });
+
+  const onMapLoad = useCallback((map: google.maps.Map) => {
+    mapRef.current = map;
+  }, []);
+
+  const onMapClick = useCallback((e: google.maps.MapMouseEvent) => {
+    if (e.latLng) {
+      handleSetLocation(e.latLng.lat(), e.latLng.lng());
+    }
+  }, []);
+
+  // Recenter map when user location changes
+  useEffect(() => {
+    if (userLocation && mapRef.current) {
+      mapRef.current.panTo({ lat: userLocation.lat, lng: userLocation.lng });
+      mapRef.current.setZoom(14);
+    }
+  }, [userLocation]);
 
   const handleSetLocation = (lat?: number, lng?: number): void => {
     setIsLocating(true);
@@ -94,6 +128,7 @@ const Ride: React.FC = () => {
     }
 
     try {
+      // Using uuid to know if the user have already shared a location and if yes to edit it without adding new one
       const userId = localStorage.getItem("userId");
       if (userId) {
         await editCoordinate({
@@ -128,6 +163,30 @@ const Ride: React.FC = () => {
     localStorage.removeItem("userId");
     toast.success("Your location is deleted");
   };
+
+  if (loadError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6 flex items-center justify-center">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-6 max-w-md">
+          <h3 className="text-red-800 font-semibold mb-2">Map Loading Error</h3>
+          <p className="text-red-600 text-sm">
+            Failed to load Google Maps. Please check your API key and try again.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full border-4 w-12 h-12 border-red-700 border-t-transparent mx-auto mb-4"></div>
+          <p className="text-gray-700 font-medium">Loading Google Maps...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6">
@@ -169,36 +228,31 @@ const Ride: React.FC = () => {
               </div>
 
               <div className="relative h-96 lg:h-[500px]">
-                <MapContainer
-                  center={[33.5938, 35.5018]}
-                  zoom={10}
-                  minZoom={9}
-                  className="w-full h-full rounded-xl shadow-lg z-0"
-                  maxBounds={[
-                    [33.0, 34.8],
-                    [34.7, 36.7],
-                  ]}
-                  maxBoundsViscosity={1.0}
-                >
-                  <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  />
-
-                  <LocationMarker handleSetLocation={handleSetLocation} />
-
-                  {userLocation && (
-                    <>
+                <div className="w-full h-full rounded-xl shadow-lg overflow-hidden">
+                  <GoogleMap
+                    mapContainerStyle={mapContainerStyle}
+                    center={center}
+                    zoom={10}
+                    options={mapOptions}
+                    onLoad={onMapLoad}
+                    onClick={onMapClick}
+                  >
+                    {userLocation && (
                       <Marker
-                        position={[userLocation.lat, userLocation.lng]}
-                        icon={personIcon}
-                      >
-                        <Popup>You are here</Popup>
-                      </Marker>
-                      <Recenter lat={userLocation.lat} lng={userLocation.lng} />
-                    </>
-                  )}
-                </MapContainer>
+                        position={{
+                          lat: userLocation.lat,
+                          lng: userLocation.lng,
+                        }}
+                        icon={{
+                          url: "/person_locator.webp",
+                          scaledSize: new window.google.maps.Size(40, 40),
+                          anchor: new window.google.maps.Point(20, 40),
+                        }}
+                        title="You are here"
+                      />
+                    )}
+                  </GoogleMap>
+                </div>
 
                 {/* Map Overlay - Location Info */}
                 {userLocation && (
@@ -225,9 +279,9 @@ const Ride: React.FC = () => {
                   addStatus.isLoading ||
                   editStatus.isLoading ||
                   deleteStatus.isLoading) && (
-                  <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-xl flex items-center justify-center z-1">
+                  <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-xl flex items-center justify-center z-10">
                     <div className="text-center">
-                      <div className="animate-spin rounded-full  border-4 w-12 h-12 border-red-700 border-t-transparent mx-auto mb-4"></div>
+                      <div className="animate-spin rounded-full border-4 w-12 h-12 border-red-700 border-t-transparent mx-auto mb-4"></div>
                       <p className="text-gray-700 font-medium">
                         {isLocating
                           ? "Finding your location..."
@@ -323,7 +377,7 @@ const Ride: React.FC = () => {
               </div>
             </div>
 
-            {/* ToDo: after adding slice coordinate data add it here as a condition */}
+            {/* Delete Location Section */}
             {userLocation && (addStatus.isSuccess || editStatus.isSuccess) && (
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
                 <p className="text-sm">Delete your location from the map</p>
@@ -335,38 +389,6 @@ const Ride: React.FC = () => {
                 </button>
               </div>
             )}
-            {/* Quick Stats */}
-            {/* <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Quick Stats
-              </h3>
-
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg transition-all duration-300 hover:bg-gray-100">
-                  <div className="flex items-center space-x-3">
-                    <Users className="h-5 w-5 text-gray-500" />
-                    <span className="text-sm text-gray-700">
-                      Available Drivers
-                    </span>
-                  </div>
-                  <span className="text-lg font-semibold text-green-600">
-                    24
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg transition-all duration-300 hover:bg-gray-100">
-                  <div className="flex items-center space-x-3">
-                    <Clock className="h-5 w-5 text-gray-500" />
-                    <span className="text-sm text-gray-700">
-                      Avg. Wait Time
-                    </span>
-                  </div>
-                  <span className="text-lg font-semibold text-blue-600">
-                    3 min
-                  </span>
-                </div>
-              </div>
-            </div> */}
 
             {/* Next Step */}
             <div className="bg-gradient-to-r from-red-700 to-green-600 rounded-2xl shadow-lg p-6 text-white animate-in slide-in-from-bottom duration-500">
