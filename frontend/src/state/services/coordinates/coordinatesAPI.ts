@@ -1,8 +1,8 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import { axiosBaseQuery } from "../../../lib/axios/axiosBaseQuery";
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { axiosBaseQuery } from '../../../lib/axios/axiosBaseQuery';
 
 export const coordinatesApi = createApi({
-  reducerPath: "coordinatesApi",
+  reducerPath: 'coordinatesApi',
   baseQuery: axiosBaseQuery(),
   endpoints: (builder) => ({
     addCoordinate: builder.mutation<
@@ -10,8 +10,8 @@ export const coordinatesApi = createApi({
       { lat: number; lng: number; userId: string }
     >({
       query: (coordinate) => ({
-        url: "/coordinates/addCoordinate",
-        method: "POST",
+        url: '/coordinates/addCoordinate',
+        method: 'POST',
         data: coordinate,
       }),
     }),
@@ -20,8 +20,8 @@ export const coordinatesApi = createApi({
       { lat: number; lng: number; userId: string }
     >({
       query: (coordinate) => ({
-        url: "/coordinates/editCoordinate",
-        method: "PATCH",
+        url: '/coordinates/editCoordinate',
+        method: 'PATCH',
         data: coordinate,
       }),
     }),
@@ -30,9 +30,21 @@ export const coordinatesApi = createApi({
       { userId: string }
     >({
       query: (userId) => ({
-        url: "/coordinates/deleteCoordinate",
-        method: "DELETE",
+        url: '/coordinates/deleteCoordinate',
+        method: 'DELETE',
         data: userId,
+      }),
+    }),
+    getCoordinates: builder.mutation<
+      {
+        message: string;
+        data: { lat: number; lng: number; userId: string };
+      }, 
+      { userId: string}
+    >({
+      query: ({ userId }) => ({
+        url: `/coordinates/getCoordinates/${userId}`,
+        method: 'GET',
       }),
     }),
   }),
@@ -42,4 +54,5 @@ export const {
   useAddCoordinateMutation,
   useEditCoordinateMutation,
   useDeleteCoordinateMutation,
+  useGetCoordinatesMutation,
 } = coordinatesApi;

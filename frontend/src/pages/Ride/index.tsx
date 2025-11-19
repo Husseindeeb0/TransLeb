@@ -1,6 +1,8 @@
-import React, { useState, useCallback, useRef, useEffect } from "react";
-import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
-import { v4 as uuidv4 } from "uuid";
+// ToDo: Add a check in mounting page that checks if the user already has a location shared and if yes to connect the socket automatically
+
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
+import { v4 as uuidv4 } from 'uuid';
 import {
   MapPin,
   Navigation,
@@ -9,17 +11,19 @@ import {
   Crosshair,
   Share2,
   Info,
-} from "lucide-react";
-import toast from "react-hot-toast";
+} from 'lucide-react';
+import toast from 'react-hot-toast';
 import {
   useAddCoordinateMutation,
   useEditCoordinateMutation,
   useDeleteCoordinateMutation,
-} from "../../state/services/coordinates/coordinatesAPI";
+  useGetCoordinatesMutation,
+} from '../../state/services/coordinates/coordinatesAPI';
+import { connectSocket, socket } from '../../socketio/socket';
 
 const mapContainerStyle = {
-  width: "100%",
-  height: "100%",
+  width: '100%',
+  height: '100%',
 };
 
 const center = {
@@ -56,13 +60,62 @@ const Ride: React.FC = () => {
   const [addCoordinate, addStatus] = useAddCoordinateMutation();
   const [editCoordinate, editStatus] = useEditCoordinateMutation();
   const [deleteCoordinate, deleteStatus] = useDeleteCoordinateMutation();
+  const [getCoordinates, getStatus] = useGetCoordinatesMutation();
+  const [remainingTime, setRemainingTime] = useState<number | null>(null);
 
   const mapRef = useRef<google.maps.Map | null>(null);
 
+  useEffect(() => {
+    const checkExistingLocation = async () => {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        try {
+          const coordinates = await getCoordinates({ userId }).unwrap();
+
+          if (coordinates && coordinates.data) {
+            console.log('Found saved coordinates:', coordinates.data);
+            setUserLocation({
+              lat: coordinates.data.lat,
+              lng: coordinates.data.lng,
+            });
+
+            connectSocket(userId);
+          }
+        } catch (err) {
+          console.log('No saved coordinates');
+        }
+      }
+    };
+
+    checkExistingLocation();
+  }, []);
+
+  // To get the remaining time from the server
+  useEffect(() => {
+    // Listen for remaining time updates
+    socket.on('remainingTime', (data: { remainingMs: number }) => {
+      console.log('Remaining time data received:', data);
+      // Convert milliseconds to minutes and round
+      const minutes = Math.ceil(data.remainingMs / 60000);
+      setRemainingTime(minutes);
+    });
+
+    // Listen for time finished
+    socket.on('timerEnded', () => {
+      console.log('Time finished event received');
+      setRemainingTime(null);
+    });
+
+    // Clean up listeners on unmount
+    return () => {
+      socket.off('remaining_tiT');
+      socket.off('time_finished');
+    };
+  }, []);
+
   const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey:
-      import.meta.env.VITE_GOOGLE_MAPS_KEY,
-    libraries: ["places"],
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_KEY,
+    libraries: ['places'],
   });
 
   const onMapLoad = useCallback((map: google.maps.Map) => {
@@ -92,7 +145,7 @@ const Ride: React.FC = () => {
         lat: Number(lat.toFixed(5)),
         lng: Number(lng.toFixed(5)),
       });
-      toast.success("Location Set");
+      toast.success('Location Set');
       setIsLocating(false);
       return;
     }
@@ -105,31 +158,31 @@ const Ride: React.FC = () => {
             lat: Number(pos.coords.latitude.toFixed(5)),
             lng: Number(pos.coords.longitude.toFixed(5)),
           });
-          toast.success("Location Set");
+          toast.success('Location Set');
           setIsLocating(false);
         },
         (err) => {
           console.error(err);
-          toast.error("Setting location failed");
+          toast.error('Setting location failed');
           setIsLocating(false);
         },
         { enableHighAccuracy: true }
       );
     } else {
-      toast.error("Geolocation not supported by this browser");
+      toast.error('Geolocation not supported by this browser');
       setIsLocating(false);
     }
   };
 
   const handleShareLocation = async () => {
     if (!userLocation) {
-      toast.error("Location is not set yet!");
+      toast.error('Location is not set yet!');
       return;
     }
 
     try {
       // Using uuid to know if the user have already shared a location and if yes to edit it without adding new one
-      const userId = localStorage.getItem("userId");
+      const userId = localStorage.getItem('userId');
       if (userId) {
         await editCoordinate({
           lat: userLocation.lat,
@@ -138,30 +191,32 @@ const Ride: React.FC = () => {
         }).unwrap();
       } else {
         const id = uuidv4();
-        localStorage.setItem("userId", id);
+        localStorage.setItem('userId', id);
         await addCoordinate({
           lat: userLocation.lat,
           lng: userLocation.lng,
           userId: id,
         }).unwrap();
       }
-      toast.success("Your location is shared with drivers");
+      console.log('Connecting socket for user:', userId);
+      connectSocket(userId || localStorage.getItem('userId')!);
+      toast.success('Your location is shared with drivers');
     } catch (err) {
-      console.error("Failed to share location:", err);
-      toast.error("Sharing location failed");
+      console.error('Failed to share location:', err);
+      toast.error('Sharing location failed');
     }
   };
 
   const handleDeleteLocation = async () => {
-    const userId = localStorage.getItem("userId");
+    const userId = localStorage.getItem('userId');
     if (!userId) {
       setUserLocation(null);
       return;
     }
     await deleteCoordinate({ userId }).unwrap();
     setUserLocation(null);
-    localStorage.removeItem("userId");
-    toast.success("Your location is deleted");
+    localStorage.removeItem('userId');
+    toast.success('Your location is deleted');
   };
 
   if (loadError) {
@@ -244,7 +299,7 @@ const Ride: React.FC = () => {
                           lng: userLocation.lng,
                         }}
                         icon={{
-                          url: "/person_locator.webp",
+                          url: '/person_locator.webp',
                           scaledSize: new window.google.maps.Size(40, 40),
                           anchor: new window.google.maps.Point(20, 40),
                         }}
@@ -266,7 +321,7 @@ const Ride: React.FC = () => {
                           Current Location
                         </p>
                         <p className="text-xs text-gray-600">
-                          {userLocation.lat.toFixed(5)},{" "}
+                          {userLocation.lat.toFixed(5)},{' '}
                           {userLocation.lng.toFixed(5)}
                         </p>
                       </div>
@@ -284,10 +339,10 @@ const Ride: React.FC = () => {
                       <div className="animate-spin rounded-full border-4 w-12 h-12 border-red-700 border-t-transparent mx-auto mb-4"></div>
                       <p className="text-gray-700 font-medium">
                         {isLocating
-                          ? "Finding your location..."
+                          ? 'Finding your location...'
                           : deleteStatus.isLoading
-                          ? "Deleting your location..."
-                          : "Sharing your location with drivers..."}
+                            ? 'Deleting your location...'
+                            : 'Sharing your location with drivers...'}
                       </p>
                     </div>
                   </div>
@@ -311,8 +366,8 @@ const Ride: React.FC = () => {
                   disabled={isLocating}
                   className={`w-full relative overflow-hidden group flex items-center justify-center space-x-3 px-6 py-4 rounded-xl font-medium transition-all duration-300 ${
                     isLocating
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-gradient-to-r from-red-700 to-green-600 hover:shadow-xl transform cursor-pointer hover:-translate-y-1"
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-red-700 to-green-600 hover:shadow-xl transform cursor-pointer hover:-translate-y-1'
                   } text-white`}
                 >
                   <div className="absolute inset-0 w-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 group-hover:w-full transition-all duration-700 ease-out"></div>
@@ -337,8 +392,8 @@ const Ride: React.FC = () => {
                     onMouseLeave={() => setShowTooltip(false)}
                     className={`w-full flex items-center justify-center space-x-3 px-6 py-4 rounded-xl font-medium transition-all duration-300 border-2 ${
                       userLocation
-                        ? "border-gray-300 text-gray-700 hover:border-green-500 hover:text-green-600 hover:bg-green-50 transform cursor-pointer hover:-translate-y-1"
-                        : "border-gray-200 text-gray-400 cursor-not-allowed"
+                        ? 'border-gray-300 text-gray-700 hover:border-green-500 hover:text-green-600 hover:bg-green-50 transform cursor-pointer hover:-translate-y-1'
+                        : 'border-gray-200 text-gray-400 cursor-not-allowed'
                     }`}
                     disabled={!userLocation}
                   >
@@ -378,7 +433,7 @@ const Ride: React.FC = () => {
             </div>
 
             {/* Delete Location Section */}
-            {userLocation && (addStatus.isSuccess || editStatus.isSuccess) && (
+            {userLocation && (addStatus.isSuccess || editStatus.isSuccess || getStatus.isSuccess) && (
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
                 <p className="text-sm">Delete your location from the map</p>
                 <button
@@ -422,6 +477,33 @@ const Ride: React.FC = () => {
           </div>
         </div>
       </div>
+      {remainingTime !== null && (
+        // {true && (
+        <div className="fixed top-20 left-4 z-[9999] pointer-events-none">
+          <div className="pointer-events-auto bg-white/95 backdrop-blur-sm shadow-lg rounded-xl p-3 w-52 border border-gray-200">
+            <div className="flex items-start gap-2">
+              <div className="flex-shrink-0 w-2 h-2 bg-green-500 rounded-full mt-1.5 animate-pulse"></div>
+
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-semibold text-gray-800 leading-tight">
+                  Location Active
+                </h3>
+
+                <div className="mt-1.5 flex items-baseline gap-1">
+                  <span className="text-2xl font-bold text-blue-600">
+                    {remainingTime}
+                  </span>
+                  <span className="text-xs text-gray-500">min left</span>
+                </div>
+
+                <p className="mt-1 text-xs text-gray-500 leading-snug">
+                  Expires automatically
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

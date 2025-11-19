@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import Coordinates from "../models/Coordinates";
+import e from "express";
 
 const addCoordinate = async (req: Request, res: Response) => {
   try {
@@ -33,7 +34,7 @@ const addCoordinate = async (req: Request, res: Response) => {
 
 const editCoordinate = async (req: Request, res: Response) => {
   try {
-    const { lat, lng, userId} = req.body;
+    const { lat, lng, userId } = req.body;
     if (!lat || !lng) {
       return res.status(400).json({ message: "Coordinates are required" });
     }
@@ -86,4 +87,31 @@ const deleteCoordinate = async (req: Request, res: Response) => {
   }
 };
 
-export { addCoordinate, editCoordinate, deleteCoordinate };
+const getCoordinates = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) {
+      return res.status(500).json({ message: "User Id is required" });
+    }
+
+    const coordinate = await Coordinates.findOne({ userId: userId });
+    if (!coordinate) {
+      return res.status(404).json({ message: "Coordinates not found" });
+    }
+    res.status(200).json({ message: "Coordinates found", data: coordinate });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error in get coordinate controller:", error.message);
+    } else {
+      console.error("Unknown error in get coordinate controller", error);
+    }
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export {
+  addCoordinate,
+  editCoordinate,
+  deleteCoordinate,
+  getCoordinates,
+};
