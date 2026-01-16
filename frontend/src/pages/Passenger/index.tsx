@@ -11,6 +11,7 @@ import {
   Crosshair,
   Share2,
   Info,
+  User,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
@@ -20,6 +21,7 @@ import {
   useGetCoordinatesMutation,
 } from '../../state/services/coordinates/coordinatesAPI';
 import { connectSocket, socket } from '../../socketio/socket';
+import { useGetUserDetailsQuery } from '../../state/services/user/userAPI';
 
 const mapContainerStyle = {
   width: '100%',
@@ -63,6 +65,13 @@ const Ride: React.FC = () => {
   const [getCoordinates, getStatus] = useGetCoordinatesMutation();
   const [remainingTime, setRemainingTime] = useState<number | null>(null);
 
+  const [driverId, setDriverId] = useState<string | null>(null);
+
+  const { data: driverDetails, isSuccess: isDriverLoaded } =
+    useGetUserDetailsQuery(driverId!, {
+      skip: !driverId,
+    });
+
   const mapRef = useRef<google.maps.Map | null>(null);
 
   useEffect(() => {
@@ -78,6 +87,13 @@ const Ride: React.FC = () => {
               lat: coordinates.data.lat,
               lng: coordinates.data.lng,
             });
+
+            // If the user is already marked by a driver, we might need to know that.
+            // But currently the API doesn't return who marked them in 'getCoordinates' explicitly unless we check 'markedBy'.
+            // If coordinates.data.markedBy exists, we should set it.
+            if (coordinates.data.markedBy) {
+              setDriverId(coordinates.data.markedBy);
+            }
 
             connectSocket(userId);
           }
@@ -95,7 +111,6 @@ const Ride: React.FC = () => {
     // Listen for remaining time updates
     socket.on('remainingTime', (data: { remainingMs: number }) => {
       console.log('Remaining time data received:', data);
-      // Convert milliseconds to minutes and round
       const minutes = Math.ceil(data.remainingMs / 60000);
       setRemainingTime(minutes);
     });
@@ -104,12 +119,35 @@ const Ride: React.FC = () => {
     socket.on('timerEnded', () => {
       console.log('Time finished event received');
       setRemainingTime(null);
+      toast('Timer ended', { icon: '⌛' });
+    });
+
+    socket.on('driverMarked', (data: { driverId: string }) => {
+      toast.success('A driver has marked your location! Timer extended.');
+      if (data?.driverId) {
+        setDriverId(data.driverId);
+      }
+      // Note: Timer update ('remainingTime') is sent separately by backend
+    });
+
+    socket.on('driverUnmarked', () => {
+      toast.error('Driver cancelled picking you up!', {
+        duration: 5000,
+        style: {
+          background: '#fee2e2',
+          color: '#991b1b',
+          fontWeight: '500',
+        },
+      });
+      setDriverId(null);
     });
 
     // Clean up listeners on unmount
     return () => {
-      socket.off('remaining_tiT');
-      socket.off('time_finished');
+      socket.off('remainingTime');
+      socket.off('timerEnded');
+      socket.off('driverMarked');
+      socket.off('driverUnmarked');
     };
   }, []);
 
@@ -433,17 +471,20 @@ const Ride: React.FC = () => {
             </div>
 
             {/* Delete Location Section */}
-            {userLocation && (addStatus.isSuccess || editStatus.isSuccess || getStatus.isSuccess) && (
-              <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
-                <p className="text-sm">Delete your location from the map</p>
-                <button
-                  onClick={handleDeleteLocation}
-                  className="px-5 py-2 mt-5 w-full cursor-pointer text-white bg-red-700 rounded-2xl hover:bg-red-800 transition-all"
-                >
-                  Delete
-                </button>
-              </div>
-            )}
+            {userLocation &&
+              (addStatus.isSuccess ||
+                editStatus.isSuccess ||
+                getStatus.isSuccess) && (
+                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+                  <p className="text-sm">Delete your location from the map</p>
+                  <button
+                    onClick={handleDeleteLocation}
+                    className="px-5 py-2 mt-5 w-full cursor-pointer text-white bg-red-700 rounded-2xl hover:bg-red-800 transition-all"
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
 
             {/* Next Step */}
             <div className="bg-gradient-to-r from-red-700 to-green-600 rounded-2xl shadow-lg p-6 text-white animate-in slide-in-from-bottom duration-500">
@@ -477,28 +518,125 @@ const Ride: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Driver Coming Card */}
+      {isDriverLoaded && driverDetails && (
+        <div className="fixed bottom-6 right-6 z-[9999] animate-in slide-in-from-bottom duration-500 w-full max-w-md px-4 md:px-0">
+          <div className="bg-white rounded-3xl shadow-2xl p-6 border border-gray-100/50 backdrop-blur-xl ring-1 ring-black/5">
+            <div className="flex items-start gap-5">
+              <div className="bg-gradient-to-br from-green-500 to-emerald-600 p-4 rounded-2xl shadow-lg shadow-green-200">
+                <User className="h-7 w-7 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-bold text-gray-900 text-xl leading-tight">
+                      Driver is coming!
+                    </h3>
+                    <p className="text-gray-500 text-sm mt-1">
+                      Your ride is on the way
+                    </p>
+                  </div>
+                  <div className="bg-green-50 px-3 py-1 rounded-full border border-green-100">
+                    <span className="text-xs font-bold text-green-700 uppercase tracking-wider">
+                      Arriving
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mt-4 space-y-3">
+                  <div className="flex items-center gap-3 text-gray-700 bg-gray-50/80 p-3 rounded-xl border border-gray-100">
+                    <div className="bg-white p-2 rounded-lg shadow-sm">
+                      <User className="w-4 h-4 text-gray-400" />
+                    </div>
+                    <span className="font-semibold text-lg">
+                      {driverDetails.data.name}
+                    </span>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <div className="flex-1 bg-gray-50/80 p-3 rounded-xl border border-gray-100 flex items-center gap-3">
+                      <div className="bg-white p-2 rounded-lg shadow-sm">
+                        <span className="text-xs font-mono font-bold text-gray-400">
+                          #
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-400 font-medium uppercase">
+                          Plate
+                        </p>
+                        <p className="font-mono font-bold text-gray-900">
+                          {driverDetails.data.plateNumber}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex-1 bg-gray-50/80 p-3 rounded-xl border border-gray-100 flex items-center gap-3">
+                      <div className="bg-white p-2 rounded-lg shadow-sm">
+                        <Navigation className="w-4 h-4 text-gray-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-400 font-medium uppercase">
+                          Model
+                        </p>
+                        <p className="font-bold text-gray-900 line-clamp-1">
+                          {driverDetails.data.carModel}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-5 flex gap-3">
+                  <button className="flex-1 bg-green-600 text-white py-3.5 rounded-xl font-bold hover:bg-green-700 active:scale-95 transition-all shadow-lg shadow-green-200 cursor-pointer">
+                    Call Driver
+                  </button>
+                  <button className="flex-1 bg-gray-100 text-gray-700 py-3.5 rounded-xl font-bold hover:bg-gray-200 active:scale-95 transition-all cursor-pointer">
+                    Message
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {remainingTime !== null && (
-        // {true && (
         <div className="fixed top-20 left-4 z-[9999] pointer-events-none">
-          <div className="pointer-events-auto bg-white/95 backdrop-blur-sm shadow-lg rounded-xl p-3 w-52 border border-gray-200">
-            <div className="flex items-start gap-2">
-              <div className="flex-shrink-0 w-2 h-2 bg-green-500 rounded-full mt-1.5 animate-pulse"></div>
+          <div className="pointer-events-auto bg-white/95 backdrop-blur-md shadow-xl rounded-2xl p-4 w-60 border border-white/20 ring-1 ring-black/5">
+            <div className="flex items-start gap-4">
+              <div className="relative">
+                <div className="w-3 h-3 bg-green-500 rounded-full mt-2 animate-pulse"></div>
+                <div className="absolute inset-0 bg-green-500 rounded-full blur-sm opacity-50 animate-pulse"></div>
+              </div>
 
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-semibold text-gray-800 leading-tight">
+                <h3 className="text-sm font-bold text-gray-800 leading-tight">
                   Location Active
                 </h3>
 
-                <div className="mt-1.5 flex items-baseline gap-1">
-                  <span className="text-2xl font-bold text-blue-600">
+                <div className="mt-2 flex items-baseline gap-1.5">
+                  <span className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-br from-blue-600 to-indigo-600 tracking-tighter">
                     {remainingTime}
                   </span>
-                  <span className="text-xs text-gray-500">min left</span>
+                  <span className="text-sm font-medium text-gray-500">
+                    min left
+                  </span>
                 </div>
 
-                <p className="mt-1 text-xs text-gray-500 leading-snug">
+                <p className="mt-1 text-xs text-gray-400 font-medium">
                   Expires automatically
                 </p>
+                {remainingTime !== null && remainingTime <= 5 && (
+                  <button
+                    onClick={() => {
+                      const userId = localStorage.getItem('userId');
+                      if (userId) socket.emit('extendTimer', { userId });
+                    }}
+                    className="mt-3 w-full bg-blue-50 text-blue-600 text-xs font-bold py-2 rounded-lg hover:bg-blue-100 transition active:scale-95 border border-blue-100"
+                  >
+                    Extend (+10m)
+                  </button>
+                )}
               </div>
             </div>
           </div>

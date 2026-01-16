@@ -38,12 +38,38 @@ export const coordinatesApi = createApi({
     getCoordinates: builder.mutation<
       {
         message: string;
-        data: { lat: number; lng: number; userId: string };
-      }, 
-      { userId: string}
+        data: {
+          lat: number;
+          lng: number;
+          userId: string;
+          markedBy?: string | null;
+          startTimer?: string;
+          duration?: number;
+        };
+      },
+      { userId: string }
     >({
       query: ({ userId }) => ({
         url: `/coordinates/getCoordinates/${userId}`,
+        method: 'GET',
+      }),
+    }),
+    getAllCoordinates: builder.mutation<
+      {
+        message: string;
+        data: {
+          lat: number;
+          lng: number;
+          userId: string;
+          markedBy?: string;
+          duration?: number;
+          startTimer?: string;
+        }[];
+      },
+      void
+    >({
+      query: () => ({
+        url: '/coordinates/getAllCoordinates',
         method: 'GET',
       }),
     }),
@@ -55,4 +81,5 @@ export const {
   useEditCoordinateMutation,
   useDeleteCoordinateMutation,
   useGetCoordinatesMutation,
+  useGetAllCoordinatesMutation,
 } = coordinatesApi;

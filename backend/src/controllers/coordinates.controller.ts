@@ -74,7 +74,13 @@ const deleteCoordinate = async (req: Request, res: Response) => {
       return res.status(500).json({ message: "User Id is required" });
     }
 
-    Coordinates.findByIdAndDelete({ userId: userId });
+    const deleted = await Coordinates.findOneAndDelete({ userId });
+
+    if (!deleted) {
+      return res
+        .status(404)
+        .json({ message: "Coordinates not found or already deleted" });
+    }
 
     res.status(200).json({ message: "Coordinates deleted successfully" });
   } catch (error) {
@@ -109,9 +115,27 @@ const getCoordinates = async (req: Request, res: Response) => {
   }
 };
 
+const getAllCoordinates = async (req: Request, res: Response) => {
+  try {
+    // get all coordinates that are not expired (logic handled by delete)
+    // and maybe filter by status if we only want available ones?
+    // For driver map, we probably want ALL, but maybe distinguish them.
+    const coordinates = await Coordinates.find({});
+    res.status(200).json({ message: "Coordinates found", data: coordinates });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error in get all coordinates controller:", error.message);
+    } else {
+      console.error("Unknown error in get all coordinates controller", error);
+    }
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 export {
   addCoordinate,
   editCoordinate,
   deleteCoordinate,
   getCoordinates,
+  getAllCoordinates,
 };

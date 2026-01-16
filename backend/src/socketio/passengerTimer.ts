@@ -1,17 +1,9 @@
-import { Socket } from "socket.io";
+import { Server } from "socket.io";
 import Coordinates from "../models/Coordinates";
 
 export async function deleteCoordinatesByUserId(userId: string) {
   return Coordinates.findOneAndDelete({ userId });
 }
-
-const FIFTEEN_MIN = 15 * 60 * 1000;
-const UPDATE_INTERVALS = [
-  5 * 60 * 1000,    // After 5 min → 10 min left
-  10 * 60 * 1000,   // After 10 min → 5 min left
-  14 * 60 * 1000,   // After 14 min → 1 min left
-  15 * 60 * 1000    // After 15 min → timer ended + delete
-];
 
 interface TimeoutMap {
   [userId: string]: NodeJS.Timeout[];
@@ -19,15 +11,21 @@ interface TimeoutMap {
 
 const userTimeouts: TimeoutMap = {};
 
-export default async function passengerTimerHandler(socket: Socket, userId: string) {
+export default async function passengerTimerHandler(
+  io: Server,
+  userId: string
+) {
   console.log(`🚕 Setting up timer handler for user ${userId}`);
   if (!userId) return;
 
   console.log(`⏳ Loading timer for passenger ${userId}`);
 
-  // Clear old timeouts if user reconnects
+  // Clear old timeouts/intervals if logic is re-run (e.g. on extension)
   if (userTimeouts[userId]) {
-    userTimeouts[userId].forEach((t) => clearTimeout(t));
+    userTimeouts[userId].forEach((t) => {
+      clearTimeout(t as NodeJS.Timeout);
+      clearInterval(t as unknown as NodeJS.Timeout);
+    });
     delete userTimeouts[userId];
   }
 
@@ -45,14 +43,15 @@ export default async function passengerTimerHandler(socket: Socket, userId: stri
     console.log(`🔁 Resuming timer for ${userId}`);
   }
 
+  const duration = record.duration || 15 * 60 * 1000;
   const startTime = record.startTimer.getTime();
   const now = Date.now();
   const elapsed = now - startTime;
-  const remaining = Math.max(FIFTEEN_MIN - elapsed, 0);
+  const remaining = Math.max(duration - elapsed, 0);
 
   // Emit initial remaining time
   console.log(`⏲️ Remaining time for ${userId}: ${remaining} ms`);
-  socket.emit("remainingTime", { remainingMs: remaining });
+  io.to(userId).emit("remainingTime", { remainingMs: remaining });
 
   // If already expired, delete immediately
   if (remaining <= 0) {
@@ -63,46 +62,77 @@ export default async function passengerTimerHandler(socket: Socket, userId: stri
     } catch (err) {
       console.error(`⚠️ Failed to delete coordinates for ${userId}`, err);
     }
-    socket.emit("timerEnded");
+    io.to(userId).emit("timerEnded");
     return;
   }
 
-  const timeouts: NodeJS.Timeout[] = [];
+  // Initialize storage for this user
+  userTimeouts[userId] = [];
 
-  // Schedule updates dynamically
-  UPDATE_INTERVALS.forEach((t) => {
-    const delay = t - elapsed;
-    if (delay > 0 && delay < FIFTEEN_MIN) {
-      const timeout = setTimeout(() => {
-        const newRemaining = Math.max(FIFTEEN_MIN - (Date.now() - startTime), 0);
-        socket.emit("remainingTime", { remainingMs: newRemaining });
-      }, delay);
-      timeouts.push(timeout);
-    }
-  });
-
-  // Schedule final deletion at timer end
-  const finalDelay = FIFTEEN_MIN - elapsed;
+  // 1. Set a Final Timeout for the exact end time
   const finalTimeout = setTimeout(async () => {
-    socket.emit("remainingTime", { remainingMs: 0 });
-    socket.emit("timerEnded");
+    io.to(userId).emit("remainingTime", { remainingMs: 0 });
+    io.to(userId).emit("timerEnded");
     try {
       await deleteCoordinatesByUserId(userId);
       console.log(`✅ Coordinates deleted for ${userId}`);
     } catch (err) {
       console.error(`⚠️ Failed to delete coordinates for ${userId}`, err);
     }
-  }, finalDelay);
+  }, remaining);
+  userTimeouts[userId].push(finalTimeout);
 
-  timeouts.push(finalTimeout);
-  userTimeouts[userId] = timeouts;
+  // 2. Recursive Loop for Updates
+  // Strategy:
+  // - > 1 min left: update every 5 mins (or wait until exactly 1 min left)
+  // - <= 1 min left: update every 10 seconds
+  const scheduleNextUpdate = () => {
+    const currentElapsed = Date.now() - startTime;
+    const currentRemaining = Math.max(duration - currentElapsed, 0);
 
-  // Clear timeouts on disconnect
-  socket.on("disconnect", () => {
-    console.log(`❌ Socket disconnected for user ${userId}`);
-    if (userTimeouts[userId]) {
-      userTimeouts[userId].forEach((t) => clearTimeout(t));
-      delete userTimeouts[userId];
+    // Stop if finished (handled by finalTimeout)
+    if (currentRemaining <= 0) return;
+
+    // Send update
+    io.to(userId).emit("remainingTime", { remainingMs: currentRemaining });
+
+    let nextDelay = 10000; // Default 10s
+
+    if (currentRemaining > 60000) {
+      const timeToOneMinute = currentRemaining - 60000;
+      // If we have more than 5 mins to go before the 1-minute mark, wait 5 mins
+      if (timeToOneMinute > 5 * 60 * 1000) {
+        nextDelay = 5 * 60 * 1000;
+      } else {
+        // Otherwise wait exactly until the 1-minute mark
+        nextDelay = timeToOneMinute;
+      }
+    } else {
+      // Last minute: 10s updates
+      nextDelay = 10000;
     }
-  });
+
+    // Schedule next
+    const loopTimeout = setTimeout(scheduleNextUpdate, nextDelay);
+
+    // Update the stored timeout reference so we can clear it if needed
+    if (userTimeouts[userId]) {
+      userTimeouts[userId].push(loopTimeout);
+    }
+  };
+
+  // Start the loop
+  // Calculate first delay based on current remaining
+  let firstDelay = 10000;
+  if (remaining > 60000) {
+    const timeToOneMinute = remaining - 60000;
+    if (timeToOneMinute > 5 * 60 * 1000) {
+      firstDelay = 5 * 60 * 1000;
+    } else {
+      firstDelay = timeToOneMinute;
+    }
+  }
+
+  const initialLoopTimeout = setTimeout(scheduleNextUpdate, firstDelay);
+  userTimeouts[userId].push(initialLoopTimeout);
 }

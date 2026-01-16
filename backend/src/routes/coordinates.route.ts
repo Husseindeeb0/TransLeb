@@ -1,16 +1,18 @@
 import express from "express";
 import {
   addCoordinate,
-  editCoordinate,
   deleteCoordinate,
-  getCoordinates
+  editCoordinate,
+  getCoordinates,
+  getAllCoordinates,
 } from "../controllers/coordinates.controller";
 
-const router = express.Router();
+const coordinatesRouter = express.Router();
 
-router.post("/addCoordinate", addCoordinate);
-router.patch("/editCoordinate", editCoordinate);
-router.delete("/deleteCoordinate", deleteCoordinate);
-router.get("/getCoordinates/:userId", getCoordinates);
+coordinatesRouter.post("/addCoordinate", addCoordinate);
+coordinatesRouter.patch("/editCoordinate", editCoordinate);
+coordinatesRouter.delete("/deleteCoordinate", deleteCoordinate);
+coordinatesRouter.get("/getCoordinates/:userId", getCoordinates);
+coordinatesRouter.get("/getAllCoordinates", getAllCoordinates);
 
-export default router;
+export default coordinatesRouter;

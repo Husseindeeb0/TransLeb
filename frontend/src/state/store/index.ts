@@ -1,14 +1,18 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore } from '@reduxjs/toolkit';
 import { coordinatesApi } from '../services/coordinates/coordinatesAPI';
-// import coordinatesReducer from '../slices/coordinates/coordinatesSlice.ts';
+import { userApi } from '../services/user/userAPI';
 
 export const store = configureStore({
   reducer: {
     // coordinates: coordinatesReducer,
     [coordinatesApi.reducerPath]: coordinatesApi.reducer,
+    [userApi.reducerPath]: userApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(coordinatesApi.middleware),
+    getDefaultMiddleware().concat(
+      coordinatesApi.middleware,
+      userApi.middleware
+    ),
 });
 
 // Types

@@ -1,6 +1,6 @@
 import { Routes, Route, BrowserRouter } from "react-router-dom";
-import Ride from "./pages/Ride";
-import Drive from "./pages/Drive";
+import Ride from "./pages/Passenger";
+import Drive from "./pages/Driver";
 import Signin from "./pages/Signin";
 import Signup from "./pages/Signup";
 import Landing from "./pages/Landing";
