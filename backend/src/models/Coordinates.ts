@@ -1,15 +1,5 @@
 import mongoose from "mongoose";
-
-export interface CoordinatesType {
-  userId: { type: String };
-  lat: number;
-  lng: number;
-  startTimer: Date;
-  markedBy?: string | null;
-  markedAt?: Date;
-  extensionCount: number;
-  duration: number;
-}
+import { CoordinatesType } from "../types";
 
 const coordinatesSchema = new mongoose.Schema<CoordinatesType>(
   {

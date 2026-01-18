@@ -8,6 +8,7 @@ import corsOptions from "./config/corsOptions";
 import http from "http";
 import { initSocket } from "./config/socketio";
 import socketRouter from "./socketio";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -15,6 +16,8 @@ const app = express();
 connectDB();
 
 const PORT = process.env.PORT || 5000;
+
+app.use(cookieParser());
 
 // Middleware
 app.use(express.json());
