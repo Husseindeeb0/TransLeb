@@ -1,11 +1,28 @@
-import { Car, Globe, User, LogIn, LogOut, UserPlus } from "lucide-react";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Car, Globe, User, LogIn, LogOut, UserPlus } from 'lucide-react';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import { useLogoutMutation } from '../../state/services/auth/authAPI';
+import toast from 'react-hot-toast';
 
 interface NavbarProps {}
 
 const Navbar: React.FC<NavbarProps> = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const [logout] = useLogoutMutation();
+
+  const handleSignOut = async () => {
+    try {
+      await logout({}).unwrap();
+      toast.success('Successfully signed out');
+      navigate('/');
+    } catch (err) {
+      console.error('Logout failed:', err);
+      toast.error('Logout failed. Please try again.');
+    }
+  };
 
   return (
     <nav className="bg-white shadow-lg border-b-4 border-green-600 sticky top-0 z-50">
@@ -25,20 +42,24 @@ const Navbar: React.FC<NavbarProps> = () => {
 
             {/* Desktop Navigation Links */}
             <div className="hidden md:flex items-center space-x-6">
-              <Link
-                to="/ride"
-                className="flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-700 hover:bg-green-50 hover:text-green-700 transition-all duration-200 font-medium border-2 border-transparent hover:border-green-200"
-              >
-                <User className="h-4 w-4" />
-                <span>Find a Ride</span>
-              </Link>
-              <Link
-                to="/drive"
-                className="flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-700 transition-all duration-200 font-medium border-2 border-transparent hover:border-red-200"
-              >
-                <Car className="h-4 w-4" />
-                <span>Become a Driver</span>
-              </Link>
+              {isAuthenticated && (
+                <>
+                  <Link
+                    to="/ride"
+                    className="flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-700 hover:bg-green-50 hover:text-green-700 transition-all duration-200 font-medium border-2 border-transparent hover:border-green-200"
+                  >
+                    <User className="h-4 w-4" />
+                    <span>Find a Ride</span>
+                  </Link>
+                  <Link
+                    to="/drive"
+                    className="flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-700 transition-all duration-200 font-medium border-2 border-transparent hover:border-red-200"
+                  >
+                    <Car className="h-4 w-4" />
+                    <span>Become a Driver</span>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 
@@ -50,7 +71,7 @@ const Navbar: React.FC<NavbarProps> = () => {
               <select
                 className="bg-transparent text-gray-700 text-sm font-medium border-none outline-none cursor-pointer"
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                  console.log("Language changed:", e.target.value)
+                  console.log('Language changed:', e.target.value)
                 }
               >
                 <option value="ar">العربية</option>
@@ -60,30 +81,34 @@ const Navbar: React.FC<NavbarProps> = () => {
 
             {/* Auth Buttons */}
             <div className="flex items-center space-x-2">
-              <Link
-                to="/signin"
-                className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-green-700 transition-colors font-medium"
-              >
-                <LogIn className="h-4 w-4" />
-                <span>Sign In</span>
-              </Link>
+              {!isAuthenticated ? (
+                <>
+                  <Link
+                    to="/signin"
+                    className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-green-700 transition-colors font-medium"
+                  >
+                    <LogIn className="h-4 w-4" />
+                    <span>Sign In</span>
+                  </Link>
 
-              <Link
-                to="/signup"
-                className="relative flex items-center space-x-2 bg-gradient-to-r from-red-700 to-green-600 text-white px-6 py-2 rounded-lg font-medium overflow-hidden group transition-all duration-200 hover:shadow-lg"
-              >
-                <div className="absolute inset-0 w-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 group-hover:w-full transition-all duration-700 ease-out"></div>
-                <UserPlus className="h-4 w-4 relative z-10" />
-                <span className="relative z-10">Sign Up</span>
-              </Link>
-
-              <Link
-                to="/signout"
-                className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-red-700 transition-colors font-medium"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>Sign Out</span>
-              </Link>
+                  <Link
+                    to="/signup"
+                    className="relative flex items-center space-x-2 bg-gradient-to-r from-red-700 to-green-600 text-white px-6 py-2 rounded-lg font-medium overflow-hidden group transition-all duration-200 hover:shadow-lg"
+                  >
+                    <div className="absolute inset-0 w-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 group-hover:w-full transition-all duration-700 ease-out"></div>
+                    <UserPlus className="h-4 w-4 relative z-10" />
+                    <span className="relative z-10">Sign Up</span>
+                  </Link>
+                </>
+              ) : (
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-red-700 transition-colors font-medium cursor-pointer"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Sign Out</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -97,17 +122,17 @@ const Navbar: React.FC<NavbarProps> = () => {
               <div className="flex flex-col justify-center items-center w-6 h-6 space-y-1">
                 <div
                   className={`w-5 h-0.5 bg-gray-700 transition-all duration-300 ${
-                    isMenuOpen ? "rotate-45 translate-y-1.5" : ""
+                    isMenuOpen ? 'rotate-45 translate-y-1.5' : ''
                   }`}
                 ></div>
                 <div
                   className={`w-5 h-0.5 bg-gray-700 transition-all duration-300 ${
-                    isMenuOpen ? "opacity-0" : "opacity-100"
+                    isMenuOpen ? 'opacity-0' : 'opacity-100'
                   }`}
                 ></div>
                 <div
                   className={`w-5 h-0.5 bg-gray-700 transition-all duration-300 ${
-                    isMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
+                    isMenuOpen ? '-rotate-45 -translate-y-1.5' : ''
                   }`}
                 ></div>
               </div>
@@ -119,66 +144,61 @@ const Navbar: React.FC<NavbarProps> = () => {
         {isMenuOpen && (
           <div className="md:hidden border-t border-gray-200 py-4 animate-in slide-in-from-top duration-200">
             <div className="flex flex-col space-y-3">
-              <Link
-                to="/ride"
-                className="flex items-center space-x-2 px-4 py-3 rounded-lg text-gray-700 hover:bg-green-50 hover:text-green-700 transition-all font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <User className="h-4 w-4" />
-                <span>Find a Ride</span>
-              </Link>
-
-              <Link
-                to="/drive"
-                className="flex items-center space-x-2 px-4 py-3 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-700 transition-all font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Car className="h-4 w-4" />
-                <span>Become a Driver</span>
-              </Link>
-
-              <div className="border-t border-gray-200 pt-3">
-                <div className="flex items-center space-x-2 px-4 py-2 text-gray-600 text-sm">
-                  <Globe className="h-4 w-4" />
-                  <select
-                    className="bg-transparent text-gray-700 border-none outline-none"
-                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                      console.log("Language changed:", e.target.value)
-                    }
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    to="/ride"
+                    className="flex items-center space-x-2 px-4 py-3 rounded-lg text-gray-700 hover:bg-green-50 hover:text-green-700 transition-all font-medium"
+                    onClick={() => setIsMenuOpen(false)}
                   >
-                    <option value="ar">العربية</option>
-                    <option value="en">English</option>
-                  </select>
+                    <User className="h-4 w-4" />
+                    <span>Find a Ride</span>
+                  </Link>
+
+                  <Link
+                    to="/drive"
+                    className="flex items-center space-x-2 px-4 py-3 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-700 transition-all font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Car className="h-4 w-4" />
+                    <span>Become a Driver</span>
+                  </Link>
+
+                  <div className="border-t border-gray-200 pt-3">
+                    <button
+                      onClick={() => {
+                        handleSignOut();
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full flex items-center space-x-2 px-4 py-3 text-gray-700 hover:text-red-700 transition-colors font-medium cursor-pointer"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="border-t border-gray-200 pt-3 flex flex-col space-y-2">
+                  <Link
+                    to="/signin"
+                    className="flex items-center space-x-2 px-4 py-3 text-gray-700 hover:text-green-700 transition-colors font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <LogIn className="h-4 w-4" />
+                    <span>Sign In</span>
+                  </Link>
+
+                  <Link
+                    to="/signup"
+                    className="relative flex items-center space-x-2 mx-4 bg-gradient-to-r from-red-700 to-green-600 text-white px-6 py-3 rounded-lg font-medium text-center justify-center overflow-hidden group transition-all duration-200"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <div className="absolute inset-0 w-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 group-hover:w-full transition-all duration-700 ease-out"></div>
+                    <UserPlus className="h-4 w-4 relative z-10" />
+                    <span className="relative z-10">Sign Up</span>
+                  </Link>
                 </div>
-
-                <Link
-                  to="/signin"
-                  className="flex items-center space-x-2 px-4 py-3 text-gray-700 hover:text-green-700 transition-colors font-medium"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <LogIn className="h-4 w-4" />
-                  <span>Sign In</span>
-                </Link>
-
-                <Link
-                  to="/signup"
-                  className="relative flex items-center space-x-2 mx-4 bg-gradient-to-r from-red-700 to-green-600 text-white px-6 py-3 rounded-lg font-medium text-center justify-center overflow-hidden group transition-all duration-200"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <div className="absolute inset-0 w-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 group-hover:w-full transition-all duration-700 ease-out"></div>
-                  <UserPlus className="h-4 w-4 relative z-10" />
-                  <span className="relative z-10">Sign Up</span>
-                </Link>
-
-                <Link
-                  to="/signout"
-                  className="flex items-center space-x-2 px-4 py-3 text-gray-700 hover:text-red-700 transition-colors font-medium"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span>Sign Out</span>
-                </Link>
-              </div>
+              )}
             </div>
           </div>
         )}

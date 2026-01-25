@@ -1,40 +1,48 @@
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
 import { verifyToken } from "../utils";
 
-export async function authMiddleware(
+export async function checkAuth(
   req: Request,
   res: Response,
 ): Promise<Response | void> {
   try {
-    // Extract access token from cookies
-    const accessToken = req.cookies.get("accessToken")?.value;
+    // Extract access token from cookies (must match name in setTokenCookies)
+    const accessToken = req.cookies.access_token;
 
     if (!accessToken) {
-      return res.status(401).json({ message: "Authentication required" });
+      return res.status(401).json({
+        state: "AUTH_REQUIRED",
+        message: "Authentication required",
+      });
     }
 
     // Verify token
     const decoded = verifyToken(accessToken, "access");
 
-    // Check that decoded token has all required fields
     if (
       !decoded ||
-      !("userId" in decoded) ||
+      !("id" in decoded) ||
       !("email" in decoded) ||
       !("role" in decoded)
     ) {
-      return res.status(401).json({ message: "Invalid or expired token" });
+      return res.status(401).json({
+        state: "INVALID_TOKEN",
+        message: "Invalid or expired token",
+      });
     }
 
-    // Return user data from token (TypeScript now knows decoded has all required fields)
+    // Return user data from token
     return res.status(200).json({
-      userId: decoded.userId,
+      id: decoded.id,
       email: decoded.email,
       role: decoded.role,
+      name: decoded.name,
     });
   } catch (error) {
     console.error("Auth middleware error:", error);
-    return res.status(401).json({ message: "Authentication failed" });
+    return res.status(401).json({
+      state: "AUTH_FAILED",
+      message: "Authentication failed",
+    });
   }
 }

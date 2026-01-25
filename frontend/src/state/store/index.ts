@@ -1,17 +1,19 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { coordinatesApi } from '../services/coordinates/coordinatesAPI';
 import { userApi } from '../services/user/userAPI';
+import { authApi } from '../services/auth/authAPI';
 
 export const store = configureStore({
   reducer: {
-    // coordinates: coordinatesReducer,
+    [authApi.reducerPath]: authApi.reducer,
     [coordinatesApi.reducerPath]: coordinatesApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       coordinatesApi.middleware,
-      userApi.middleware
+      userApi.middleware,
+      authApi.middleware
     ),
 });
 

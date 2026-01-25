@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/dbconnect";
 import coordinatesRoute from "./routes/coordinates.route";
 import userRouter from "./routes/user.route";
+import authRouter from "./routes/auth.route";
 import cors from "cors";
 import corsOptions from "./config/corsOptions";
 import http from "http";
@@ -26,6 +27,7 @@ app.use(cors(corsOptions));
 // Routes
 app.use("/coordinates", coordinatesRoute);
 app.use("/user", userRouter);
+app.use("/auth", authRouter);
 
 // Create HTTP server and attach Socket.IO
 const server = http.createServer(app);

@@ -28,6 +28,6 @@ export interface TokenPayload {
   name: string;
   email: string;
   role: string;
-  iat?: number; // issued at (added by JWT)
-  exp?: number; // expiration time (added by JWT)
+  iat?: number;
+  exp?: number;
 }

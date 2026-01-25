@@ -1,5 +1,25 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 button {
-    cursor: pointer;
+  cursor: pointer;
+}
+
+@keyframes bounce-short {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-bounce-short {
+  animation: bounce-short 1.5s ease-in-out infinite;
+}
+
+@layer base {
+  body {
+    @apply antialiased text-gray-900;
+  }
 }
