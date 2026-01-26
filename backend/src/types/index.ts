@@ -1,5 +1,3 @@
-import { Types } from "mongoose";
-
 export interface CoordinatesType {
   userId: { type: String };
   lat: number;
@@ -9,18 +7,6 @@ export interface CoordinatesType {
   markedAt?: Date;
   extensionCount: number;
   duration: number;
-}
-
-export interface UserType {
-  _id: string;
-  name: string;
-  email: string;
-  password: string;
-  refreshToken: string;
-  role: string;
-  coordinates: Types.ObjectId | CoordinatesType;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export interface TokenPayload {

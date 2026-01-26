@@ -1,4 +1,4 @@
-import { UserType } from "../types";
+import { UserResponse } from "../types/userTypes";
 import User from "../models/User";
 import {
   generateToken,
@@ -11,7 +11,7 @@ import { Request, Response } from "express";
 
 const signup = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, role }: UserType = req.body;
+    const { name, email, password, role }: UserResponse = req.body;
 
     if (!name || !email || !password || !role) {
       return res.status(400).json({
@@ -60,7 +60,7 @@ const signup = async (req: Request, res: Response) => {
 
 const signin = async (req: Request, res: Response) => {
   try {
-    const { email, password }: UserType = req.body;
+    const { email, password }: UserResponse = req.body;
 
     if (!email || !password) {
       return res.status(400).json({
