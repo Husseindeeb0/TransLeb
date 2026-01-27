@@ -10,6 +10,8 @@ import http from "http";
 import { initSocket } from "./config/socketio";
 import socketRouter from "./socketio";
 import cookieParser from "cookie-parser";
+import dayCardRouter from "./routes/dayCard.route";
+import passengerFormRouter from "./routes/passengerForm.route";
 
 dotenv.config();
 
@@ -28,6 +30,8 @@ app.use(cors(corsOptions));
 app.use("/coordinates", coordinatesRoute);
 app.use("/user", userRouter);
 app.use("/auth", authRouter);
+app.use("/dayCard", dayCardRouter);
+app.use("/passengerForm", passengerFormRouter);
 
 // Create HTTP server and attach Socket.IO
 const server = http.createServer(app);

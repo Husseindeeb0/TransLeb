@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { verifyToken } from "../utils";
+import { UserResponse } from "../types/userTypes";
 
 export async function checkAuth(
   req: Request,
@@ -31,13 +32,15 @@ export async function checkAuth(
       });
     }
 
-    // Return user data from token
-    return res.status(200).json({
-      id: decoded.id,
-      email: decoded.email,
-      role: decoded.role,
-      name: decoded.name,
-    });
+    // Return user data from token in UserResponse format
+    const response: UserResponse = {
+      _id: decoded.id as string,
+      email: decoded.email as string,
+      role: decoded.role as string,
+      name: decoded.name as string,
+    };
+
+    return res.status(200).json(response);
   } catch (error) {
     console.error("Auth middleware error:", error);
     return res.status(401).json({

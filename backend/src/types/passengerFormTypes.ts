@@ -10,3 +10,21 @@ export interface PassengerFormType {
   desiredTime: string;
   passengerCount: number;
 }
+
+export interface SubmitRequestType {
+  dayCardId: string;
+  fullName: string;
+  phoneNumber: string;
+  livingPlace: string;
+  desiredTime: string;
+  passengerCount: number;
+}
+
+export interface UpdateRequestType {
+  formId: string;
+  fullName?: string;
+  phoneNumber?: string;
+  livingPlace?: string;
+  desiredTime?: string;
+  passengerCount?: number;
+}

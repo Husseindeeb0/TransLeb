@@ -1,4 +1,8 @@
-import { UserResponse } from "../types/userTypes";
+import {
+  SigninRequest,
+  SignupRequest,
+  AuthResponse,
+} from "../types/userTypes";
 import User from "../models/User";
 import {
   generateToken,
@@ -11,7 +15,7 @@ import { Request, Response } from "express";
 
 const signup = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, role }: UserResponse = req.body;
+    const { name, email, password, role }: SignupRequest = req.body;
 
     if (!name || !email || !password || !role) {
       return res.status(400).json({
@@ -42,13 +46,15 @@ const signup = async (req: Request, res: Response) => {
     newUser.refreshToken = refreshToken;
     await newUser.save();
 
-    res.status(201).json({
-      id: newUser._id,
+    const response: AuthResponse = {
+      _id: newUser._id.toString(),
       name: newUser.name,
       email: newUser.email,
       role: newUser.role,
       message: "User created successfully",
-    });
+    };
+
+    res.status(201).json(response);
   } catch (error) {
     console.error("Signup error:", error);
     res.status(500).json({
@@ -60,7 +66,7 @@ const signup = async (req: Request, res: Response) => {
 
 const signin = async (req: Request, res: Response) => {
   try {
-    const { email, password }: UserResponse = req.body;
+    const { email, password }: SigninRequest = req.body;
 
     if (!email || !password) {
       return res.status(400).json({
@@ -91,13 +97,15 @@ const signin = async (req: Request, res: Response) => {
     user.refreshToken = refreshToken;
     await user.save();
 
-    res.status(200).json({
-      id: user._id,
+    const response: AuthResponse = {
+      _id: user._id.toString(),
       name: user.name,
       email: user.email,
       role: user.role,
       message: "User signed in successfully",
-    });
+    };
+
+    res.status(200).json(response);
   } catch (error) {
     console.error("Signin error:", error);
     res.status(500).json({
