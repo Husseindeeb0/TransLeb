@@ -1,4 +1,4 @@
-import { Car, Globe, User, LogIn, LogOut, UserPlus } from 'lucide-react';
+import { Car, Globe, User, LogIn, LogOut, UserPlus, LayoutGrid } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
@@ -57,6 +57,13 @@ const Navbar: React.FC<NavbarProps> = () => {
                   >
                     <Car className="h-4 w-4" />
                     <span>Become a Driver</span>
+                  </Link>
+                  <Link
+                    to="/dashboard"
+                    className="flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200 font-medium border-2 border-transparent hover:border-gray-200"
+                  >
+                    <LayoutGrid className="h-4 w-4" />
+                    <span>Dashboard</span>
                   </Link>
                 </>
               )}
@@ -162,6 +169,14 @@ const Navbar: React.FC<NavbarProps> = () => {
                   >
                     <Car className="h-4 w-4" />
                     <span>Become a Driver</span>
+                  </Link>
+                  <Link
+                    to="/dashboard"
+                    className="flex items-center space-x-2 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-all font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <LayoutGrid className="h-4 w-4" />
+                    <span>Dashboard</span>
                   </Link>
 
                   <div className="border-t border-gray-200 pt-3">

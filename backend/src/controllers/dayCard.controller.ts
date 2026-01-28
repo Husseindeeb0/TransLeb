@@ -54,8 +54,8 @@ export const createDayCard = async (req: Request, res: Response) => {
 
 export const updateDayCard = async (req: Request, res: Response) => {
   try {
-    const { dayCardId, date, busTimers, formState }: UpdateDayCardRequest =
-      req.body;
+    const dayCardId = req.params.dayCardId || req.body.dayCardId;
+    const { date, busTimers, formState }: UpdateDayCardRequest = req.body;
 
     if (!dayCardId) {
       return res.status(400).json({
@@ -81,7 +81,7 @@ export const updateDayCard = async (req: Request, res: Response) => {
     }
 
     const response: DayCardResponse = {
-      dayCardId: dayCard._id.toString(),
+      dayCardId: dayCardId,
       driverId: dayCard.driverId,
       date: dayCard.date,
       busTimers: dayCard.busTimers,
@@ -100,16 +100,16 @@ export const updateDayCard = async (req: Request, res: Response) => {
 
 export const deleteDayCard = async (req: Request, res: Response) => {
   try {
-    const { _id } = req.body;
+    const { dayCardId } = req.params;
 
-    if (!_id) {
+    if (!dayCardId) {
       return res.status(400).json({
         state: "MISSING_FIELDS",
         message: "Day Card ID is required",
       });
     }
 
-    const dayCard = await DayCard.findByIdAndDelete(_id);
+    const dayCard = await DayCard.findByIdAndDelete(dayCardId);
 
     if (!dayCard) {
       return res.status(404).json({
@@ -130,7 +130,7 @@ export const deleteDayCard = async (req: Request, res: Response) => {
 
 export const getDayCards = async (req: Request, res: Response) => {
   try {
-    const { driverId } = req.params;
+    const driverId = req.params.driverId || (req as any).user?._id;
 
     if (!driverId) {
       return res.status(400).json({
@@ -141,10 +141,15 @@ export const getDayCards = async (req: Request, res: Response) => {
 
     const dayCards = await DayCard.find({ driverId: driverId });
 
-    res.status(200).json({
-      message: "Day cards fetched successfully",
-      data: dayCards,
-    });
+    const response: DayCardResponse[] = dayCards.map((card) => ({
+      dayCardId: card._id.toString(),
+      driverId: card.driverId,
+      date: card.date,
+      busTimers: card.busTimers,
+      formState: card.formState,
+    }));
+
+    res.status(200).json(response);
   } catch (error) {
     console.error("Day cards fetch error:", error);
     res.status(500).json({
@@ -173,14 +178,19 @@ export const getDayCardById = async (req: Request, res: Response) => {
       });
     }
 
-    return res.status(200).json({
-      message: "Day card fetched successfully",
-      data: dayCard,
-    });
+    const response: DayCardResponse = {
+      dayCardId: dayCard._id.toString(),
+      driverId: dayCard.driverId,
+      date: dayCard.date,
+      busTimers: dayCard.busTimers,
+      formState: dayCard.formState,
+    };
+
+    return res.status(200).json(response);
   } catch (error) {
     console.error("Day card fetch error:", error);
     return res.status(500).json({
       message: "Failed to fetch day card",
     });
   }
-}
+};

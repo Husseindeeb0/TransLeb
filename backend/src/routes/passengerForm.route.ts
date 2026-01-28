@@ -5,8 +5,8 @@ const router = express.Router();
 
 router.post("/submit", checkAuth, submitForm);
 router.put("/update", checkAuth, updateForm);
-router.delete("/delete", checkAuth, deleteForm);
-router.get("/getForms", checkAuth, getForms);
+router.delete("/delete/:formId", checkAuth, deleteForm);
+router.get("/getForms/:dayCardId", checkAuth, getForms);
 router.get("/getFormById/:formId", checkAuth, getFormById);
 
 export default router;

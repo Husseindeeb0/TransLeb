@@ -1,8 +1,4 @@
-import {
-  SigninRequest,
-  SignupRequest,
-  AuthResponse,
-} from "../types/userTypes";
+import { SigninRequest, SignupRequest, AuthResponse } from "../types/userTypes";
 import User from "../models/User";
 import {
   generateToken,
@@ -144,4 +140,23 @@ const logout = async (req: Request, res: Response) => {
   }
 };
 
-export { signup, signin, logout };
+const getMe = async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    if (!user) {
+      return res.status(401).json({
+        state: "AUTH_REQUIRED",
+        message: "Authentication required",
+      });
+    }
+    return res.status(200).json(user);
+  } catch (error) {
+    console.error("GetMe error:", error);
+    return res.status(500).json({
+      state: "INTERNAL_SERVER_ERROR",
+      message: "Internal server error",
+    });
+  }
+};
+
+export { signup, signin, logout, getMe };

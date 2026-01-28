@@ -5,6 +5,7 @@ import Signin from './pages/Signin';
 import Signup from './pages/Signup';
 import Landing from './pages/Landing';
 import Navbar from './components/Navbar';
+import Dashboard from './pages/Dashboard';
 import { Toaster } from 'react-hot-toast';
 
 import { useAuth } from './hooks/useAuth';
@@ -41,6 +42,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Drive />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
               </ProtectedRoute>
             }
           />
