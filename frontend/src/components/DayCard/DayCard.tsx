@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Calendar, Clock, Trash2, Edit3, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import type { DayCard as DayCardType } from '../../types/dayCardTypes';
 
 interface DayCardProps {
@@ -96,10 +97,13 @@ const DayCard: React.FC<DayCardProps> = ({ card, onEdit, onDelete }) => {
               {card.formState.charAt(0).toUpperCase() + card.formState.slice(1)}
             </span>
           </div>
-          <button className="flex items-center gap-1 text-red-600 font-black text-xs uppercase tracking-wider group/btn">
+          <Link 
+            to={`/day-card/${card.dayCardId}`}
+            className="flex items-center gap-1 text-red-600 font-black text-xs uppercase tracking-wider group/btn"
+          >
             View Details
             <ChevronRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
-          </button>
+          </Link>
         </div>
       </div>
     </motion.div>

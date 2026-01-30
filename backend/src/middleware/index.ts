@@ -42,7 +42,7 @@ export async function checkAuth(
     };
 
     // Attach user to request object
-    (req as any).user = userData;
+    req.user = userData;
 
     next();
   } catch (error) {

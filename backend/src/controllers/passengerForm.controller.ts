@@ -15,9 +15,11 @@ export const submitForm = async (req: Request, res: Response) => {
       desiredTime,
       passengerCount,
     }: SubmitRequestType = req.body;
+    const userId = req.user?._id;
 
     if (
       !dayCardId ||
+      !userId ||
       !fullName ||
       !phoneNumber ||
       !livingPlace ||
@@ -30,8 +32,9 @@ export const submitForm = async (req: Request, res: Response) => {
       });
     }
 
-    await PassengerForm.create({
+    const newForm = await PassengerForm.create({
       dayCardId,
+      userId,
       fullName,
       phoneNumber,
       livingPlace,
@@ -41,6 +44,7 @@ export const submitForm = async (req: Request, res: Response) => {
 
     res.status(201).json({
       message: "Passenger form submitted successfully",
+      formId: newForm._id,
     });
   } catch (error) {
     console.error("Passenger form submission error:", error);
@@ -60,8 +64,9 @@ export const updateForm = async (req: Request, res: Response) => {
       desiredTime,
       passengerCount,
     }: UpdateRequestType = req.body;
+    const userId = req.user?._id;
 
-    if (!formId) {
+    if (!formId || !userId) {
       return res.status(400).json({
         state: "MISSING_FIELDS",
         message: "All fields are required",
@@ -85,6 +90,7 @@ export const updateForm = async (req: Request, res: Response) => {
 
     res.status(200).json({
       message: "Passenger form updated successfully",
+      formId: updatedForm._id,
     });
   } catch (error) {
     console.error("Passenger form update error:", error);
@@ -123,7 +129,36 @@ export const deleteForm = async (req: Request, res: Response) => {
       message: "Failed to delete passenger form",
     });
   }
-}
+};
+
+export const isFormExists = async (req: Request, res: Response) => {
+  try {
+    const { dayCardId } = req.params;
+    const userId = req.user?._id; // from auth middleware
+
+    if (!dayCardId) {
+      return res.status(400).json({
+        state: "MISSING_FIELDS",
+        message: "dayCardId is required",
+      });
+    }
+
+    const existingForm = await PassengerForm.findOne({
+      dayCardId,
+      userId,
+    });
+
+    return res.status(200).json({
+      exists: !!existingForm,
+      data: existingForm || null,
+    });
+  } catch (error) {
+    console.error("Form existence check error:", error);
+    return res.status(500).json({
+      message: "Failed to check form submission status",
+    });
+  }
+};
 
 export const getForms = async (req: Request, res: Response) => {
   try {
@@ -148,7 +183,7 @@ export const getForms = async (req: Request, res: Response) => {
       message: "Failed to fetch passenger forms",
     });
   }
-}
+};
 
 export const getFormById = async (req: Request, res: Response) => {
   try {
@@ -180,7 +215,7 @@ export const getFormById = async (req: Request, res: Response) => {
       message: "Failed to fetch passenger form",
     });
   }
-}
+};
 
 export default {
   submitForm,
@@ -188,4 +223,5 @@ export default {
   deleteForm,
   getForms,
   getFormById,
+  isFormExists,
 };

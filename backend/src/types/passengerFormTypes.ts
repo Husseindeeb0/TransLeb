@@ -4,6 +4,7 @@ import { DayCardType } from "./dayCardTypes";
 export interface PassengerFormType {
   _id: string;
   dayCardId: Types.ObjectId | DayCardType;
+  userId: Types.ObjectId;
   fullName: string;
   phoneNumber: string;
   livingPlace: string;

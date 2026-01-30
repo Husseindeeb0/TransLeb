@@ -1,31 +1,31 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { axiosBaseQuery } from "../../../lib/axios/axiosBaseQuery";
-import type { passengerFormType } from "../../../types/passengerFormTypes";
+import type { SubmitPassengerFormRequest, UpdatePassengerFormRequest, PassengerForm, IsFormExistsResponse } from "../../../types/passengerFormTypes";
 
 export const passengerFormApi = createApi({
 	reducerPath: "passengerFormApi",
   baseQuery: axiosBaseQuery(),
   endpoints: (builder) => ({
-    getPassengerForms: builder.query<passengerFormType[], void>({
-      query: () => ({
-        url: "/passengerForm/getPassengerForms",
+    getPassengerForms: builder.query<PassengerForm[], string>({
+      query: (dayCardId) => ({
+        url: `/passengerForm/getForms/${dayCardId}`,
         method: "GET"
       })
     }),
-    getPassengerFormById: builder.query<passengerFormType, string>({
-      query: (id) => ({
-        url: `/passengerForm/getPassengerFormById/${id}`,
+    getPassengerFormById: builder.query<PassengerForm, string>({
+      query: (formId) => ({
+        url: `/passengerForm/getFormById/${formId}`,
         method: "GET"
       })
     }),
-    submitPassengerForm: builder.mutation<string, passengerFormType>({
+    submitPassengerForm: builder.mutation<{ message: string; formId: string }, SubmitPassengerFormRequest>({
       query: (form) => ({
         url: "/passengerForm/submit",
         method: "POST",
         data: form
       })
     }),
-    updatePassengerForm: builder.mutation<string, passengerFormType>({
+    updatePassengerForm: builder.mutation<{ message: string; formId: string }, UpdatePassengerFormRequest>({
       query: (form) => ({
         url: "/passengerForm/update",
         method: "PUT",
@@ -37,6 +37,21 @@ export const passengerFormApi = createApi({
         url: `/passengerForm/delete/${formId}`,
         method: "DELETE"
       })
+    }),
+    isFormExists: builder.query<IsFormExistsResponse, string>({
+      query: (dayCardId) => ({
+        url: `/passengerForm/exists/${dayCardId}`,
+        method: "GET"
+      })
     })
   })
-})
+});
+
+export const {
+  useGetPassengerFormsQuery,
+  useGetPassengerFormByIdQuery,
+  useSubmitPassengerFormMutation,
+  useUpdatePassengerFormMutation,
+  useDeletePassengerFormMutation,
+  useIsFormExistsQuery,
+} = passengerFormApi;

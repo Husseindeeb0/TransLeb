@@ -15,11 +15,11 @@ export const dayCardApi = createApi({
       providesTags: ["DayCard"]
     }),
     getDayCardById: builder.query<DayCard, string>({
-      query: (id) => ({
-        url: `/dayCard/getDayCardById/${id}`,
+      query: (dayCardId) => ({
+        url: `/dayCard/getDayCardById/${dayCardId}`,
         method: "GET"
       }),
-      providesTags: (result, error, id) => [{ type: "DayCard", id }]
+      providesTags: (result, error, dayCardId) => [{ type: "DayCard", id: dayCardId }]
     }),
     createDayCard: builder.mutation<DayCard, CreateDayCardRequest>({
       query: (dayCard) => ({

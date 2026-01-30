@@ -9,6 +9,12 @@ const passengerSubmissionSchema = new mongoose.Schema<PassengerFormType>(
       required: true,
       index: true,
     },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
     fullName: { type: String, required: true, trim: true },
     phoneNumber: { type: String, required: true },
     livingPlace: { type: String, required: true, index: true },

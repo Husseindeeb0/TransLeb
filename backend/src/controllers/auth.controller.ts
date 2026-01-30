@@ -142,7 +142,7 @@ const logout = async (req: Request, res: Response) => {
 
 const getMe = async (req: Request, res: Response) => {
   try {
-    const user = (req as any).user;
+    const user = req.user;
     if (!user) {
       return res.status(401).json({
         state: "AUTH_REQUIRED",
