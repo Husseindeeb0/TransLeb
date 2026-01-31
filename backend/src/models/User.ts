@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema<UserType>(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     coordinates: { type: mongoose.Schema.Types.ObjectId, ref: "Coordinates" },
+
     role: {
       type: String,
       enum: ["driver", "passenger"],

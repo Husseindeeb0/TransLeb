@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion';
-import { Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Clock, AlertCircle, CheckCircle2, Users } from 'lucide-react';
+import type { BusSchedule } from '../../types/dayCardTypes';
+import { formatTimeToAMPM } from '../../helpers';
 
 interface TimerDisplayProps {
-  timers: string[];
+  timers: BusSchedule[];
   formState: string;
 }
 
@@ -21,10 +23,10 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({ timers, formState }) => {
 
       <div className="flex-grow flex flex-col justify-center">
         {isDecided ? (
-          <div className="grid grid-cols-2 gap-4">
-            {timers.map((time, index) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {timers.map((bus, index) => (
               <motion.div
-                key={time}
+                key={`${bus.time}-${index}`}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
@@ -33,8 +35,11 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({ timers, formState }) => {
                 <div className="p-3 bg-white rounded-2xl shadow-sm text-green-600 group-hover:scale-110 transition-transform">
                   <Clock size={24} />
                 </div>
-                <span className="text-2xl font-black text-gray-900">{time}</span>
-                <span className="text-[10px] uppercase tracking-widest text-gray-400 font-black">Departure</span>
+                <span className="text-2xl font-black text-gray-900">{formatTimeToAMPM(bus.time)}</span>
+                <div className="flex items-center gap-2 px-3 py-1 bg-gray-900/5 rounded-full text-[10px] font-black uppercase tracking-widest text-gray-500">
+                   <Users size={12} className="text-red-500" />
+                   {bus.capacity} CAPACITY
+                </div>
               </motion.div>
             ))}
           </div>

@@ -63,6 +63,7 @@ export const updateForm = async (req: Request, res: Response) => {
       livingPlace,
       desiredTime,
       passengerCount,
+      assignedBusTime,
     }: UpdateRequestType = req.body;
     const userId = req.user?._id;
 
@@ -79,6 +80,7 @@ export const updateForm = async (req: Request, res: Response) => {
       livingPlace,
       desiredTime,
       passengerCount,
+      assignedBusTime,
     });
 
     if (!updatedForm) {

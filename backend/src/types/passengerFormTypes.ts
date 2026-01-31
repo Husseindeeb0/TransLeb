@@ -10,6 +10,7 @@ export interface PassengerFormType {
   livingPlace: string;
   desiredTime: string;
   passengerCount: number;
+  assignedBusTime?: string;
 }
 
 export interface SubmitRequestType {
@@ -28,4 +29,5 @@ export interface UpdateRequestType {
   livingPlace?: string;
   desiredTime?: string;
   passengerCount?: number;
+  assignedBusTime?: string;
 }

@@ -9,9 +9,11 @@ import {
 import type { SubmitPassengerFormRequest } from '../../types/passengerFormTypes';
 import toast from 'react-hot-toast';
 
+import type { BusSchedule } from '../../types/dayCardTypes';
+
 interface PassengerFormProps {
   dayCardId: string;
-  availableTimes: string[];
+  availableTimes: BusSchedule[];
   isLocked?: boolean;
 }
 
@@ -52,6 +54,13 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, availableTimes
     e.preventDefault();
     if (isLocked) {
       toast.error('This form is currently not accepting submissions.');
+      return;
+    }
+
+    // Phone validation
+    const cleanPhone = formData.phoneNumber.replace(/[^0-9]/g, '');
+    if (cleanPhone.length < 8) {
+      toast.error('Please enter a valid phone number (at least 8 digits)');
       return;
     }
 
@@ -155,11 +164,29 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, availableTimes
                   type="tel"
                   required
                   disabled={isLocked}
-                  placeholder="+961 00 000 000"
+                  placeholder="+961 70 123 456"
+                  pattern="^\+?[0-9]{8,15}$"
+                  title="Phone number must be between 8 and 15 digits"
                   className="w-full pl-12 pr-5 py-4 bg-gray-50/50 border-2 border-gray-100 rounded-2xl focus:outline-none focus:border-green-600/30 focus:ring-4 focus:ring-green-600/5 transition-all font-bold"
                   value={formData.phoneNumber}
-                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Only allow + at the very beginning and digits elsewhere
+                    let cleaned = val.replace(/[^\d+]/g, '');
+                    if (cleaned.includes('+') && cleaned.indexOf('+') !== 0) {
+                      cleaned = cleaned.replace(/\+/g, '');
+                    }
+                    // Limit to 15 digits (standard max for international numbers)
+                    const digitsOnly = cleaned.replace(/\+/g, '');
+                    if (digitsOnly.length > 15) {
+                      cleaned = (cleaned.startsWith('+') ? '+' : '') + digitsOnly.slice(0, 15);
+                    }
+                    setFormData({ ...formData, phoneNumber: cleaned });
+                  }}
                 />
+                <p className="text-[10px] text-gray-400 font-bold ml-1 mt-1 opacity-70 italic">
+                  * Format: +96170123456 (8-15 digits)
+                </p>
               </div>
             </div>
 

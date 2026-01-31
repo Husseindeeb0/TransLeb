@@ -20,6 +20,7 @@ const passengerSubmissionSchema = new mongoose.Schema<PassengerFormType>(
     livingPlace: { type: String, required: true, index: true },
     desiredTime: { type: String, required: true },
     passengerCount: { type: Number, default: 1 },
+    assignedBusTime: { type: String, default: null },
   },
   { timestamps: true },
 );

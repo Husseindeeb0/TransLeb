@@ -10,7 +10,16 @@ const dayCardSchema = new mongoose.Schema<DayCardType>(
       index: true,
     },
     date: { type: Date, required: true },
-    busTimers: { type: [String], default: [], required: false },
+    busTimers: {
+      type: [
+        {
+          time: { type: String, required: true },
+          capacity: { type: Number, required: true },
+        },
+      ],
+      default: [],
+      required: false,
+    },
     formState: {
       type: String,
       enum: ["open", "planning", "scheduled", "archived"],
@@ -20,11 +29,7 @@ const dayCardSchema = new mongoose.Schema<DayCardType>(
   { timestamps: true },
 );
 
-dayCardSchema.index(
-  { driverId: 1, date: 1 },
-  { unique: true }
-);
-
+dayCardSchema.index({ driverId: 1, date: 1 }, { unique: true });
 
 const DayCard = mongoose.model("DayCard", dayCardSchema);
 export default DayCard;

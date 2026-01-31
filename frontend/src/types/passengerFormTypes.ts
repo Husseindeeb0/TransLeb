@@ -7,6 +7,7 @@ export interface PassengerForm {
     livingPlace: string;
     desiredTime: string;
     passengerCount: number;
+    assignedBusTime?: string | null;
 }
 
 export interface SubmitPassengerFormRequest {
@@ -26,6 +27,7 @@ export interface UpdatePassengerFormRequest {
     livingPlace?: string;
     desiredTime?: string;
     passengerCount?: number;
+    assignedBusTime?: string | null;
 }
 
 export interface IsFormExistsResponse {

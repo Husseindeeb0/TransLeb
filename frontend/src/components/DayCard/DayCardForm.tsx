@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Plus, X, Clock, LayoutGrid, ListTodo, CalendarCheck, Archive } from 'lucide-react';
-import type { DayCard as DayCardType, DayCardFormData } from '../../types/dayCardTypes';
+import { Calendar, Plus, X, Clock, LayoutGrid, ListTodo, CalendarCheck, Archive, Users } from 'lucide-react';
+import type { DayCard as DayCardType, DayCardFormData, BusSchedule } from '../../types/dayCardTypes';
 
 interface DayCardFormProps {
   initialData?: DayCardType | null;
@@ -19,22 +19,26 @@ const DayCardForm: React.FC<DayCardFormProps> = ({
   const [date, setDate] = useState(
     initialData ? new Date(initialData.date).toISOString().split('T')[0] : ''
   );
-  const [busTimers, setBusTimers] = useState<string[]>(
-    initialData?.busTimers || []
+  const [busTimers, setBusTimers] = useState<BusSchedule[]>(
+    initialData?.busTimers?.map(item => 
+      typeof item === 'string' ? { time: item, capacity: 30 } : item
+    ) || []
   );
   const [newTime, setNewTime] = useState('');
+  const [newCapacity, setNewCapacity] = useState<number>(30);
   const [formState, setFormState] = useState(initialData?.formState || 'open');
 
   const handleAddTime = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newTime && !busTimers.includes(newTime)) {
-      setBusTimers([...busTimers, newTime].sort());
+    if (newTime) {
+      setBusTimers([...busTimers, { time: newTime, capacity: newCapacity }].sort((a, b) => a.time.localeCompare(b.time)));
       setNewTime('');
+      setNewCapacity(30);
     }
   };
 
-  const removeTime = (timeToRemove: string) => {
-    setBusTimers(busTimers.filter((t) => t !== timeToRemove));
+  const removeTime = (index: number) => {
+    setBusTimers(busTimers.filter((_, i) => i !== index));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -134,8 +138,8 @@ const DayCardForm: React.FC<DayCardFormProps> = ({
           <label className="text-sm font-black text-gray-700 uppercase tracking-widest ml-1">
             Bus Timers
           </label>
-          <div className="flex gap-4">
-            <div className="relative group flex-grow">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="relative group col-span-1 lg:col-span-1">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-green-600 transition-colors">
                 <Clock size={20} />
               </div>
@@ -146,35 +150,56 @@ const DayCardForm: React.FC<DayCardFormProps> = ({
                 onChange={(e) => setNewTime(e.target.value)}
               />
             </div>
+
+            <div className="relative group col-span-1 lg:col-span-1">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-green-600 transition-colors">
+                <Users size={20} />
+              </div>
+              <input
+                type="number"
+                placeholder="Capacity"
+                className="w-full pl-12 pr-5 py-4 bg-gray-50/50 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-green-600/5 focus:border-green-600/30 transition-all font-bold text-gray-900"
+                value={newCapacity}
+                onChange={(e) => setNewCapacity(Number(e.target.value))}
+              />
+            </div>
+
             <button
               type="button"
               onClick={handleAddTime}
-              className="px-8 bg-gray-900 text-white rounded-2xl font-bold hover:shadow-xl active:scale-95 transition-all flex items-center gap-2"
+              className="px-8 bg-gray-900 text-white rounded-2xl font-bold hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
             >
               <Plus size={20} />
-              Add
+              Add Bus
             </button>
           </div>
 
           <div className="flex flex-wrap gap-3 mt-4">
             <AnimatePresence>
-              {busTimers.map((time) => (
-                <motion.span
-                  key={time}
+              {busTimers.map((bus, index) => (
+                <motion.div
+                  key={`${bus.time}-${index}`}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
-                  className="px-4 py-2 bg-white border-2 border-gray-100 rounded-xl flex items-center gap-2 text-gray-700 font-bold shadow-sm"
+                  className="px-4 py-3 bg-white border-2 border-gray-100 rounded-2xl flex items-center justify-between gap-6 text-gray-700 font-bold shadow-sm min-w-[150px]"
                 >
-                  {time}
+                  <div className="flex flex-col">
+                    <span className="text-xs uppercase tracking-widest text-gray-400 font-black">Time</span>
+                    <span className="text-sm">{bus.time}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs uppercase tracking-widest text-gray-400 font-black">Cap</span>
+                    <span className="text-sm">{bus.capacity}</span>
+                  </div>
                   <button
                     type="button"
-                    onClick={() => removeTime(time)}
-                    className="p-1 hover:bg-red-50 rounded-md text-red-500 transition-colors"
+                    onClick={() => removeTime(index)}
+                    className="p-2 hover:bg-red-50 rounded-xl text-red-500 transition-colors"
                   >
-                    <X size={14} />
+                    <X size={16} />
                   </button>
-                </motion.span>
+                </motion.div>
               ))}
             </AnimatePresence>
             {busTimers.length === 0 && (

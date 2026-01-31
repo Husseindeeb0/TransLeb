@@ -66,12 +66,12 @@ const DayCard: React.FC<DayCardProps> = ({ card, onEdit, onDelete }) => {
           </div>
 
           <div className="flex flex-wrap gap-2 mb-6">
-            {card.busTimers.slice(0, 3).map((time, idx) => (
+            {card.busTimers.slice(0, 3).map((bus, idx) => (
               <span
                 key={idx}
                 className="px-3 py-1 bg-gray-100/50 text-gray-600 rounded-lg text-xs font-bold border border-gray-100"
               >
-                {time}
+                {bus.time}
               </span>
             ))}
             {card.busTimers.length > 3 && (
@@ -97,13 +97,21 @@ const DayCard: React.FC<DayCardProps> = ({ card, onEdit, onDelete }) => {
               {card.formState.charAt(0).toUpperCase() + card.formState.slice(1)}
             </span>
           </div>
-          <Link 
-            to={`/day-card/${card.dayCardId}`}
-            className="flex items-center gap-1 text-red-600 font-black text-xs uppercase tracking-wider group/btn"
-          >
-            View Details
-            <ChevronRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
-          </Link>
+          <div className="flex gap-4">
+            <Link 
+              to={`/day-card-stats/${card.dayCardId}`}
+              className="flex items-center gap-1 text-gray-400 hover:text-gray-900 font-black text-[10px] uppercase tracking-wider transition-colors"
+            >
+              Stats
+            </Link>
+            <Link 
+              to={`/day-card/${card.dayCardId}`}
+              className="flex items-center gap-1 text-red-600 font-black text-xs uppercase tracking-wider group/btn"
+            >
+              View Details
+              <ChevronRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
+            </Link>
+          </div>
         </div>
       </div>
     </motion.div>

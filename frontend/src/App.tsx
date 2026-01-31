@@ -7,6 +7,7 @@ import Landing from './pages/Landing';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import DayCardDetails from './pages/DayCardDetails';
+import DayCardStat from './pages/DayCardStat';
 import { Toaster } from 'react-hot-toast';
 
 import { useAuth } from './hooks/useAuth';
@@ -59,6 +60,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <DayCardDetails />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/day-card-stats/:dayCardId"
+            element={
+              <ProtectedRoute>
+                <DayCardStat />
               </ProtectedRoute>
             }
           />
