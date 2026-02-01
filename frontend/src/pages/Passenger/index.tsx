@@ -550,7 +550,7 @@ const Ride: React.FC = () => {
                       <User className="w-4 h-4 text-gray-400" />
                     </div>
                     <span className="font-semibold text-lg">
-                      {driverDetails.data.name}
+                      {driverDetails.name}
                     </span>
                   </div>
 
@@ -561,26 +561,10 @@ const Ride: React.FC = () => {
                           #
                         </span>
                       </div>
-                      <div>
-                        <p className="text-xs text-gray-400 font-medium uppercase">
-                          Plate
-                        </p>
-                        <p className="font-mono font-bold text-gray-900">
-                          {driverDetails.data.plateNumber}
-                        </p>
-                      </div>
                     </div>
                     <div className="flex-1 bg-gray-50/80 p-3 rounded-xl border border-gray-100 flex items-center gap-3">
                       <div className="bg-white p-2 rounded-lg shadow-sm">
                         <Navigation className="w-4 h-4 text-gray-400" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-400 font-medium uppercase">
-                          Model
-                        </p>
-                        <p className="font-bold text-gray-900 line-clamp-1">
-                          {driverDetails.data.carModel}
-                        </p>
                       </div>
                     </div>
                   </div>

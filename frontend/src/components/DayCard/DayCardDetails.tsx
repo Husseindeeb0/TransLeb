@@ -1,15 +1,17 @@
 import { motion } from 'framer-motion';
-import { Calendar, MapPin, ChevronLeft, Share2, Info } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { DayCard as DayCardType } from '../../types/dayCardTypes';
 import TimerDisplay from './TimerDisplay';
 import PassengerForm from '../PassengerForm';
+import { useGetUserDetailsQuery } from '../../state/services/user/userAPI';
 
 interface DayCardDetailsProps {
   card: DayCardType;
 }
 
 const DayCardDetails: React.FC<DayCardDetailsProps> = ({ card }) => {
+  const { data, isLoading, isError } = useGetUserDetailsQuery(card.driverId);
   const navigate = useNavigate();
 
   const formattedDate = new Date(card.date).toLocaleDateString('en-US', {
@@ -21,6 +23,7 @@ const DayCardDetails: React.FC<DayCardDetailsProps> = ({ card }) => {
 
   // Decide if form is locked (e.g., if archived or if no timers yet?)
   const isLocked = card.formState === 'archived';
+
 
   return (
     <div className="min-h-screen bg-[#f8fafc] pb-20">
@@ -38,17 +41,13 @@ const DayCardDetails: React.FC<DayCardDetailsProps> = ({ card }) => {
           </button>
 
           <div className="flex items-center gap-4">
-            <button className="p-3 text-gray-400 hover:text-red-600 transition-colors">
-              <Share2 size={20} />
-            </button>
-            <div className="h-6 w-px bg-gray-100" />
             <div className="flex items-center gap-3">
               <div className="text-right hidden sm:block">
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Driver</p>
-                <p className="text-sm font-bold text-gray-900">Hussein Deeb</p>
+                <p className="text-sm font-bold text-gray-900">{data?.name}</p>
               </div>
               <div className="w-10 h-10 bg-gradient-to-br from-red-600 to-green-600 rounded-full flex items-center justify-center text-white font-black text-xs">
-                HD
+                {data?.name ? data.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '??'}
               </div>
             </div>
           </div>
@@ -81,27 +80,12 @@ const DayCardDetails: React.FC<DayCardDetailsProps> = ({ card }) => {
               <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-4">
                 {formattedDate}
               </h1>
-              <div className="flex flex-wrap items-center gap-6 text-gray-300">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-red-500" />
-                  <span className="font-bold">Trip Date</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-green-500" />
-                  <span className="font-bold">Route: South - Beirut</span>
-                </div>
-              </div>
             </div>
 
             <div className="flex items-center gap-8 bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[2.5rem]">
               <div className="text-center">
                 <p className="text-4xl font-black mb-1">{card.busTimers.length}</p>
                 <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Planned Trips</p>
-              </div>
-              <div className="w-px h-12 bg-white/10" />
-              <div className="text-center">
-                <p className="text-4xl font-black mb-1">24</p>
-                <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Seats Left</p>
               </div>
             </div>
           </div>
@@ -116,20 +100,6 @@ const DayCardDetails: React.FC<DayCardDetailsProps> = ({ card }) => {
             transition={{ delay: 0.2 }}
           >
             <TimerDisplay timers={card.busTimers} formState={card.formState} />
-            
-            {/* Additional Info Helper */}
-            <div className="mt-10 p-8 bg-blue-50/50 border-2 border-dashed border-blue-200 rounded-[2.5rem] flex items-start gap-4">
-              <div className="p-3 bg-white rounded-2xl shadow-sm text-blue-600">
-                <Info size={24} />
-              </div>
-              <div>
-                <h4 className="font-black text-gray-900 mb-1">Important Notice</h4>
-                <p className="text-sm text-gray-500 font-medium leading-relaxed">
-                  Departure times might slightly vary depending on traffic conditions. 
-                  Please be at the pickup location 10 minutes before the scheduled time.
-                </p>
-              </div>
-            </div>
           </motion.div>
 
           {/* Right Column: Passenger Form */}

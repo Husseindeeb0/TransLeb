@@ -15,6 +15,8 @@ const userSchema = new mongoose.Schema<UserType>(
       required: true,
     },
     refreshToken: { type: String, default: null },
+    phoneNumber: { type: String, default: null },
+    region: { type: String, default: null },
   },
   { timestamps: true },
 );

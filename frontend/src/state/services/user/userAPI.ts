@@ -5,15 +5,30 @@ export const userApi = createApi({
   reducerPath: 'userApi',
   baseQuery: axiosBaseQuery(),
   endpoints: (builder) => ({
+    getMe: builder.query<
+      {
+        _id: string;
+        name: string;
+        email: string;
+        role: string;
+        phoneNumber?: string;
+        region?: string;
+      },
+      void
+    >({
+      query: () => ({
+        url: `/user/me`,
+        method: 'GET',
+      }),
+    }),
     getUserDetails: builder.query<
       {
-        message: string;
-        data: {
-          name: string;
-          phone: string;
-          carModel?: string;
-          plateNumber?: string;
-        };
+        _id: string,
+        name: string,
+        email: string,
+        role: string,
+        phoneNumber?: string,
+        region?: string,
       },
       string
     >({
@@ -22,7 +37,23 @@ export const userApi = createApi({
         method: 'GET',
       }),
     }),
+    getAllDrivers: builder.query<
+      {
+        _id: string;
+        name: string;
+        email: string;
+        role: string;
+        phoneNumber?: string;
+        region?: string;
+      }[],
+      void
+    >({
+      query: () => ({
+        url: `/user/getAllDrivers`,
+        method: 'GET',
+      }),
+    }),
   }),
 });
 
-export const { useGetUserDetailsQuery } = userApi;
+export const { useGetMeQuery, useGetUserDetailsQuery, useGetAllDriversQuery } = userApi;

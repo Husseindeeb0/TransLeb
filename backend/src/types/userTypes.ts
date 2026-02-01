@@ -11,6 +11,8 @@ export interface UserType {
   coordinates: Types.ObjectId | CoordinatesType;
   createdAt: Date;
   updatedAt: Date;
+  phoneNumber?: string;
+  region?: string;
 }
 
 export interface SignupRequest {
@@ -19,6 +21,8 @@ export interface SignupRequest {
   password: string;
   role: string;
   coordinates?: Types.ObjectId | CoordinatesType;
+  phoneNumber?: string;
+  region?: string;
 }
 
 export interface SigninRequest {
@@ -32,6 +36,8 @@ export interface UserResponse {
   email: string;
   role: string;
   coordinates?: Types.ObjectId | CoordinatesType;
+  phoneNumber?: string;
+  region?: string;
 }
 
 export interface AuthResponse extends UserResponse {

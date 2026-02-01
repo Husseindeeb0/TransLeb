@@ -31,7 +31,7 @@ export const authApi = createApi({
     }),
     checkAuth: builder.query({
       query: () => ({
-        url: '/auth/check',
+        url: '/user/me',
         method: 'GET',
       }),
       providesTags: ['Auth'],
