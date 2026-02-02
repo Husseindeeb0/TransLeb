@@ -43,12 +43,39 @@ const DayCardForm: React.FC<DayCardFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({
-      dayCardId: initialData?.dayCardId, // if undefined then removed from json
-      date: new Date(date),
-      busTimers,
-      formState,
-    });
+
+    const data: DayCardFormData = {
+      dayCardId: initialData?.dayCardId,
+    };
+
+    let hasChanged = false;
+
+    // Check Date
+    const newDateStr = new Date(date).toISOString().split('T')[0];
+    const oldDateStr = initialData ? new Date(initialData.date).toISOString().split('T')[0] : '';
+    
+    if (!initialData || newDateStr !== oldDateStr) {
+      data.date = new Date(date);
+      hasChanged = true;
+    }
+
+    // Check formState
+    if (!initialData || formState !== initialData.formState) {
+      data.formState = formState;
+      hasChanged = true;
+    }
+
+    // Check busTimers
+    if (!initialData || JSON.stringify(busTimers) !== JSON.stringify(initialData.busTimers)) {
+      data.busTimers = busTimers;
+      hasChanged = true;
+    }
+
+    if (hasChanged) {
+      onSubmit(data);
+    } else {
+      onCancel();
+    }
   };
 
   return (

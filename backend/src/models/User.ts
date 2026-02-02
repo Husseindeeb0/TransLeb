@@ -17,6 +17,9 @@ const userSchema = new mongoose.Schema<UserType>(
     refreshToken: { type: String, default: null },
     phoneNumber: { type: String, default: null },
     region: { type: String, default: null },
+    description: { type: String, default: null },
+    profileImage: { type: String, default: null },
+    coverImage: { type: String, default: null },
   },
   { timestamps: true },
 );

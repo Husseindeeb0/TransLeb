@@ -13,9 +13,9 @@ export interface DayCard {
 
 export interface DayCardFormData {
     dayCardId?: string;
-    date: Date | string;
-    busTimers: BusSchedule[];
-    formState: string;
+    date?: Date | string;
+    busTimers?: BusSchedule[];
+    formState?: string;
 }
 
 export interface CreateDayCardRequest {

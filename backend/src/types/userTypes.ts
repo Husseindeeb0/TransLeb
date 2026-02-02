@@ -13,6 +13,9 @@ export interface UserType {
   updatedAt: Date;
   phoneNumber?: string;
   region?: string;
+  description?: string;
+  profileImage?: string;
+  coverImage?: string;
 }
 
 export interface SignupRequest {
@@ -38,6 +41,9 @@ export interface UserResponse {
   coordinates?: Types.ObjectId | CoordinatesType;
   phoneNumber?: string;
   region?: string;
+  description?: string;
+  profileImage?: string;
+  coverImage?: string;
 }
 
 export interface AuthResponse extends UserResponse {

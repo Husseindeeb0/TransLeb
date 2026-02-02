@@ -74,14 +74,21 @@ export const updateForm = async (req: Request, res: Response) => {
       });
     }
 
-    const updatedForm = await PassengerForm.findByIdAndUpdate(formId, {
-      fullName,
-      phoneNumber,
-      livingPlace,
-      desiredTime,
-      passengerCount,
-      assignedBusTime,
-    });
+    const updateData: any = {};
+    if (fullName !== undefined) updateData.fullName = fullName;
+    if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
+    if (livingPlace !== undefined) updateData.livingPlace = livingPlace;
+    if (desiredTime !== undefined) updateData.desiredTime = desiredTime;
+    if (passengerCount !== undefined)
+      updateData.passengerCount = passengerCount;
+    if (assignedBusTime !== undefined)
+      updateData.assignedBusTime = assignedBusTime;
+
+    const updatedForm = await PassengerForm.findByIdAndUpdate(
+      formId,
+      updateData,
+      { new: true },
+    );
 
     if (!updatedForm) {
       return res.status(404).json({

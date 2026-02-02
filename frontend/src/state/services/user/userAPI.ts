@@ -13,6 +13,9 @@ export const userApi = createApi({
         role: string;
         phoneNumber?: string;
         region?: string;
+        description?: string;
+        profileImage?: string;
+        coverImage?: string;
       },
       void
     >({
@@ -29,6 +32,9 @@ export const userApi = createApi({
         role: string,
         phoneNumber?: string,
         region?: string,
+        description?: string,
+        profileImage?: string,
+        coverImage?: string,
       },
       string
     >({
@@ -45,6 +51,9 @@ export const userApi = createApi({
         role: string;
         phoneNumber?: string;
         region?: string;
+        description?: string;
+        profileImage?: string;
+        coverImage?: string;
       }[],
       void
     >({
@@ -53,7 +62,43 @@ export const userApi = createApi({
         method: 'GET',
       }),
     }),
+    updateProfile: builder.mutation<
+      {
+        message: string;
+        user: {
+          _id: string;
+          name: string;
+          email: string;
+          phoneNumber?: string;
+          region?: string;
+          description?: string;
+          profileImage?: string;
+          coverImage?: string;
+          role: string;
+        };
+      },
+      {
+        name?: string;
+        email?: string;
+        phoneNumber?: string;
+        region?: string;
+        description?: string;
+        profileImage?: string;
+        coverImage?: string;
+      }
+    >({
+      query: (body) => ({
+        url: `/user/updateProfile`,
+        method: 'PATCH',
+        data: body,
+      }),
+    }),
   }),
 });
 
-export const { useGetMeQuery, useGetUserDetailsQuery, useGetAllDriversQuery } = userApi;
+export const { 
+  useGetMeQuery, 
+  useGetUserDetailsQuery, 
+  useGetAllDriversQuery,
+  useUpdateProfileMutation 
+} = userApi;

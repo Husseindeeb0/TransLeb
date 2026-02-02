@@ -66,8 +66,38 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, availableTimes
 
     try {
       if (formId) {
-        await updateForm({ ...formData, formId }).unwrap();
-        toast.success('Your reservation has been updated!');
+        // Partial Update logic
+        const updateData: any = { formId };
+        const existing = existenceData?.data as any;
+        let hasChanged = false;
+
+        if (formData.fullName !== (existing?.fullName || "")) {
+          updateData.fullName = formData.fullName;
+          hasChanged = true;
+        }
+        if (formData.phoneNumber !== (existing?.phoneNumber || "")) {
+          updateData.phoneNumber = formData.phoneNumber;
+          hasChanged = true;
+        }
+        if (formData.livingPlace !== (existing?.livingPlace || "")) {
+          updateData.livingPlace = formData.livingPlace;
+          hasChanged = true;
+        }
+        if (formData.desiredTime !== (existing?.desiredTime || "")) {
+          updateData.desiredTime = formData.desiredTime;
+          hasChanged = true;
+        }
+        if (formData.passengerCount !== (existing?.passengerCount || 1)) {
+          updateData.passengerCount = formData.passengerCount;
+          hasChanged = true;
+        }
+
+        if (hasChanged) {
+          await updateForm(updateData).unwrap();
+          toast.success('Your reservation has been updated!');
+        } else {
+          toast('No changes detected', { icon: 'ℹ️' });
+        }
       } else {
         const response = await submitForm({ ...formData, dayCardId }).unwrap();
         setFormId(response.formId);
