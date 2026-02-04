@@ -7,9 +7,9 @@ export const dayCardApi = createApi({
   baseQuery: axiosBaseQuery(),
   tagTypes: ["DayCard"],
   endpoints: (builder) => ({
-    getDayCards: builder.query<DayCard[], void>({
-      query: () => ({
-        url: "/dayCard/getDayCards",
+    getDayCards: builder.query<DayCard[], string>({
+      query: (driverId) => ({
+        url: `/dayCard/getDayCards/${driverId}`,
         method: "GET"
       }),
       providesTags: ["DayCard"]

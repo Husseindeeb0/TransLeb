@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, MapPin, Phone, ArrowRight, Loader2, Users } from 'lucide-react';
+import { Search, MapPin, Phone, ArrowRight, Users } from 'lucide-react';
 import { useGetAllDriversQuery } from '../../state/services/user/userAPI';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../../components/Loader';
 
 const Home = () => {
   const { data: drivers, isLoading, isError } = useGetAllDriversQuery();
@@ -14,17 +15,7 @@ const Home = () => {
   );
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] gap-4 font-inter">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-        >
-          <Loader2 className="w-16 h-16 text-red-600" />
-        </motion.div>
-        <p className="font-black text-gray-500 text-lg uppercase tracking-widest">Finding Drivers...</p>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (isError) {

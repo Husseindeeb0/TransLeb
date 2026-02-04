@@ -1,7 +1,8 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Response } from "express";
-import { UserType, TokenPayload } from "../types";
+import { TokenPayload } from "../types";
+import { UserType } from "../types/userTypes";
 import dotenv from "dotenv";
 dotenv.config();
 

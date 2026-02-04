@@ -5,8 +5,8 @@ import type { DayCard as DayCardType } from '../../types/dayCardTypes';
 
 interface DayCardProps {
   card: DayCardType;
-  onEdit: (card: DayCardType) => void;
-  onDelete: (id: string) => void;
+  onEdit?: (card: DayCardType) => void;
+  onDelete?: (id: string) => void;
 }
 
 const DayCard: React.FC<DayCardProps> = ({ card, onEdit, onDelete }) => {
@@ -36,20 +36,24 @@ const DayCard: React.FC<DayCardProps> = ({ card, onEdit, onDelete }) => {
             <Calendar className="w-6 h-6 text-red-600" />
           </div>
           <div className="flex gap-2">
-            <button
-              onClick={() => onEdit(card)}
-              className="p-2 hover:bg-green-50 rounded-xl text-green-600 transition-colors"
-              title="Edit Card"
-            >
-              <Edit3 size={18} />
-            </button>
-            <button
-              onClick={() => onDelete(card.dayCardId)}
-              className="p-2 hover:bg-red-50 rounded-xl text-red-600 transition-colors"
-              title="Delete Card"
-            >
-              <Trash2 size={18} />
-            </button>
+            {onEdit && (
+              <button
+                onClick={() => onEdit(card)}
+                className="p-2 hover:bg-green-50 rounded-xl text-green-600 transition-colors"
+                title="Edit Card"
+              >
+                <Edit3 size={18} />
+              </button>
+            )}
+            {onDelete && (
+              <button
+                onClick={() => onDelete(card.dayCardId)}
+                className="p-2 hover:bg-red-50 rounded-xl text-red-600 transition-colors"
+                title="Delete Card"
+              >
+                <Trash2 size={18} />
+              </button>
+            )}
           </div>
         </div>
 

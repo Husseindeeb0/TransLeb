@@ -12,7 +12,7 @@ const router = express.Router();
 router.post("/create", checkAuth, createDayCard);
 router.patch("/update/:dayCardId", checkAuth, updateDayCard);
 router.delete("/delete/:dayCardId", checkAuth, deleteDayCard);
-router.get("/getDayCards", checkAuth, getDayCards);
+router.get("/getDayCards/:driverId", checkAuth, getDayCards);
 router.get("/getDayCardById/:dayCardId", checkAuth, getDayCardById);
 
 export default router;

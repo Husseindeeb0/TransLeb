@@ -1,25 +1,15 @@
 import { useParams } from 'react-router-dom';
 import { useGetDayCardByIdQuery } from '../../state/services/dayCard/dayCardAPI';
 import DayCardDetails from '../../components/DayCard/DayCardDetails';
-import { Loader2, AlertCircle } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { AlertCircle } from 'lucide-react';
+import Loader from '../../components/Loader';
 
 const DayCardDetailsPage = () => {
   const { dayCardId } = useParams<{ dayCardId: string }>();
   const { data: card, isLoading, isError, refetch } = useGetDayCardByIdQuery(dayCardId || '');
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] gap-4">
-        <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-        >
-            <Loader2 className="w-16 h-16 text-red-600" />
-        </motion.div>
-        <p className="font-black text-gray-500 text-lg">Preparing your journey details...</p>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (isError || !card) {

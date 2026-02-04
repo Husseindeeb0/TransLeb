@@ -37,9 +37,6 @@ const Loader = () => {
           transition={{ delay: 0.2 }}
           className="flex flex-col items-center gap-2"
         >
-          <h2 className="text-xl font-black text-gray-900 tracking-tight">
-            TransLeb
-          </h2>
           <div className="flex gap-1">
             <motion.div
               animate={{ opacity: [0.3, 1, 0.3] }}

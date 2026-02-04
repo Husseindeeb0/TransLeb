@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, LayoutGrid, List, Search, Loader2, AlertCircle } from 'lucide-react';
+import { Plus, LayoutGrid, List, Search, AlertCircle } from 'lucide-react';
 import { 
   useGetDayCardsQuery, 
   useCreateDayCardMutation, 
@@ -12,10 +12,11 @@ import DayCardForm from '../../components/DayCard/DayCardForm';
 import type { DayCard as DayCardType, DayCardFormData, CreateDayCardRequest, UpdateDayCardRequest } from '../../types/dayCardTypes';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../hooks/useAuth';
+import Loader from '../../components/Loader';
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { data: cards, isLoading, isError, refetch } = useGetDayCardsQuery();
+  const { data: cards, isLoading, isError, refetch } = useGetDayCardsQuery(user?._id || "");
   const [createCard, { isLoading: isCreating }] = useCreateDayCardMutation();
   const [updateCard, { isLoading: isUpdating }] = useUpdateDayCardMutation();
   const [deleteCard] = useDeleteDayCardMutation();
@@ -146,10 +147,7 @@ const Dashboard = () => {
               {/* Grid with custom border styling on empty state or main container */}
               <div className="relative">
                 {isLoading ? (
-                  <div className="flex flex-col items-center justify-center py-40 gap-4">
-                    <Loader2 className="w-12 h-12 text-red-600 animate-spin" />
-                    <p className="font-bold text-gray-500">Fetching your schedules...</p>
-                  </div>
+                  <Loader />
                 ) : isError ? (
                   <div className="bg-red-50 border-2 border-red-100 p-12 rounded-[2.5rem] flex flex-col items-center text-center">
                     <AlertCircle className="w-16 h-16 text-red-500 mb-4" />

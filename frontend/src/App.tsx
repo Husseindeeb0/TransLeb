@@ -10,12 +10,14 @@ import Dashboard from './pages/Dashboard';
 import DayCardDetails from './pages/DayCardDetails';
 import DayCardStat from './pages/DayCardStat';
 import Profile from './pages/Profile';
+import DriverProfile from './pages/DriverProfile';
 import { Toaster } from 'react-hot-toast';
 
 import { useAuth } from './hooks/useAuth';
 import ProtectedRoute from './components/ProtectedRoutes';
-import Loader from './components/Loader';
 import Landing from './pages/Landing';
+import Loader from './components/Loader';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   const { isLoading } = useAuth();
@@ -27,6 +29,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
+        <ScrollToTop />
         <Navbar />
         <Routes>
           <Route path="/" element={<Landing />} />
@@ -80,6 +83,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/:userId"
+            element={
+              <ProtectedRoute>
+                <DriverProfile />
               </ProtectedRoute>
             }
           />

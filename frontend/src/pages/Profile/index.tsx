@@ -9,10 +9,11 @@ import {
 import { useGetMeQuery, useUpdateProfileMutation } from '../../state/services/user/userAPI';
 import { useGetDayCardsQuery } from '../../state/services/dayCard/dayCardAPI';
 import toast from 'react-hot-toast';
+import Loader from '../../components/Loader';
 
 const Profile = () => {
   const { data: user, isLoading, refetch } = useGetMeQuery();
-  const { data: dayCards, isLoading: isLoadingCards } = useGetDayCardsQuery();
+  const { data: dayCards, isLoading: isLoadingCards } = useGetDayCardsQuery(user?._id || "");
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
   const [isEditing, setIsEditing] = useState(false);
 
@@ -85,17 +86,7 @@ const Profile = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] gap-4 font-inter">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-        >
-          <Loader2 className="w-16 h-16 text-red-600" />
-        </motion.div>
-        <p className="font-black text-gray-400 uppercase tracking-widest text-xs">Loading Profile...</p>
-      </div>
-    );
+    return <Loader />
   }
 
   return (
