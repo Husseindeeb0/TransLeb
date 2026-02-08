@@ -71,20 +71,6 @@ const Navbar: React.FC<NavbarProps> = () => {
               {isAuthenticated && (
                 <>
                   <Link
-                    to="/ride"
-                    className="flex items-center space-x-2 px-5 py-2.5 rounded-xl text-gray-600 hover:bg-green-50 hover:text-green-700 transition-all duration-300 font-black uppercase text-[11px] tracking-widest border border-transparent hover:border-green-100"
-                  >
-                    <User className="h-4 w-4" />
-                    <span>Find a Ride</span>
-                  </Link>
-                  <Link
-                    to="/drive"
-                    className="flex items-center space-x-2 px-5 py-2.5 rounded-xl text-gray-600 hover:bg-red-50 hover:text-red-700 transition-all duration-300 font-black uppercase text-[11px] tracking-widest border border-transparent hover:border-red-100"
-                  >
-                    <Car className="h-4 w-4" />
-                    <span>Become a Driver</span>
-                  </Link>
-                  <Link
                     to="/dashboard"
                     className="flex items-center space-x-2 px-5 py-2.5 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all duration-300 font-black uppercase text-[11px] tracking-widest border border-transparent hover:border-gray-200"
                   >
@@ -241,24 +227,6 @@ const Navbar: React.FC<NavbarProps> = () => {
 
                 {isAuthenticated ? (
                   <>
-                    <Link
-                      to="/ride"
-                      className="flex items-center space-x-3 px-5 py-4 rounded-2xl text-gray-600 hover:bg-green-50 hover:text-green-700 transition-all font-black uppercase text-[10px] tracking-widest"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <User className="h-4 w-4" />
-                      <span>Find a Ride</span>
-                    </Link>
-
-                    <Link
-                      to="/drive"
-                      className="flex items-center space-x-3 px-5 py-4 rounded-2xl text-gray-600 hover:bg-red-50 hover:text-red-700 transition-all font-black uppercase text-[10px] tracking-widest"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Car className="h-4 w-4" />
-                      <span>Become a Driver</span>
-                    </Link>
-
                     <Link
                       to="/dashboard"
                       className="flex items-center space-x-3 px-5 py-4 rounded-2xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-black uppercase text-[10px] tracking-widest"

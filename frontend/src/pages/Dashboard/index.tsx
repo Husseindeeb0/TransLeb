@@ -133,15 +133,6 @@ const Dashboard = () => {
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
-
-                <div className="flex items-center gap-4 p-1 bg-white rounded-2xl border border-gray-100 shadow-sm">
-                  <button className="p-3 bg-gray-50 rounded-xl text-gray-900 shadow-sm">
-                    <LayoutGrid size={20} />
-                  </button>
-                  <button className="p-3 text-gray-400 hover:text-gray-600 transition-colors">
-                    <List size={20} />
-                  </button>
-                </div>
               </div>
 
               {/* Grid with custom border styling on empty state or main container */}

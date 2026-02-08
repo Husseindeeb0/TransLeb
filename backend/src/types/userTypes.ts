@@ -15,7 +15,9 @@ export interface UserType {
   region?: string;
   description?: string;
   profileImage?: string;
+  profileImageId?: string;
   coverImage?: string;
+  coverImageId?: string;
 }
 
 export interface SignupRequest {
@@ -43,7 +45,9 @@ export interface UserResponse {
   region?: string;
   description?: string;
   profileImage?: string;
+  profileImageId?: string;
   coverImage?: string;
+  coverImageId?: string;
 }
 
 export interface AuthResponse extends UserResponse {

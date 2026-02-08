@@ -182,16 +182,6 @@ const DriverProfile = () => {
                 <MessageCircle size={20} />
                 Chat on WhatsApp
               </motion.button>
-              <div className="flex gap-4">
-                <button className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-gray-50 text-gray-600 rounded-2xl font-bold text-xs hover:bg-gray-100 transition-all">
-                  <Clock size={16} />
-                  Reliable
-                </button>
-                <button className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-gray-50 text-gray-600 rounded-2xl font-bold text-xs hover:bg-gray-100 transition-all">
-                  <ExternalLink size={16} />
-                  Share
-                </button>
-              </div>
             </div>
           </div>
         </motion.div>

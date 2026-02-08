@@ -20,7 +20,7 @@ const Signin = () => {
         email,
         password,
       }).unwrap();
-      navigate('/');
+      navigate('/home');
     } catch (err) {
       console.error('Login failed side-effect:', err);
     }

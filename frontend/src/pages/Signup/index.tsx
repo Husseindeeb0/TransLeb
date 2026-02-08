@@ -42,7 +42,7 @@ const Signup = () => {
         password,
         role,
       }).unwrap();
-      navigate('/');
+      navigate('/home');
     } catch (err) {
       console.error('Signup failed side-effect:', err);
     }

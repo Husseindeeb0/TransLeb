@@ -41,9 +41,9 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] pb-20 font-inter">
+    <div className="min-h-screen bg-[#f8fafc] pb-10 font-inter">
       {/* Hero Section */}
-      <div className="relative bg-gray-900 pt-32 pb-24 overflow-hidden">
+      <div className="relative bg-gray-900 pt-20 pb-24 overflow-hidden">
         {/* Animated Background Blobs */}
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-red-600/10 rounded-full blur-[120px] -mr-80 -mt-80 animate-pulse" />
         <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-green-600/10 rounded-full blur-[120px] -ml-80 -mb-80 animate-pulse opacity-50" />
@@ -85,7 +85,7 @@ const Home = () => {
       {/* Drivers List Section */}
       <div className="max-w-7xl mx-auto px-6 -mt-16">
         {/* Stats Section with sleek design */}
-        <div className="mb-20 grid grid-cols-1 md:grid-cols-3 gap-6 relative z-20">
+        <div className="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6 relative z-20">
             <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl shadow-gray-200/50 border border-gray-50 flex items-center gap-6">
                 <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center border border-red-100/50 shadow-inner">
                     <Users className="w-8 h-8 text-red-600" />
@@ -96,16 +96,16 @@ const Home = () => {
                 </div>
             </div>
             {/* Design accents */}
-            <div className="hidden md:block col-span-2 bg-gradient-to-r from-red-600 to-green-600 p-px rounded-[2.5rem]">
-                <div className="bg-white/90 backdrop-blur-xl h-full w-full rounded-[2.5rem] px-10 flex items-center justify-between">
-                    <div className="flex gap-10">
+            <div className="hidden md:block col-span-2 bg-gradient-to-r from-red-600 to-green-600 rounded-[2.5rem]">
+                <div className="bg-white/90 backdrop-blur-xl h-full w-full rounded-[2.5rem] px-10 flex justify-between">
+                    <div className="flex justify-between w-full">
                         <div className="flex items-center gap-3">
                             <div className="w-2 h-2 bg-green-500 rounded-full" />
-                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Verified background</span>
+                            <span className="text-sm font-black text-gray-400 uppercase tracking-widest">Verified background</span>
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="w-2 h-2 bg-red-500 rounded-full" />
-                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">24/7 Availability</span>
+                            <span className="text-sm font-black text-gray-400 uppercase tracking-widest">24/7 Availability</span>
                         </div>
                     </div>
                 </div>
@@ -126,72 +126,99 @@ const Home = () => {
                 className="group h-full"
               >
                 <div 
-                  className="relative bg-white rounded-[3.5rem] shadow-2xl shadow-gray-200/40 border border-gray-100/50 cursor-pointer overflow-hidden h-full flex flex-col group-hover:-translate-y-4 group-hover:shadow-[0_45px_70px_-25px_rgba(0,0,0,0.15)] group-hover:border-red-100 transition-all duration-700 ease-out"
-                  onClick={() => navigate(`/profile/${driver._id}`)}
+                  className="relative bg-white rounded-[3rem] shadow-2xl shadow-gray-200/40 border border-gray-100/50 h-full flex flex-col group-hover:-translate-y-2 group-hover:shadow-[0_35px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 ease-out"
                 >
-                  {/* Card Header Color - Placeholder for Image */}
-                  <div className="h-40 w-full relative overflow-hidden bg-gray-100 group-hover:scale-105 transition-transform duration-700 ease-out">
-                     <div className="absolute inset-0 bg-gradient-to-br from-red-600 to-green-600 opacity-20" />
-                     {/* Pattern Overlay */}
-                     <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, black 1px, transparent 0)`, backgroundSize: '24px 24px' }} />
+                  {/* Card Header Illustration/Image */}
+                  <div className="h-32 w-full relative overflow-hidden bg-gray-100 group-hover:scale-105 transition-transform duration-700 ease-out rounded-t-[3rem]">
+                     {driver.coverImage ? (
+                        <img 
+                          src={driver.coverImage} 
+                          alt={`${driver.name} cover`} 
+                          className="w-full h-full object-cover"
+                        />
+                     ) : (
+                        <>
+                          <div className="absolute inset-0 bg-gradient-to-br from-red-600 to-green-600 opacity-20" />
+                          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, black 1px, transparent 0)`, backgroundSize: '24px 24px' }} />
+                        </>
+                     )}
                   </div>
 
                   {/* Profile Avatar Overlap */}
-                  <div className="relative -mt-16 px-10 flex items-end justify-between mb-8">
-                    <div className="w-28 h-28 bg-white p-2 rounded-[2.5rem] shadow-xl relative z-10 group-hover:rotate-6 transition-transform duration-500">
-                        <div className="w-full h-full bg-gray-900 rounded-[2rem] flex items-center justify-center text-white text-4xl font-black relative overflow-hidden">
-                           <div className="absolute inset-0 bg-gradient-to-tr from-red-600/30 to-green-600/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                           <span className="relative z-10">
-                             {driver.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
-                           </span>
+                  <div className="relative -mt-14 px-8 flex items-end justify-between mb-4">
+                    <div className="w-24 h-24 bg-white p-2 rounded-[2rem] shadow-xl relative z-10 group-hover:rotate-3 transition-transform duration-500">
+                        <div className="w-full h-full bg-gray-900 rounded-[1.5rem] flex items-center justify-center text-white text-3xl font-black relative overflow-hidden">
+                           {driver.profileImage ? (
+                              <img 
+                                src={driver.profileImage} 
+                                alt={driver.name} 
+                                className="w-full h-full object-cover rounded-[1.4rem]"
+                              />
+                           ) : (
+                              <>
+                                <div className="absolute inset-0 bg-gradient-to-tr from-red-600/30 to-green-600/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                <span className="relative z-10">
+                                  {driver.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                                </span>
+                              </>
+                           )}
                         </div>
                     </div>
                   </div>
 
                   {/* Body Content */}
-                  <div className="px-10 pb-12 flex flex-col flex-1">
-                    <div className="mb-10">
-                        <h3 className="text-4xl font-black text-gray-900 tracking-tighter mb-2 group-hover:text-red-600 transition-colors uppercase italic leading-none">
-                        {driver.name}
-                        </h3>
-                        <div className="flex items-center gap-2">
-                            <span className="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em]">Official partner</span>
+                  <div className="px-8 pb-5 flex flex-col flex-1 relative z-10">
+                    <div className="mb-6">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h3 className="text-3xl font-black text-gray-900 tracking-tighter group-hover:text-red-600 transition-colors uppercase italic leading-none mb-2">
+                              {driver.name}
+                            </h3>
+                            <div className="flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                                <span className="text-[8px] font-black text-gray-400 uppercase tracking-[0.25em]">Active Status</span>
+                            </div>
+                          </div>
+                          <div className="bg-gray-100 text-gray-900 p-2 rounded-xl group-hover:bg-red-600 group-hover:text-white transition-colors duration-500">
+                             <Users size={14} />
+                          </div>
                         </div>
                     </div>
                     
-                    <div className="space-y-6 mb-12">
-                      <div className="flex items-center gap-5 group/item transition-all">
-                        <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-red-50 group-hover:text-red-600 transition-all duration-500">
-                          <MapPin size={20} />
+                    <div className="space-y-4 mb-8">
+                      <div className="group/item flex items-center gap-5 transition-all">
+                        <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover/item:bg-red-50 group-hover/item:text-red-600 group-hover/item:scale-105 transition-all duration-500 shadow-sm border border-gray-100">
+                          <MapPin size={18} />
                         </div>
                         <div>
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Service Region</p>
-                            <p className="text-base font-bold text-gray-700">{driver.region || 'Beirut District'}</p>
+                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Region</p>
+                            <p className="text-base font-bold text-gray-800 tracking-tight leading-none">{driver.region || 'Beirut District'}</p>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-5 group/item transition-all">
-                        <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-green-50 group-hover:text-green-600 transition-all duration-500">
-                          <Phone size={20} />
+                      <div className="group/item flex items-center gap-5 transition-all">
+                        <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover/item:bg-green-50 group-hover/item:text-green-600 group-hover/item:scale-105 transition-all duration-500 shadow-sm border border-gray-100">
+                          <Phone size={18} />
                         </div>
                         <div>
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Contact Number</p>
-                            <p className="text-base font-bold text-gray-700">{driver.phoneNumber || '+961 XX XXX XXX'}</p>
+                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Contact</p>
+                            <p className="text-base font-bold text-gray-800 tracking-tight leading-none">{driver.phoneNumber || '+961 XX XXX XXX'}</p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="mt-auto pt-8 border-t border-gray-50 relative overflow-hidden flex items-center justify-between">
-                         <div className="flex flex-col">
-                            <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mb-1.5 leading-none">Verification</p>
-                            <span className="text-xs font-black text-green-600">ID SEALED</span>
-                         </div>
-                        <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-gray-900 group-hover:text-red-600 transition-colors">
-                            Explore Profile
-                            <div className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white group-hover:scale-110 group-hover:bg-red-600 transition-all duration-500">
-                                <ArrowRight size={16} />
+                    <div className="mt-auto pt-2 border-t border-dashed border-gray-100 relative flex items-center justify-end">
+                        <button 
+                          onClick={() => navigate(`/profile/${driver._id}`)}
+                          className="flex items-center gap-4 group/btn cursor-pointer transition-transform duration-300 active:scale-95"
+                        >
+                            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 opacity-0 group-hover/btn:opacity-100 transition-all duration-500 translate-x-2 group-hover/btn:translate-x-0">
+                              View Profile
+                            </span>
+                            <div className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white shadow-xl shadow-gray-900/20 group-hover/btn:scale-110 group-hover/btn:bg-red-600 group-hover/btn:shadow-red-600/30 transition-all duration-500 relative">
+                                <ArrowRight size={16} className="group-hover/btn:rotate-[-45deg] transition-transform duration-500 relative z-10" />
                             </div>
-                        </div>
+                        </button>
                     </div>
                   </div>
                 </div>

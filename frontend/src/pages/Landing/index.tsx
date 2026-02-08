@@ -12,23 +12,15 @@ import {
   Target
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 
 const Landing = () => {
+  const { isAuthenticated } = useAuth();
   const fadeInUp = {
     initial: { opacity: 0, y: 30 },
     whileInView: { opacity: 1, y: 0 },
     viewport: { once: true },
     transition: { duration: 0.6 }
-  };
-
-  const staggerContainer = {
-    initial: {},
-    whileInView: {
-      transition: {
-        staggerChildren: 0.2
-      }
-    },
-    viewport: { once: true }
   };
 
   return (
@@ -68,7 +60,7 @@ const Landing = () => {
               
               <div className="flex flex-wrap gap-6">
                 <Link 
-                  to="/signup" 
+                  to={isAuthenticated ? "/home" : "/signup"} 
                   className="px-10 py-5 bg-white text-gray-900 rounded-[1.5rem] font-black uppercase text-[12px] tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-2xl flex items-center gap-3 active:scale-95"
                 >
                   Get Started Now
@@ -276,16 +268,10 @@ const Landing = () => {
               
               <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                 <Link 
-                  to="/signup" 
+                  to={isAuthenticated ? "/home" : "/signup"} 
                   className="w-full sm:w-auto px-12 py-6 bg-red-600 text-white rounded-2xl font-black uppercase text-[14px] tracking-widest hover:bg-red-700 hover:scale-105 transition-all shadow-2xl active:scale-95"
                 >
-                  Create Your Account
-                </Link>
-                <Link 
-                  to="/signin" 
-                  className="w-full sm:w-auto px-12 py-6 bg-white/10 border border-white/20 text-white rounded-2xl font-black uppercase text-[14px] tracking-widest hover:bg-white/20 transition-all active:scale-95"
-                >
-                  Sign In to Continue
+                  {isAuthenticated ? "Go to Home" : "Create Your Account"}
                 </Link>
               </div>
             </motion.div>

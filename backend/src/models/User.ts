@@ -19,7 +19,9 @@ const userSchema = new mongoose.Schema<UserType>(
     region: { type: String, default: null },
     description: { type: String, default: null },
     profileImage: { type: String, default: null },
+    profileImageId: { type: String, default: null },
     coverImage: { type: String, default: null },
+    coverImageId: { type: String, default: null },
   },
   { timestamps: true },
 );

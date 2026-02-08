@@ -74,12 +74,45 @@ const Profile = () => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'profile' | 'cover') => {
     const file = e.target.files?.[0];
     if (file) {
+      // Basic size validation (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image is too large. Please select a file smaller than 5MB.');
+        return;
+      }
+
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData(prev => ({
-          ...prev,
-          [type === 'profile' ? 'profileImage' : 'coverImage']: reader.result as string
-        }));
+        const img = new Image();
+        img.onload = () => {
+          // Create canvas for resizing
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          // Max dimensions
+          const maxWidth = type === 'cover' ? 1920 : 800;
+          const maxHeight = type === 'cover' ? 1080 : 800;
+
+          if (width > maxWidth || height > maxHeight) {
+            const ratio = Math.min(maxWidth / width, maxHeight / height);
+            width = width * ratio;
+            height = height * ratio;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          // Get compressed data URL
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          
+          setFormData(prev => ({
+            ...prev,
+            [type === 'profile' ? 'profileImage' : 'coverImage']: compressedDataUrl
+          }));
+        };
+        img.src = reader.result as string;
       };
       reader.readAsDataURL(file);
     }
