@@ -18,6 +18,8 @@ import ProtectedRoute from './components/ProtectedRoutes';
 import Landing from './pages/Landing';
 import Loader from './components/Loader';
 import ScrollToTop from './components/ScrollToTop';
+import Footer from './components/Footer';
+import About from './pages/About';
 
 function App() {
   const { isLoading } = useAuth();
@@ -36,6 +38,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/signin" element={<Signin />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/about" element={<About />} />
 
           {/* Protected Routes */}
           <Route
@@ -95,6 +98,7 @@ function App() {
             }
           />
         </Routes>
+        <Footer />
       </BrowserRouter>
       <Toaster />
     </>

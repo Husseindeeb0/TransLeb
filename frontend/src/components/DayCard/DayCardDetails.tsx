@@ -11,7 +11,7 @@ interface DayCardDetailsProps {
 }
 
 const DayCardDetails: React.FC<DayCardDetailsProps> = ({ card }) => {
-  const { data, isLoading, isError } = useGetUserDetailsQuery(card.driverId);
+  const { data } = useGetUserDetailsQuery(card.driverId);
   const navigate = useNavigate();
 
   const formattedDate = new Date(card.date).toLocaleDateString('en-US', {
@@ -46,8 +46,16 @@ const DayCardDetails: React.FC<DayCardDetailsProps> = ({ card }) => {
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Driver</p>
                 <p className="text-sm font-bold text-gray-900">{data?.name}</p>
               </div>
-              <div className="w-10 h-10 bg-gradient-to-br from-red-600 to-green-600 rounded-full flex items-center justify-center text-white font-black text-xs">
-                {data?.name ? data.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '??'}
+              <div className="w-10 h-10 bg-gradient-to-br from-red-600 to-green-600 rounded-full flex items-center justify-center text-white font-black text-xs overflow-hidden shadow-inner">
+                {data?.profileImage ? (
+                  <img 
+                    src={data.profileImage} 
+                    alt={data.name} 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  data?.name ? data.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '??'
+                )}
               </div>
             </div>
           </div>

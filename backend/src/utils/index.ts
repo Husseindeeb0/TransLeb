@@ -52,7 +52,7 @@ const generateRefreshToken = (user: UserType) => {
       role: user.role,
     },
     secret,
-    { expiresIn: "1d" },
+    { expiresIn: "7d" },
   );
 };
 

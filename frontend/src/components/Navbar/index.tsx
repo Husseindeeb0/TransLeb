@@ -1,4 +1,4 @@
-import { Car, Globe, User, LogIn, LogOut, UserPlus, LayoutGrid, Home as HomeIcon, ChevronDown } from 'lucide-react';
+import { Car, Globe, User, LogIn, LogOut, UserPlus, LayoutGrid, Home as HomeIcon, ChevronDown, Info } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
@@ -46,10 +46,9 @@ const Navbar: React.FC<NavbarProps> = () => {
   return (
     <nav className="bg-white shadow-lg border-b-4 border-green-600 sticky top-0 z-50 font-inter">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
-          {/* Left Side */}
-          <div className="flex items-center space-x-12">
-            {/* Logo */}
+        <div className="relative flex justify-between items-center h-20">
+          {/* Left Side - Logo */}
+          <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-3 group">
               <div className="bg-gradient-to-br from-red-600 to-green-600 p-2.5 rounded-2xl shadow-lg group-hover:rotate-12 transition-transform duration-300">
                 <Car className="h-7 w-7 text-white" />
@@ -58,32 +57,37 @@ const Navbar: React.FC<NavbarProps> = () => {
                 TransLeb
               </div>
             </Link>
+          </div>
 
-            {/* Desktop Navigation Links */}
-            <div className="hidden lg:flex items-center space-x-2">
+          {/* Center Side - Desktop Navigation Links */}
+          <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center space-x-2 pl-4">
+            <Link
+              to="/home"
+              className="flex items-center space-x-2 px-5 py-2.5 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-red-600 transition-all duration-300 font-black uppercase text-[11px] tracking-widest border border-transparent hover:border-gray-100"
+            >
+              <HomeIcon className="h-4 w-4" />
+              <span>Home</span>
+            </Link>
+            <Link
+              to="/about"
+              className="flex items-center space-x-2 px-5 py-2.5 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-red-600 transition-all duration-300 font-black uppercase text-[11px] tracking-widest border border-transparent hover:border-gray-100"
+            >
+              <Info size={14} className="h-4 w-4" />
+              <span>About</span>
+            </Link>
+            {isAuthenticated && (
               <Link
-                to="/home"
-                className="flex items-center space-x-2 px-5 py-2.5 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-red-600 transition-all duration-300 font-black uppercase text-[11px] tracking-widest border border-transparent hover:border-gray-100"
+                to="/dashboard"
+                className="flex items-center space-x-2 px-5 py-2.5 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all duration-300 font-black uppercase text-[11px] tracking-widest border border-transparent hover:border-gray-200"
               >
-                <HomeIcon className="h-4 w-4" />
-                <span>Home</span>
+                <LayoutGrid className="h-4 w-4" />
+                <span>Dashboard</span>
               </Link>
-              {isAuthenticated && (
-                <>
-                  <Link
-                    to="/dashboard"
-                    className="flex items-center space-x-2 px-5 py-2.5 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all duration-300 font-black uppercase text-[11px] tracking-widest border border-transparent hover:border-gray-200"
-                  >
-                    <LayoutGrid className="h-4 w-4" />
-                    <span>Dashboard</span>
-                  </Link>
-                </>
-              )}
-            </div>
+            )}
           </div>
 
           {/* Right Side - Desktop */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden lg:flex items-center space-x-6">
             {/* Language Selector */}
             <div className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-md transition-all cursor-pointer">
               <Globe className="h-4 w-4 text-gray-400" />
@@ -179,7 +183,7 @@ const Navbar: React.FC<NavbarProps> = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden">
+          <div className="lg:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="inline-flex items-center justify-center p-2 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-none transition-colors cursor-pointer"
@@ -223,6 +227,14 @@ const Navbar: React.FC<NavbarProps> = () => {
                 >
                   <HomeIcon className="h-4 w-4" />
                   <span>Home</span>
+                </Link>
+                <Link
+                  to="/about"
+                  className="flex items-center space-x-3 px-5 py-4 rounded-2xl text-gray-600 hover:bg-gray-50 hover:text-red-600 transition-all font-black uppercase text-[10px] tracking-widest"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Info className="h-4 w-4" />
+                  <span>About</span>
                 </Link>
 
                 {isAuthenticated ? (
