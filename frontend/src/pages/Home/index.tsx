@@ -4,8 +4,11 @@ import { Search, MapPin, Phone, ArrowRight, Users } from 'lucide-react';
 import { useGetAllDriversQuery } from '../../state/services/user/userAPI';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../../components/Loader';
+import { useTranslation } from 'react-i18next';
 
 const Home = () => {
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || 'en';
   const { data: drivers, isLoading, isError } = useGetAllDriversQuery();
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
@@ -25,15 +28,15 @@ const Home = () => {
           <div className="w-20 h-20 bg-red-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
             <Users className="w-10 h-10 text-red-500" />
           </div>
-          <h3 className="text-3xl font-black text-gray-900 mb-2">Error Loading Drivers</h3>
+          <h3 className="text-3xl font-black text-gray-900 mb-2">{t('home.error.title')}</h3>
           <p className="text-gray-500 font-medium mb-10">
-            We encountered a problem fetching our driver partners. Please check your connection and try again.
+            {t('home.error.desc')}
           </p>
           <button 
             onClick={() => window.location.reload()}
             className="px-10 py-4 bg-gray-900 text-white rounded-[1.5rem] font-bold shadow-lg hover:bg-gray-800 transition-all active:scale-95"
           >
-            Retry Connection
+            {t('home.error.retry')}
           </button>
         </div>
       </div>
@@ -54,11 +57,11 @@ const Home = () => {
             animate={{ opacity: 1, y: 0 }}
           >
             <span className="px-5 py-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-full text-[10px] font-black uppercase tracking-[0.25em] text-gray-300 mb-10 inline-block shadow-xl">
-              Partner network
+              {t('home.hero.badge')}
             </span>
             <h1 className="text-6xl md:text-8xl font-black text-white tracking-tighter mb-10 leading-[0.9] uppercase italic">
-              Discover <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-green-500">Premium</span> Drivers
+              {t('home.hero.title')} <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-green-500">{t('home.hero.titlePremium')}</span> {t('home.hero.titleDrivers')}
             </h1>
             
             {/* Search Bar */}
@@ -71,7 +74,7 @@ const Home = () => {
                 </div>
                 <input 
                   type="text" 
-                  placeholder="Who are you looking for?"
+                  placeholder={t('home.search.placeholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full py-6 text-lg text-white font-bold bg-transparent outline-none placeholder:text-gray-500 transition-all"
@@ -92,7 +95,7 @@ const Home = () => {
                 </div>
                 <div>
                     <h4 className="text-3xl font-black text-gray-900">{filteredDrivers?.length}</h4>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Active Fleet</p>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t('home.stats.fleet')}</p>
                 </div>
             </div>
             {/* Design accents */}
@@ -101,11 +104,11 @@ const Home = () => {
                     <div className="flex justify-between w-full">
                         <div className="flex items-center gap-3">
                             <div className="w-2 h-2 bg-green-500 rounded-full" />
-                            <span className="text-sm font-black text-gray-400 uppercase tracking-widest">Verified background</span>
+                            <span className="text-sm font-black text-gray-400 uppercase tracking-widest">{t('home.stats.verified')}</span>
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="w-2 h-2 bg-red-500 rounded-full" />
-                            <span className="text-sm font-black text-gray-400 uppercase tracking-widest">24/7 Availability</span>
+                            <span className="text-sm font-black text-gray-400 uppercase tracking-widest">{t('home.stats.availability')}</span>
                         </div>
                     </div>
                 </div>
@@ -176,7 +179,7 @@ const Home = () => {
                             </h3>
                             <div className="flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                                <span className="text-[8px] font-black text-gray-400 uppercase tracking-[0.25em]">Active Status</span>
+                                <span className="text-[8px] font-black text-gray-400 uppercase tracking-[0.25em]">{t('home.card.status')}</span>
                             </div>
                           </div>
                           <div className="bg-gray-100 text-gray-900 p-2 rounded-xl group-hover:bg-red-600 group-hover:text-white transition-colors duration-500">
@@ -191,8 +194,8 @@ const Home = () => {
                           <MapPin size={18} />
                         </div>
                         <div>
-                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Region</p>
-                            <p className="text-base font-bold text-gray-800 tracking-tight leading-none">{driver.region || 'Beirut District'}</p>
+                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">{t('home.card.regionLabel')}</p>
+                            <p className="text-base font-bold text-gray-800 tracking-tight leading-none">{driver.region || t('home.card.regionFallback')}</p>
                         </div>
                       </div>
 
@@ -201,7 +204,7 @@ const Home = () => {
                           <Phone size={18} />
                         </div>
                         <div>
-                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Contact</p>
+                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">{t('home.card.contactLabel')}</p>
                             <p className="text-base font-bold text-gray-800 tracking-tight leading-none">{driver.phoneNumber || '+961 XX XXX XXX'}</p>
                         </div>
                       </div>
@@ -209,11 +212,11 @@ const Home = () => {
 
                     <div className="mt-auto pt-2 border-t border-dashed border-gray-100 relative flex items-center justify-end">
                         <button 
-                          onClick={() => navigate(`/profile/${driver._id}`)}
+                          onClick={() => navigate(`/${currentLang}/profile/${driver._id}`)}
                           className="flex items-center gap-4 group/btn cursor-pointer transition-transform duration-300 active:scale-95"
                         >
                             <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 opacity-0 group-hover/btn:opacity-100 transition-all duration-500 translate-x-2 group-hover/btn:translate-x-0">
-                              View Profile
+                              {t('home.card.viewProfile')}
                             </span>
                             <div className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white shadow-xl shadow-gray-900/20 group-hover/btn:scale-110 group-hover/btn:bg-red-600 group-hover/btn:shadow-red-600/30 transition-all duration-500 relative">
                                 <ArrowRight size={16} className="group-hover/btn:rotate-[-45deg] transition-transform duration-500 relative z-10" />
@@ -237,15 +240,15 @@ const Home = () => {
             <div className="w-24 h-24 bg-gray-50 rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 border border-gray-100 shadow-inner">
                 <Search className="w-10 h-10 text-gray-200" />
             </div>
-            <h3 className="text-4xl font-black text-gray-900 mb-4 tracking-tighter uppercase italic">No Match Found</h3>
+            <h3 className="text-4xl font-black text-gray-900 mb-4 tracking-tighter uppercase italic">{t('home.empty.title')}</h3>
             <p className="text-gray-500 font-medium max-w-sm mx-auto mb-12">
-              We couldn't find any drivers matching "<span className="text-red-600 font-black">{searchQuery}</span>". 
+              {t('home.empty.desc')} "<span className="text-red-600 font-black">{searchQuery}</span>". 
             </p>
             <button 
               onClick={() => setSearchQuery('')}
               className="px-12 py-5 bg-gray-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] hover:bg-red-600 transition-all shadow-xl active:scale-95"
             >
-              Reset Search
+              {t('home.empty.reset')}
             </button>
           </motion.div>
         )}

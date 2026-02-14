@@ -10,8 +10,10 @@ import { useGetMeQuery, useUpdateProfileMutation } from '../../state/services/us
 import { useGetDayCardsQuery } from '../../state/services/dayCard/dayCardAPI';
 import toast from 'react-hot-toast';
 import Loader from '../../components/Loader';
+import { useTranslation } from 'react-i18next';
 
 const Profile = () => {
+  const { t, i18n } = useTranslation();
   const { data: user, isLoading, refetch } = useGetMeQuery();
   const { data: dayCards, isLoading: isLoadingCards } = useGetDayCardsQuery(user?._id || "");
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
@@ -62,11 +64,11 @@ const Profile = () => {
       }
 
       await updateProfile(updatePayload).unwrap();
-      toast.success('Profile updated successfully!');
+      toast.success(t('profile.toast.updateSuccess'));
       setIsEditing(false);
       refetch();
     } catch (err) {
-      toast.error('Failed to update profile');
+      toast.error(t('profile.toast.updateError'));
       console.error(err);
     }
   };
@@ -76,7 +78,7 @@ const Profile = () => {
     if (file) {
       // Basic size validation (5MB)
       if (file.size > 5 * 1024 * 1024) {
-        toast.error('Image is too large. Please select a file smaller than 5MB.');
+        toast.error(t('profile.toast.imageTooLarge'));
         return;
       }
 
@@ -145,7 +147,7 @@ const Profile = () => {
               className="px-6 py-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-white font-black uppercase tracking-widest text-[10px] flex items-center gap-3 hover:bg-white/20 transition-all shadow-2xl"
             >
               <Camera size={16} />
-              Change Cover Image
+              {t('profile.changeCover')}
             </button>
           )}
         </div>
@@ -165,7 +167,7 @@ const Profile = () => {
               className="px-6 py-3 bg-white text-gray-900 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center gap-3 shadow-2xl hover:bg-red-600 hover:text-white transition-all transform hover:-translate-y-1"
             >
               <Edit3 size={16} />
-              Edit Profile
+              {t('profile.editProfile')}
             </button>
           ) : (
             <div className="flex gap-3">
@@ -173,7 +175,7 @@ const Profile = () => {
                 onClick={() => setIsEditing(false)}
                 className="px-6 py-3 bg-white text-gray-900 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-2xl hover:bg-gray-100 transition-all"
               >
-                Cancel
+                {t('profile.cancel')}
               </button>
               <button 
                 onClick={handleUpdate}
@@ -181,7 +183,7 @@ const Profile = () => {
                 className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center gap-3 shadow-2xl hover:shadow-red-200 transition-all disabled:opacity-50"
               >
                 {isUpdating ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                Save Changes
+                {t('profile.saveChanges')}
               </button>
             </div>
           )}
@@ -248,7 +250,7 @@ const Profile = () => {
                 )}
                 <div className="flex items-center justify-center gap-2 text-gray-400 font-black uppercase tracking-[0.2em] text-[10px]">
                   <Briefcase size={12} className="text-red-600" />
-                  {user?.role} partner
+                  {user?.role} {t('profile.partner')}
                 </div>
               </div>
             </div>
@@ -284,7 +286,7 @@ const Profile = () => {
                     className="flex-1 bg-gray-50 border-2 border-gray-100 rounded-xl py-3 px-4 focus:outline-none focus:border-green-600/30 font-bold text-sm"
                   />
                 ) : (
-                  <p className="font-bold text-gray-700 text-sm">{user?.phoneNumber || 'Not set'}</p>
+                  <p className="font-bold text-gray-700 text-sm">{user?.phoneNumber || t('profile.notSet')}</p>
                 )}
               </div>
 
@@ -301,7 +303,7 @@ const Profile = () => {
                     className="flex-1 bg-gray-50 border-2 border-gray-100 rounded-xl py-3 px-4 focus:outline-none focus:border-amber-600/30 font-bold text-sm"
                   />
                 ) : (
-                  <p className="font-bold text-gray-700 text-sm">{user?.region || 'Not set'}</p>
+                  <p className="font-bold text-gray-700 text-sm">{user?.region || t('profile.notSet')}</p>
                 )}
               </div>
             </div>
@@ -317,7 +319,7 @@ const Profile = () => {
                   <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center">
                     <Edit3 size={18} className="text-red-600" />
                   </div>
-                  <h3 className="text-xl font-black text-gray-900 tracking-tight uppercase italic">About</h3>
+                  <h3 className="text-xl font-black text-gray-900 tracking-tight uppercase italic">{t('profile.about')}</h3>
                 </div>
                 
                 {isEditing ? (
@@ -325,12 +327,12 @@ const Profile = () => {
                     rows={3}
                     value={formData.description}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    placeholder="Tell us about yourself and your services..."
+                    placeholder={t('profile.aboutPlaceholder')}
                     className="w-full bg-gray-50/50 border-2 border-gray-100 rounded-2xl p-6 focus:outline-none focus:border-red-600/30 font-bold text-gray-700 leading-relaxed"
                   />
                 ) : (
                   <p className="text-gray-600 font-bold leading-relaxed bg-gray-50 p-6 rounded-2xl border border-gray-100 italic">
-                    "{formData.description || "No description yet."}"
+                    "{formData.description || t('profile.noDescription')}"
                   </p>
                 )}
               </div>
@@ -343,17 +345,18 @@ const Profile = () => {
                   <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center">
                     <Calendar size={18} className="text-green-600" />
                   </div>
-                  <h3 className="text-xl font-black text-gray-900 tracking-tight uppercase italic">My Schedules</h3>
+                  <h3 className="text-xl font-black text-gray-900 tracking-tight uppercase italic">{t('profile.mySchedules')}</h3>
                 </div>
 
                 {isLoadingCards ? (
                   <div className="flex items-center justify-center py-12">
                     <Loader2 className="w-8 h-8 text-red-600 animate-spin" />
+                    <span className="ml-3 font-bold text-gray-400">{t('profile.loadingSchedules')}</span>
                   </div>
                 ) : dayCards && dayCards.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {dayCards.map((card) => {
-                      const formattedDate = new Date(card.date).toLocaleDateString('en-US', {
+                      const formattedDate = new Date(card.date).toLocaleDateString(i18n.language, {
                         weekday: 'short',
                         month: 'short',
                         day: 'numeric',
@@ -378,7 +381,7 @@ const Profile = () => {
                                   <p className="font-black text-gray-900">{formattedDate}</p>
                                   <div className="flex items-center gap-1 text-gray-400 text-xs font-bold">
                                     <Clock size={12} />
-                                    {card.busTimers.length} times
+                                    {card.busTimers.length} {t('profile.times')}
                                   </div>
                                 </div>
                               </div>
@@ -388,7 +391,7 @@ const Profile = () => {
                                 card.formState === 'open' ? 'bg-blue-50 text-blue-600' :
                                 'bg-gray-100 text-gray-500'
                               }`}>
-                                {card.formState}
+                                {t(`daycard.states.${card.formState}`)}
                               </span>
                             </div>
 
@@ -409,10 +412,10 @@ const Profile = () => {
                             </div>
 
                             <Link 
-                              to={`/day-card/${card.dayCardId}`}
+                              to={`/${i18n.language}/day-card/${card.dayCardId}`}
                               className="flex items-center gap-1 text-red-600 font-black text-[10px] uppercase tracking-wider group/btn"
                             >
-                              View Details
+                              {t('profile.viewDetails')}
                               <ChevronRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
                             </Link>
                           </div>
@@ -423,7 +426,7 @@ const Profile = () => {
                 ) : (
                   <div className="text-center py-12 bg-gray-50 rounded-2xl border border-gray-100">
                     <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500 font-bold">No schedules created yet.</p>
+                    <p className="text-gray-500 font-bold">{t('profile.noSchedules')}</p>
                   </div>
                 )}
               </div>

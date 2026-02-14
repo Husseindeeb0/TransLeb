@@ -9,15 +9,15 @@ import {
 import type { SubmitPassengerFormRequest } from '../../types/passengerFormTypes';
 import toast from 'react-hot-toast';
 
-import type { BusSchedule } from '../../types/dayCardTypes';
+import { useTranslation } from 'react-i18next';
 
 interface PassengerFormProps {
   dayCardId: string;
-  availableTimes: BusSchedule[];
   isLocked?: boolean;
 }
 
-const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, availableTimes, isLocked }) => {
+const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, isLocked }) => {
+  const { t } = useTranslation();
   const { data: existenceData, isLoading: isCheckingExists } = useIsFormExistsQuery(dayCardId);
   const [submitForm, { isLoading: isSubmitting }] = useSubmitPassengerFormMutation();
   const [updateForm, { isLoading: isUpdating }] = useUpdatePassengerFormMutation();
@@ -53,14 +53,14 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, availableTimes
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isLocked) {
-      toast.error('This form is currently not accepting submissions.');
+      toast.error(t('daycard.passengerForm.lockedError'));
       return;
     }
 
     // Phone validation
     const cleanPhone = formData.phoneNumber.replace(/[^0-9]/g, '');
     if (cleanPhone.length < 8) {
-      toast.error('Please enter a valid phone number (at least 8 digits)');
+      toast.error(t('daycard.passengerForm.phoneError'));
       return;
     }
 
@@ -94,19 +94,19 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, availableTimes
 
         if (hasChanged) {
           await updateForm(updateData).unwrap();
-          toast.success('Your reservation has been updated!');
+          toast.success(t('daycard.passengerForm.updateSuccess'));
         } else {
-          toast('No changes detected', { icon: 'ℹ️' });
+          toast(t('daycard.passengerForm.noChanges'), { icon: 'ℹ️' });
         }
       } else {
         const response = await submitForm({ ...formData, dayCardId }).unwrap();
         setFormId(response.formId);
-        toast.success('Your request has been submitted successfully!');
+        toast.success(t('daycard.passengerForm.submitSuccess'));
       }
       setIsSubmitted(true);
       setIsEditing(false);
     } catch (err) {
-      toast.error('Failed to save request. Please try again.');
+      toast.error(t('daycard.passengerForm.saveError'));
       console.error(err);
     }
   };
@@ -129,9 +129,9 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, availableTimes
         <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
           <CheckCircle2 className="w-10 h-10 text-green-600" />
         </div>
-        <h3 className="text-2xl font-black text-gray-900 mb-2">Reservation Saved!</h3>
+        <h3 className="text-2xl font-black text-gray-900 mb-2">{t('daycard.passengerForm.savedTitle')}</h3>
         <p className="text-gray-500 font-medium mb-8">
-          We've recorded your details. You can update them at any time before the trip.
+          {t('daycard.passengerForm.savedDesc')}
         </p>
         <button
           onClick={() => {
@@ -140,7 +140,7 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, availableTimes
           }}
           className="px-8 py-4 bg-gray-900 text-white rounded-[1.5rem] font-bold hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto"
         >
-          {formId ? 'Edit My Reservation' : 'Edit Again'}
+          {formId ? t('daycard.passengerForm.editBtn') : t('daycard.passengerForm.editAgain')}
         </button>
       </motion.div>
     );
@@ -155,17 +155,17 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, availableTimes
       <div className="relative">
         <div className="mb-10 text-center md:text-left">
           <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-2">
-            {formId ? 'Update Reservation' : 'Book Your Ride'}
+            {formId ? t('daycard.passengerForm.updateTitle') : t('daycard.passengerForm.title')}
           </h2>
           <p className="text-gray-500 font-medium">
-            {formId ? 'Adjust your reservation details below.' : 'Please fill in your details to reserve a seat.'}
+            {formId ? t('daycard.passengerForm.updateSubtitle') : t('daycard.passengerForm.subtitle')}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Full Name */}
           <div className="space-y-2">
-            <label className="text-xs font-black text-gray-700 uppercase tracking-widest ml-1">Full Name</label>
+            <label className="text-xs font-black text-gray-700 uppercase tracking-widest ml-1">{t('daycard.passengerForm.nameLabel')}</label>
             <div className="relative group">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-red-600 transition-colors">
                 <User size={18} />
@@ -174,7 +174,7 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, availableTimes
                 type="text"
                 required
                 disabled={isLocked}
-                placeholder="John Doe"
+                placeholder={t('daycard.passengerForm.namePlaceholder')}
                 className="w-full pl-12 pr-5 py-4 bg-gray-50/50 border-2 border-gray-100 rounded-2xl focus:outline-none focus:border-red-600/30 focus:ring-4 focus:ring-red-600/5 transition-all font-bold"
                 value={formData.fullName}
                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
@@ -185,7 +185,7 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, availableTimes
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Phone Number */}
             <div className="space-y-2">
-              <label className="text-xs font-black text-gray-700 uppercase tracking-widest ml-1">Phone Number</label>
+              <label className="text-xs font-black text-gray-700 uppercase tracking-widest ml-1">{t('daycard.passengerForm.phoneLabel')}</label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-green-600 transition-colors">
                   <Phone size={18} />
@@ -194,7 +194,7 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, availableTimes
                   type="tel"
                   required
                   disabled={isLocked}
-                  placeholder="+961 70 123 456"
+                  placeholder={t('daycard.passengerForm.phonePlaceholder')}
                   pattern="^\+?[0-9]{8,15}$"
                   title="Phone number must be between 8 and 15 digits"
                   className="w-full pl-12 pr-5 py-4 bg-gray-50/50 border-2 border-gray-100 rounded-2xl focus:outline-none focus:border-green-600/30 focus:ring-4 focus:ring-green-600/5 transition-all font-bold"
@@ -215,14 +215,14 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, availableTimes
                   }}
                 />
                 <p className="text-[10px] text-gray-400 font-bold ml-1 mt-1 opacity-70 italic">
-                  * Format: +96170123456 (8-15 digits)
+                  {t('daycard.passengerForm.phoneFormatHint')}
                 </p>
               </div>
             </div>
 
             {/* Passenger Count */}
             <div className="space-y-2">
-              <label className="text-xs font-black text-gray-700 uppercase tracking-widest ml-1">Passengers</label>
+              <label className="text-xs font-black text-gray-700 uppercase tracking-widest ml-1">{t('daycard.passengerForm.passengersLabel')}</label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-gray-900 transition-colors">
                   <Users size={18} />
@@ -243,7 +243,7 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, availableTimes
 
           {/* Living Place */}
           <div className="space-y-2">
-            <label className="text-xs font-black text-gray-700 uppercase tracking-widest ml-1">Pickup Location</label>
+            <label className="text-xs font-black text-gray-700 uppercase tracking-widest ml-1">{t('daycard.passengerForm.pickupLabel')}</label>
             <div className="relative group">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-red-700 transition-colors">
                 <MapPin size={18} />
@@ -252,7 +252,7 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, availableTimes
                 type="text"
                 required
                 disabled={isLocked}
-                placeholder="e.g. Beirut, Hamra St."
+                placeholder={t('daycard.passengerForm.pickupPlaceholder')}
                 className="w-full pl-12 pr-5 py-4 bg-gray-50/50 border-2 border-gray-100 rounded-2xl focus:outline-none focus:border-red-600/30 focus:ring-4 focus:ring-red-600/5 transition-all font-bold"
                 value={formData.livingPlace}
                 onChange={(e) => setFormData({ ...formData, livingPlace: e.target.value })}
@@ -262,7 +262,7 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, availableTimes
 
           {/* Desired Time */}
           <div className="space-y-2">
-            <label className="text-xs font-black text-gray-700 uppercase tracking-widest ml-1">Desired Pickup Time</label>
+            <label className="text-xs font-black text-gray-700 uppercase tracking-widest ml-1">{t('daycard.passengerForm.timeLabel')}</label>
             <div className="relative group">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-green-600 transition-colors">
                 <Clock size={18} />
@@ -277,7 +277,7 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, availableTimes
               />
             </div>
             <p className="text-[10px] text-gray-400 font-bold ml-1 italic">
-              * Enter your preferred time for pickup.
+              {t('daycard.passengerForm.timeHint')}
             </p>
           </div>
 
@@ -291,7 +291,7 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, availableTimes
             ) : (
               <>
                 {formId ? <Save size={18} /> : <Send size={18} />}
-                {formId ? 'Update My Reservation' : 'Submit Reservation'}
+                {formId ? t('daycard.passengerForm.update') : t('daycard.passengerForm.submit')}
               </>
             )}
           </button>
@@ -299,7 +299,7 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, availableTimes
           {isLocked && (
             <p className="text-center text-sm font-bold text-red-500 mt-4 flex items-center justify-center gap-2">
               <Clock size={14} />
-              Reservations are currently closed for this card.
+              {t('daycard.passengerForm.closed')}
             </p>
           )}
         </form>

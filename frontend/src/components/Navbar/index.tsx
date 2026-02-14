@@ -1,14 +1,18 @@
-import { Car, Globe, User, LogIn, LogOut, UserPlus, LayoutGrid, Home as HomeIcon, ChevronDown, Info } from 'lucide-react';
+import { Car, User, LogIn, LogOut, UserPlus, LayoutGrid, Home as HomeIcon, ChevronDown, Info } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useLogoutMutation } from '../../state/services/auth/authAPI';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../LanguageSwitcher';
 
 interface NavbarProps {}
 
 const Navbar: React.FC<NavbarProps> = () => {
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || 'en';
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -30,12 +34,12 @@ const Navbar: React.FC<NavbarProps> = () => {
   const handleSignOut = async () => {
     try {
       await logout({}).unwrap();
-      toast.success('Successfully signed out');
+      toast.success(t('nav.logoutSuccess', 'Successfully signed out'));
       setIsProfileOpen(false);
-      navigate('/');
+      navigate(`/${currentLang}/`);
     } catch (err) {
       console.error('Logout failed:', err);
-      toast.error('Logout failed. Please try again.');
+      toast.error(t('nav.logoutFailed', 'Logout failed. Please try again.'));
     }
   };
 
@@ -49,7 +53,7 @@ const Navbar: React.FC<NavbarProps> = () => {
         <div className="relative flex justify-between items-center h-20">
           {/* Left Side - Logo */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-3 group">
+            <Link to={`/${currentLang}/`} className="flex items-center space-x-3 group">
               <div className="bg-gradient-to-br from-red-600 to-green-600 p-2.5 rounded-2xl shadow-lg group-hover:rotate-12 transition-transform duration-300">
                 <Car className="h-7 w-7 text-white" />
               </div>
@@ -62,65 +66,52 @@ const Navbar: React.FC<NavbarProps> = () => {
           {/* Center Side - Desktop Navigation Links */}
           <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center space-x-2 pl-4">
             <Link
-              to="/home"
+              to={`/${currentLang}/home`}
               className="flex items-center space-x-2 px-5 py-2.5 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-red-600 transition-all duration-300 font-black uppercase text-[11px] tracking-widest border border-transparent hover:border-gray-100"
             >
               <HomeIcon className="h-4 w-4" />
-              <span>Home</span>
+              <span>{t('nav.home')}</span>
             </Link>
             <Link
-              to="/about"
+              to={`/${currentLang}/about`}
               className="flex items-center space-x-2 px-5 py-2.5 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-red-600 transition-all duration-300 font-black uppercase text-[11px] tracking-widest border border-transparent hover:border-gray-100"
             >
               <Info size={14} className="h-4 w-4" />
-              <span>About</span>
+              <span>{t('nav.about')}</span>
             </Link>
             {isAuthenticated && (
               <Link
-                to="/dashboard"
+                to={`/${currentLang}/dashboard`}
                 className="flex items-center space-x-2 px-5 py-2.5 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all duration-300 font-black uppercase text-[11px] tracking-widest border border-transparent hover:border-gray-200"
               >
                 <LayoutGrid className="h-4 w-4" />
-                <span>Dashboard</span>
+                <span>{t('nav.dashboard')}</span>
               </Link>
             )}
           </div>
 
           {/* Right Side - Desktop */}
           <div className="hidden lg:flex items-center space-x-6">
-            {/* Language Selector */}
-            <div className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-md transition-all cursor-pointer">
-              <Globe className="h-4 w-4 text-gray-400" />
-              <select
-                className="bg-transparent text-gray-600 text-[10px] font-black uppercase border-none outline-none cursor-pointer tracking-widest"
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                  console.log('Language changed:', e.target.value)
-                }
-              >
-                <option value="ar">العربية</option>
-                <option value="en">English</option>
-              </select>
-            </div>
+            <LanguageSwitcher />
 
-            {/* Auth Buttons / Profile Dropdown */}
             <div className="flex items-center space-x-4">
               {!isAuthenticated ? (
                 <>
                   <Link
-                    to="/signin"
+                    to={`/${currentLang}/signin`}
                     className="flex items-center space-x-2 px-5 py-2.5 text-gray-600 hover:text-red-600 transition-colors font-black uppercase text-[11px] tracking-widest"
                   >
                     <LogIn className="h-4 w-4" />
-                    <span>Sign In</span>
+                    <span>{t('nav.signin')}</span>
                   </Link>
 
                   <Link
-                    to="/signup"
+                    to={`/${currentLang}/signup`}
                     className="relative flex items-center space-x-2 bg-gray-900 text-white px-7 py-3 rounded-2xl font-black uppercase text-[11px] tracking-widest overflow-hidden group transition-all duration-300 hover:shadow-xl hover:shadow-red-900/10 hover:-translate-y-0.5 active:scale-95"
                   >
                     <div className="absolute inset-0 w-0 bg-gradient-to-r from-red-600/50 to-green-600/50 group-hover:w-full transition-all duration-500 ease-out italic"></div>
                     <UserPlus className="h-4 w-4 relative z-10" />
-                    <span className="relative z-10">Sign Up</span>
+                    <span className="relative z-10">{t('nav.signup')}</span>
                   </Link>
                 </>
               ) : (
@@ -160,19 +151,19 @@ const Navbar: React.FC<NavbarProps> = () => {
                              <p className="text-xs font-bold text-gray-900 truncate">{user?.email}</p>
                         </div>
                         <Link
-                          to="/profile"
+                          to={`/${currentLang}/profile`}
                           onClick={() => setIsProfileOpen(false)}
                           className="flex items-center space-x-3 px-5 py-3.5 rounded-2xl text-gray-600 hover:bg-red-50 hover:text-red-700 transition-all font-black uppercase text-[10px] tracking-widest"
                         >
                           <User className="h-4 w-4" />
-                          <span>My Profile</span>
+                          <span>{t('nav.profile')}</span>
                         </Link>
                         <button
                           onClick={handleSignOut}
                           className="w-full flex items-center space-x-3 px-5 py-3.5 rounded-2xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-black uppercase text-[10px] tracking-widest"
                         >
                           <LogOut className="h-4 w-4 text-red-500" />
-                          <span>Sign Out</span>
+                          <span>{t('nav.logout')}</span>
                         </button>
                       </motion.div>
                     )}
@@ -183,7 +174,8 @@ const Navbar: React.FC<NavbarProps> = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="lg:hidden">
+          <div className="lg:hidden flex items-center space-x-4">
+            <LanguageSwitcher />
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="inline-flex items-center justify-center p-2 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-none transition-colors cursor-pointer"
@@ -221,41 +213,41 @@ const Navbar: React.FC<NavbarProps> = () => {
             >
               <div className="p-6 flex flex-col space-y-2">
                 <Link
-                  to="/home"
+                  to={`/${currentLang}/home`}
                   className="flex items-center space-x-3 px-5 py-4 rounded-2xl text-gray-600 hover:bg-gray-50 hover:text-red-600 transition-all font-black uppercase text-[10px] tracking-widest"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <HomeIcon className="h-4 w-4" />
-                  <span>Home</span>
+                  <span>{t('nav.home')}</span>
                 </Link>
                 <Link
-                  to="/about"
+                  to={`/${currentLang}/about`}
                   className="flex items-center space-x-3 px-5 py-4 rounded-2xl text-gray-600 hover:bg-gray-50 hover:text-red-600 transition-all font-black uppercase text-[10px] tracking-widest"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <Info className="h-4 w-4" />
-                  <span>About</span>
+                  <span>{t('nav.about')}</span>
                 </Link>
 
                 {isAuthenticated ? (
                   <>
                     <Link
-                      to="/dashboard"
+                      to={`/${currentLang}/dashboard`}
                       className="flex items-center space-x-3 px-5 py-4 rounded-2xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-black uppercase text-[10px] tracking-widest"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <LayoutGrid className="h-4 w-4" />
-                      <span>Dashboard</span>
+                      <span>{t('nav.dashboard')}</span>
                     </Link>
 
                     <div className="pt-4 mt-2 border-t border-gray-100 flex flex-col space-y-2">
                       <Link
-                        to="/profile"
+                        to={`/${currentLang}/profile`}
                         className="flex items-center space-x-3 px-5 py-4 rounded-2xl text-gray-600 hover:bg-red-50 hover:text-red-700 transition-all font-black uppercase text-[10px] tracking-widest"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         <User className="h-4 w-4" />
-                        <span>My Profile</span>
+                        <span>{t('nav.profile')}</span>
                       </Link>
 
                       <button
@@ -266,28 +258,28 @@ const Navbar: React.FC<NavbarProps> = () => {
                         className="w-full flex items-center space-x-3 px-5 py-4 rounded-2xl text-gray-600 hover:bg-gray-50 transition-all font-black uppercase text-[10px] tracking-widest"
                       >
                         <LogOut className="h-4 w-4 text-red-500" />
-                        <span>Sign Out</span>
+                        <span>{t('nav.logout')}</span>
                       </button>
                     </div>
                   </>
                 ) : (
                   <div className="pt-4 mt-2 border-t border-gray-100 flex flex-col space-y-2">
                     <Link
-                      to="/signin"
+                      to={`/${currentLang}/signin`}
                       className="flex items-center space-x-3 px-5 py-4 rounded-2xl text-gray-600 hover:text-red-600 transition-all font-black uppercase text-[10px] tracking-widest"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <LogIn className="h-4 w-4" />
-                      <span>Sign In</span>
+                      <span>{t('nav.signin')}</span>
                     </Link>
 
                     <Link
-                      to="/signup"
+                      to={`/${currentLang}/signup`}
                       className="flex items-center justify-center space-x-3 px-5 py-4 bg-gray-900 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-red-600 transition-all shadow-lg active:scale-95"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <UserPlus className="h-4 w-4" />
-                      <span>Sign Up</span>
+                      <span>{t('nav.signup')}</span>
                     </Link>
                   </div>
                 )}

@@ -5,8 +5,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import type { ApiError } from '../../types/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Variants } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 const Signin = () => {
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || 'en';
   const navigate = useNavigate();
   const [login, { isLoading, error: signinError }] = useLoginMutation();
   const error = signinError as ApiError | undefined;
@@ -20,7 +23,7 @@ const Signin = () => {
         email,
         password,
       }).unwrap();
-      navigate('/home');
+      navigate(`/${currentLang}/home`);
     } catch (err) {
       console.error('Login failed side-effect:', err);
     }
@@ -30,7 +33,7 @@ const Signin = () => {
     if (!error) return null;
 
     if (error.status && Number(error.status) >= 500) {
-      return 'Our servers are experiencing issues. Please try again later.';
+      return t('auth.signin.errors.server');
     }
 
     switch (error.data?.state) {
@@ -38,28 +41,28 @@ const Signin = () => {
         return (
           <div className="flex flex-col items-center gap-1 text-center font-sans">
             <span className="font-semibold text-gray-800">
-              Account not found
+              {t('auth.signin.errors.userNotFound')}
             </span>
             <span className="text-gray-500 text-xs mt-1 leading-relaxed">
-              Please check your credentials or{' '}
+              {t('auth.signin.errors.userNotFoundDetail')}{' '}
               <Link
-                to="/signup"
+                to={`/${currentLang}/signup`}
                 className="text-red-700 hover:text-red-800 underline underline-offset-4 font-bold transition-all"
               >
-                create an account
+                {t('auth.signin.errors.createAccount')}
               </Link>{' '}
-              if you don't have one.
+              {t('auth.signin.errors.failed').split('. ')[1] || ""}
             </span>
           </div>
         );
       case 'MISSING_FIELDS':
-        return 'Please provide both your email and password to sign in.';
+        return t('auth.signin.errors.missingFields');
       case 'INTERNAL_SERVER_ERROR':
-        return 'Something went wrong on our end. Please try again in a moment.';
+        return t('auth.signin.errors.internal');
       default:
         return (
           error.data?.message ||
-          'Login failed. Please check your details and try again.'
+          t('auth.signin.errors.failed')
         );
     }
   };
@@ -115,10 +118,10 @@ const Signin = () => {
             </motion.div>
 
             <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-3">
-              Welcome back
+              {t('auth.signin.title')}
             </h1>
             <p className="text-gray-500 font-medium">
-              Securely sign in to your TransLeb account
+              {t('auth.signin.subtitle')}
             </p>
           </div>
 
@@ -144,7 +147,7 @@ const Signin = () => {
             {/* Email Input */}
             <motion.div variants={itemVariants} className="space-y-2.5">
               <label className="text-[0.85rem] font-bold text-gray-700 ml-1 tracking-wide uppercase">
-                Email Address
+                {t('auth.signin.emailLabel')}
               </label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-red-700 transition-all duration-300">
@@ -152,7 +155,7 @@ const Signin = () => {
                 </div>
                 <input
                   type="email"
-                  placeholder="name@example.com"
+                  placeholder={t('auth.signin.emailPlaceholder')}
                   className="w-full pl-12 pr-5 py-4 bg-gray-50/50 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-700/5 focus:border-red-700/30 focus:bg-white transition-all text-gray-900 font-medium placeholder:text-gray-400"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -165,13 +168,13 @@ const Signin = () => {
             <motion.div variants={itemVariants} className="space-y-2.5">
               <div className="flex justify-between items-center ml-1">
                 <label className="text-[0.85rem] font-bold text-gray-700 tracking-wide uppercase">
-                  Password
+                  {t('auth.signin.passwordLabel')}
                 </label>
                 <Link
-                  to="/forgot-password"
+                  to={`/${currentLang}/forgot-password`}
                   className="text-[0.85rem] font-bold text-red-700 hover:text-red-800 transition-colors"
                 >
-                  Forgot?
+                  {t('auth.signin.forgotPassword')}
                 </Link>
               </div>
               <div className="relative group">
@@ -180,7 +183,7 @@ const Signin = () => {
                 </div>
                 <input
                   type="password"
-                  placeholder="••••••••"
+                  placeholder={t('auth.signin.passwordPlaceholder')}
                   className="w-full pl-12 pr-5 py-4 bg-gray-50/50 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-700/5 focus:border-red-700/30 focus:bg-white transition-all text-gray-900 font-medium"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -212,7 +215,7 @@ const Signin = () => {
                     />
                   ) : (
                     <>
-                      <span>Sign In</span>
+                      <span>{t('auth.signin.submit')}</span>
                       <ArrowRight
                         size={20}
                         className="group-hover:translate-x-1 transition-transform"
@@ -230,12 +233,12 @@ const Signin = () => {
             className="mt-10 pt-10 border-t border-gray-100 text-center"
           >
             <p className="text-gray-500 font-medium">
-              Don't have an account?{' '}
+              {t('auth.signin.noAccount')}{' '}
               <Link
-                to="/signup"
+                to={`/${currentLang}/signup`}
                 className="font-bold text-gray-900 hover:text-red-700 transition-colors"
               >
-                Create an account
+                {t('auth.signin.signupLink')}
               </Link>
             </p>
           </motion.div>
@@ -247,7 +250,7 @@ const Signin = () => {
           transition={{ delay: 1 }}
           className="mt-8 text-center text-gray-400 text-xs font-medium tracking-widest uppercase"
         >
-          © 2026 TransLeb • Premium Transportation Services
+          {t('auth.copyright')}
         </motion.p>
       </motion.div>
     </div>

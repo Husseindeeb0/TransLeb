@@ -7,9 +7,7 @@ import {
   Search, 
   ArrowLeft, 
   MessageCircle, 
-  ExternalLink,
   Info,
-  Clock,
   LayoutGrid
 } from 'lucide-react';
 import { useGetUserDetailsQuery } from '../../state/services/user/userAPI';
@@ -17,8 +15,10 @@ import { useGetDayCardsQuery } from '../../state/services/dayCard/dayCardAPI';
 import DayCard from '../../components/DayCard/DayCard';
 import Loader from '../../components/Loader';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 const DriverProfile = () => {
+  const { t, i18n } = useTranslation();
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
@@ -37,7 +37,7 @@ const DriverProfile = () => {
     if (!searchQuery) return sorted;
 
     return sorted.filter(card => {
-      const dateStr = new Date(card.date).toLocaleDateString('en-US', {
+      const dateStr = new Date(card.date).toLocaleDateString(i18n.language, {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
@@ -52,7 +52,7 @@ const DriverProfile = () => {
       const formattedPhone = driver.phoneNumber.replace(/\D/g, '');
       window.open(`https://wa.me/${formattedPhone}`, '_blank');
     } else {
-      toast.error('Driver phone number not available');
+      toast.error(t('driverProfile.whatsappError'));
     }
   };
 
@@ -64,14 +64,14 @@ const DriverProfile = () => {
         <div className="w-20 h-20 bg-red-50 rounded-3xl flex items-center justify-center mb-6">
           <Info className="w-10 h-10 text-red-600" />
         </div>
-        <h1 className="text-3xl font-black text-gray-900 mb-2">Driver Not Found</h1>
-        <p className="text-gray-500 mb-8 max-w-sm">We couldn't find the driver profile you're looking for. It might have been deleted or the link is incorrect.</p>
+        <h1 className="text-3xl font-black text-gray-900 mb-2">{t('driverProfile.notFound.title')}</h1>
+        <p className="text-gray-500 mb-8 max-w-sm">{t('driverProfile.notFound.desc')}</p>
         <button 
-          onClick={() => navigate('/home')}
+          onClick={() => navigate(`/${i18n.language}/home`)}
           className="flex items-center gap-2 px-8 py-4 bg-gray-900 text-white rounded-2xl font-bold hover:bg-gray-800 transition-all"
         >
           <ArrowLeft size={20} />
-          Back to Home
+          {t('driverProfile.notFound.backHome')}
         </button>
       </div>
     );
@@ -103,7 +103,7 @@ const DriverProfile = () => {
             className="flex items-center gap-2 px-6 py-3 bg-white/20 backdrop-blur-md rounded-2xl text-white font-bold text-sm border border-white/20 hover:bg-white/30 transition-all"
           >
             <ArrowLeft size={18} />
-            Back
+            {t('driverProfile.back')}
           </motion.button>
         </div>
       </div>
@@ -148,7 +148,7 @@ const DriverProfile = () => {
                     <MapPin size={20} className="text-red-600" />
                   </div>
                   <span className="font-bold text-sm uppercase tracking-wide">
-                    {driver.region || 'All Lebanon'}
+                    {driver.region || t('driverProfile.allLebanon')}
                   </span>
                 </div>
                 <div className="flex items-center gap-3 text-gray-100">
@@ -167,7 +167,7 @@ const DriverProfile = () => {
               </div>
 
               <p className="text-gray-500 font-medium leading-relaxed max-w-3xl">
-                {driver.description || "Passionate about providing safe and timely transportation for all passengers. Always on schedule and ready to cover your daily needs across lebanon regions."}
+                {driver.description || t('driverProfile.defaultDescription')}
               </p>
             </div>
 
@@ -180,7 +180,7 @@ const DriverProfile = () => {
                 className="flex items-center justify-center gap-3 px-10 py-5 bg-green-600 text-white rounded-[2rem] font-black shadow-xl shadow-green-100 hover:shadow-green-200 transition-all uppercase text-[11px] tracking-widest"
               >
                 <MessageCircle size={20} />
-                Chat on WhatsApp
+                {t('driverProfile.whatsapp')}
               </motion.button>
             </div>
           </div>
@@ -191,8 +191,8 @@ const DriverProfile = () => {
       <div className="max-w-7xl mx-auto px-6 mt-20">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12">
           <div>
-            <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-2">Driver's Schedule</h2>
-            <p className="text-gray-500 font-medium leading-relaxed">Browse through all available schedules for this driver.</p>
+            <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-2">{t('driverProfile.schedulesTitle')}</h2>
+            <p className="text-gray-500 font-medium leading-relaxed">{t('driverProfile.schedulesSubtitle')}</p>
           </div>
 
           <div className="relative w-full md:w-96">
@@ -201,7 +201,7 @@ const DriverProfile = () => {
             </div>
             <input 
               type="text" 
-              placeholder="Search by date..."
+              placeholder={t('driverProfile.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-16 pr-8 py-5 bg-white border-2 border-transparent focus:border-red-600/10 rounded-[2rem] shadow-xl shadow-gray-100/50 focus:outline-none transition-all font-bold placeholder:text-gray-400"
@@ -230,8 +230,8 @@ const DriverProfile = () => {
               <div className="w-24 h-24 bg-gray-50 rounded-[2rem] flex items-center justify-center mb-8">
                 <LayoutGrid className="w-10 h-10 text-gray-300" />
               </div>
-              <h3 className="text-2xl font-black text-gray-900 mb-2">No Schedules Found</h3>
-              <p className="text-gray-500 max-w-sm font-medium">Try searching for a different date or check back later for new updates.</p>
+              <h3 className="text-2xl font-black text-gray-900 mb-2">{t('driverProfile.noSchedulesFound')}</h3>
+              <p className="text-gray-500 max-w-sm font-medium">{t('driverProfile.noSchedulesDesc')}</p>
             </motion.div>
           )}
         </AnimatePresence>

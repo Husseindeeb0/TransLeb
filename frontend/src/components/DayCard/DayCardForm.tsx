@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, Plus, X, Clock, LayoutGrid, ListTodo, CalendarCheck, Archive, Users } from 'lucide-react';
 import type { DayCard as DayCardType, DayCardFormData, BusSchedule } from '../../types/dayCardTypes';
+import { useTranslation } from 'react-i18next';
 
 interface DayCardFormProps {
   initialData?: DayCardType | null;
@@ -16,6 +17,7 @@ const DayCardForm: React.FC<DayCardFormProps> = ({
   onCancel,
   isLoading,
 }) => {
+  const { t } = useTranslation();
   const [date, setDate] = useState(
     initialData ? new Date(initialData.date).toISOString().split('T')[0] : ''
   );
@@ -90,10 +92,10 @@ const DayCardForm: React.FC<DayCardFormProps> = ({
 
       <div className="mb-10">
         <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-2">
-          {initialData ? 'Update Day Card' : 'Create Day Card'}
+          {initialData ? t('daycard.form.updateTitle') : t('daycard.form.createTitle')}
         </h2>
         <p className="text-gray-500 font-medium">
-          Set up your schedule for a specific day
+          {t('daycard.form.subtitle')}
         </p>
       </div>
 
@@ -102,7 +104,7 @@ const DayCardForm: React.FC<DayCardFormProps> = ({
           {/* Date Picker */}
           <div className="space-y-3">
             <label className="text-sm font-black text-gray-700 uppercase tracking-widest ml-1">
-              Select Date
+              {t('daycard.form.selectDate')}
             </label>
             <div className="relative group">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-red-600 transition-colors">
@@ -121,7 +123,7 @@ const DayCardForm: React.FC<DayCardFormProps> = ({
           {/* Form State Selector */}
           <div className="space-y-4 md:col-span-2">
             <label className="text-sm font-black text-gray-700 uppercase tracking-widest ml-1">
-              Passenger Form Status
+              {t('daycard.form.statusLabel')}
             </label>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {[
@@ -153,7 +155,7 @@ const DayCardForm: React.FC<DayCardFormProps> = ({
                   }`}
                 >
                   <state.icon size={24} className={formState === state.id ? state.iconColor : ''} />
-                  <span className="text-xs">{state.label}</span>
+                  <span className="text-xs">{t(`daycard.states.${state.id}`)}</span>
                 </button>
               ))}
             </div>
@@ -163,7 +165,7 @@ const DayCardForm: React.FC<DayCardFormProps> = ({
         {/* Bus Timers Section */}
         <div className="space-y-4">
           <label className="text-sm font-black text-gray-700 uppercase tracking-widest ml-1">
-            Bus Timers
+            {t('daycard.form.timersLabel')}
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="relative group col-span-1 lg:col-span-1">
@@ -184,7 +186,7 @@ const DayCardForm: React.FC<DayCardFormProps> = ({
               </div>
               <input
                 type="number"
-                placeholder="Capacity"
+                placeholder={t('daycard.form.capacityPlaceholder')}
                 className="w-full pl-12 pr-5 py-4 bg-gray-50/50 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-green-600/5 focus:border-green-600/30 transition-all font-bold text-gray-900"
                 value={newCapacity}
                 onChange={(e) => setNewCapacity(Number(e.target.value))}
@@ -197,7 +199,7 @@ const DayCardForm: React.FC<DayCardFormProps> = ({
               className="px-8 bg-gray-900 text-white rounded-2xl font-bold hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
             >
               <Plus size={20} />
-              Add Bus
+              {t('daycard.form.addBus')}
             </button>
           </div>
 
@@ -212,11 +214,11 @@ const DayCardForm: React.FC<DayCardFormProps> = ({
                   className="px-4 py-3 bg-white border-2 border-gray-100 rounded-2xl flex items-center justify-between gap-6 text-gray-700 font-bold shadow-sm min-w-[150px]"
                 >
                   <div className="flex flex-col">
-                    <span className="text-xs uppercase tracking-widest text-gray-400 font-black">Time</span>
+                    <span className="text-xs uppercase tracking-widest text-gray-400 font-black">{t('daycard.form.time')}</span>
                     <span className="text-sm">{bus.time}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs uppercase tracking-widest text-gray-400 font-black">Cap</span>
+                    <span className="text-xs uppercase tracking-widest text-gray-400 font-black">{t('daycard.form.cap')}</span>
                     <span className="text-sm">{bus.capacity}</span>
                   </div>
                   <button
@@ -230,7 +232,7 @@ const DayCardForm: React.FC<DayCardFormProps> = ({
               ))}
             </AnimatePresence>
             {busTimers.length === 0 && (
-              <p className="text-sm text-gray-400 italic ml-1">No times added yet...</p>
+              <p className="text-sm text-gray-400 italic ml-1">{t('daycard.form.noTimes')}</p>
             )}
           </div>
         </div>
@@ -242,14 +244,14 @@ const DayCardForm: React.FC<DayCardFormProps> = ({
             onClick={onCancel}
             className="flex-1 py-4.5 border-2 border-gray-100 text-gray-600 rounded-2xl font-bold hover:bg-gray-50 transition-colors"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             type="submit"
             disabled={isLoading || !date}
             className="flex-2 py-4.5 bg-gradient-to-r from-red-700 to-green-600 text-white rounded-2xl font-bold hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.2)] disabled:opacity-50 transition-all active:scale-[0.98]"
           >
-            {isLoading ? 'Saving...' : initialData ? 'Update Card' : 'Create Card'}
+            {isLoading ? t('daycard.form.saving') : initialData ? t('daycard.form.update') : t('daycard.form.create')}
           </button>
         </div>
       </form>

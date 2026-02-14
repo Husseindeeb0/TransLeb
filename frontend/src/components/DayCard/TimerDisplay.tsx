@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Clock, AlertCircle, CheckCircle2, Users } from 'lucide-react';
 import type { BusSchedule } from '../../types/dayCardTypes';
 import { formatTimeToAMPM } from '../../helpers';
+import { useTranslation } from 'react-i18next';
 
 interface TimerDisplayProps {
   timers: BusSchedule[];
@@ -9,6 +10,7 @@ interface TimerDisplayProps {
 }
 
 const TimerDisplay: React.FC<TimerDisplayProps> = ({ timers, formState }) => {
+  const { t } = useTranslation();
   const isDecided = timers.length > 0;
 
   return (
@@ -17,8 +19,8 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({ timers, formState }) => {
       <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-green-500 to-red-600 opacity-20" />
 
       <div className="mb-8">
-        <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-2">Bus Schedule</h2>
-        <p className="text-gray-500 font-medium">Exact departure times for today</p>
+        <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-2">{t('daycard.timerDisplay.title')}</h2>
+        <p className="text-gray-500 font-medium">{t('daycard.timerDisplay.subtitle')}</p>
       </div>
 
       <div className="flex-grow flex flex-col justify-center">
@@ -38,7 +40,7 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({ timers, formState }) => {
                 <span className="text-2xl font-black text-gray-900">{formatTimeToAMPM(bus.time)}</span>
                 <div className="flex items-center gap-2 px-3 py-1 bg-gray-900/5 rounded-full text-[10px] font-black uppercase tracking-widest text-gray-500">
                    <Users size={12} className="text-red-500" />
-                   {bus.capacity} CAPACITY
+                   {bus.capacity} {t('daycard.timerDisplay.capacity')}
                 </div>
               </motion.div>
             ))}
@@ -48,9 +50,9 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({ timers, formState }) => {
             <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-sm">
               <AlertCircle size={32} className="text-amber-500" />
             </div>
-            <h3 className="text-xl font-black text-gray-900 mb-2">Times Not Decided Yet</h3>
+            <h3 className="text-xl font-black text-gray-900 mb-2">{t('daycard.timerDisplay.notDecidedTitle')}</h3>
             <p className="text-gray-500 font-medium max-w-[250px]">
-              The driver is still planning the exact schedule. Check back soon!
+              {t('daycard.timerDisplay.notDecidedDesc')}
             </p>
           </div>
         )}
@@ -62,13 +64,13 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({ timers, formState }) => {
             <CheckCircle2 size={16} />
           </div>
           <div>
-            <span className="text-[10px] uppercase tracking-widest text-gray-400 font-black block">Status</span>
-            <span className="text-sm font-black text-gray-900 capitalize">{formState}</span>
+            <span className="text-[10px] uppercase tracking-widest text-gray-400 font-black block">{t('daycard.timerDisplay.status')}</span>
+            <span className="text-sm font-black text-gray-900 capitalize">{t(`daycard.states.${formState}`)}</span>
           </div>
         </div>
         
         <div className="text-right">
-          <span className="text-[10px] uppercase tracking-widest text-gray-400 font-black block">Total Trips</span>
+          <span className="text-[10px] uppercase tracking-widest text-gray-400 font-black block">{t('daycard.timerDisplay.totalTrips')}</span>
           <span className="text-2xl font-black text-gray-900">{timers.length}</span>
         </div>
       </div>

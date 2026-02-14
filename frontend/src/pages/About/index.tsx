@@ -8,8 +8,10 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 
 import { useSendContactEmailMutation } from '../../state/services/contact/contactAPI';
+import { useTranslation } from 'react-i18next';
 
 const About = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -24,11 +26,11 @@ const About = () => {
 
     try {
       const response = await sendContactEmail(formData).unwrap();
-      toast.success(response.message || 'Message sent! We will get back to you soon.');
+      toast.success(response.message || t('common.saveSuccess', 'Message sent! We will get back to you soon.'));
       setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error: any) {
       console.error('Error sending message:', error);
-      toast.error(error.data?.message || 'Failed to send message.');
+      toast.error(error.data?.message || t('common.error', 'Failed to send message.'));
     }
   };
 
@@ -42,20 +44,20 @@ const About = () => {
   const features = [
     {
       icon: Users,
-      title: "Community Driven",
-      description: "We bridge the gap between drivers and commuters across Lebanon, fostering a trust-based ecosystem.",
+      title: t('about.ourGoal.community.title'),
+      description: t('about.ourGoal.community.desc'),
       color: "red"
     },
     {
       icon: ShieldCheck,
-      title: "Security First",
-      description: "Every driver is verified, and every trip is monitored to ensure the highest safety standards.",
+      title: t('about.ourGoal.security.title'),
+      description: t('about.ourGoal.security.desc'),
       color: "green"
     },
     {
       icon: Rocket,
-      title: "Scaleable Tech",
-      description: "Built on modern architecture to provide real-time updates and seamless coordination.",
+      title: t('about.ourGoal.tech.title'),
+      description: t('about.ourGoal.tech.desc'),
       color: "blue"
     }
   ];
@@ -74,14 +76,14 @@ const About = () => {
           >
             <span className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-gray-50 border border-gray-100 text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-8">
               <Info size={14} className="text-red-600" />
-              Get to know TransLeb
+              {t('about.badge')}
             </span>
             <h1 className="text-6xl md:text-8xl font-black text-gray-900 tracking-tighter leading-[0.9] uppercase italic mb-8">
-              Changing the way <br />
-              <span className="text-red-600">Lebanon Moves</span>
+              {t('about.title')} <br />
+              <span className="text-red-600">{t('about.titleMoves')}</span>
             </h1>
             <p className="max-w-2xl mx-auto text-gray-500 font-bold text-xl leading-relaxed italic">
-              "A premium network connecting Lebanon, one ride at a time. Built with passion, safety, and reliability at its core."
+              {t('about.quote')}
             </p>
           </motion.div>
         </div>
@@ -96,25 +98,25 @@ const About = () => {
                 <div className="w-12 h-12 bg-red-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-red-200">
                   <Users size={24} />
                 </div>
-                <h2 className="text-4xl font-black text-gray-900 uppercase italic tracking-tight">Who We Are</h2>
+                <h2 className="text-4xl font-black text-gray-900 uppercase italic tracking-tight">{t('about.whoWeAre.title')}</h2>
               </div>
               <div className="space-y-6">
                 <p className="text-gray-600 font-bold text-lg leading-relaxed italic">
-                  TransLeb is a dedicated platform designed to revolutionize the transportation sector in Lebanon. We recognized the challenges faced by both drivers and passengers in the current landscape—unreliable schedules, safety concerns, and lack of coordination.
+                  {t('about.whoWeAre.p1')}
                 </p>
                 <p className="text-gray-500 font-medium leading-relaxed">
-                  We are a team of passionate Lebanese individuals who believe that technology can solve local problems. By creating a centralized hub for verified drivers and daily commuters, we're not just providing a service; we're building a community.
+                  {t('about.whoWeAre.p2')}
                 </p>
               </div>
               
               <div className="grid grid-cols-2 gap-6 pt-4">
                 <div className="p-6 bg-gray-50 rounded-[2rem] border border-gray-100">
-                  <p className="text-3xl font-black text-red-600 mb-1">500+</p>
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Verified Drivers</p>
+                  <p className="text-3xl font-black text-red-600 mb-1">{t('about.whoWeAre.statDrivers')}</p>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t('about.whoWeAre.statDriversLabel')}</p>
                 </div>
                 <div className="p-6 bg-gray-50 rounded-[2rem] border border-gray-100">
-                  <p className="text-3xl font-black text-green-600 mb-1">10k+</p>
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Happy Riders</p>
+                  <p className="text-3xl font-black text-green-600 mb-1">{t('about.whoWeAre.statRiders')}</p>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t('about.whoWeAre.statRidersLabel')}</p>
                 </div>
               </div>
             </motion.div>
@@ -131,8 +133,8 @@ const About = () => {
                 <div className="absolute inset-0 flex items-center justify-center">
                    <div className="text-white text-center p-12">
                       <Heart size={80} className="mx-auto mb-8 text-red-600 fill-red-600 animate-pulse" />
-                      <h3 className="text-3xl font-black uppercase italic tracking-tighter mb-4 leading-none">Built for Lebanon</h3>
-                      <p className="text-gray-400 font-bold italic leading-tight">Empowering our local economy and simplifying daily life.</p>
+                      <h3 className="text-3xl font-black uppercase italic tracking-tighter mb-4 leading-none">{t('about.builtForLebanon.title')}</h3>
+                      <p className="text-gray-400 font-bold italic leading-tight">{t('about.builtForLebanon.desc')}</p>
                    </div>
                 </div>
                 <div className="absolute bottom-8 left-8 right-8 p-8 bg-white/10 backdrop-blur-xl rounded-[2.5rem] border border-white/20">
@@ -140,7 +142,7 @@ const About = () => {
                       <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-gray-900">
                         <CheckCircle2 size={24} />
                       </div>
-                      <p className="text-white font-black uppercase text-[10px] tracking-[0.2em]">Verified Standards</p>
+                      <p className="text-white font-black uppercase text-[10px] tracking-[0.2em]">{t('about.builtForLebanon.verified')}</p>
                     </div>
                 </div>
               </div>
@@ -159,10 +161,10 @@ const About = () => {
               <div className="w-12 h-12 bg-green-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-green-200">
                 <Target size={24} />
               </div>
-              <h2 className="text-4xl font-black text-gray-900 uppercase italic tracking-tight">Our Goal</h2>
+              <h2 className="text-4xl font-black text-gray-900 uppercase italic tracking-tight">{t('about.ourGoal.title')}</h2>
             </div>
             <p className="max-w-2xl mx-auto text-gray-500 font-bold text-xl italic leading-relaxed">
-              Our mission is to become the leading intelligence layer for transportation in the region, focusing on transparency and user-centric solutions.
+              {t('about.ourGoal.mission')}
             </p>
           </motion.div>
 
@@ -202,10 +204,10 @@ const About = () => {
             <div className="lg:col-span-5 space-y-12">
               <motion.div {...fadeInUp}>
                 <h2 className="text-5xl font-black text-gray-900 uppercase italic tracking-tighter mb-6 leading-none">
-                  GET IN <span className="text-red-600">TOUCH</span>
+                  {t('about.contact.title')} <span className="text-red-600">{t('about.contact.titleTouch')}</span>
                 </h2>
                 <p className="text-gray-500 font-bold text-lg leading-relaxed italic">
-                  Have questions or want to partner with us? We're always here to help and listen.
+                  {t('about.contact.desc')}
                 </p>
               </motion.div>
 
@@ -215,7 +217,7 @@ const About = () => {
                     <Mail size={24} />
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Email Us</p>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t('about.contact.emailLabel')}</p>
                     <p className="text-xl font-black text-gray-900 italic uppercase leading-none">transleb84@gmail.com</p>
                   </div>
                 </div>
@@ -225,7 +227,7 @@ const About = () => {
                     <Phone size={24} />
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Call Us</p>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t('about.contact.phoneLabel')}</p>
                     <p className="text-xl font-black text-gray-900 italic uppercase leading-none">+961 70 063 612</p>
                   </div>
                 </div>
@@ -235,8 +237,8 @@ const About = () => {
                     <MapPin size={24} />
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Visit Us</p>
-                    <p className="text-xl font-black text-gray-900 italic uppercase leading-none">Beirut, Lebanon</p>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t('about.contact.visitLabel')}</p>
+                    <p className="text-xl font-black text-gray-900 italic uppercase leading-none">{t('about.contact.visitValue')}</p>
                   </div>
                 </div>
               </div>
@@ -251,50 +253,50 @@ const About = () => {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Full Name</label>
+                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{t('about.contact.form.name')}</label>
                        <input 
                          type="text" 
                          required
                          value={formData.name}
                          onChange={(e) => setFormData({...formData, name: e.target.value})}
                          className="w-full bg-gray-50 border-2 border-gray-100 rounded-[2rem] px-8 py-4 focus:outline-none focus:border-red-600/30 transition-all font-bold"
-                         placeholder="John Doe"
+                         placeholder={t('about.contact.form.placeholderName')}
                        />
                     </div>
                     <div className="space-y-2">
-                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Email Address</label>
+                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{t('about.contact.form.email')}</label>
                        <input 
                          type="email" 
                          required
                          value={formData.email}
                          onChange={(e) => setFormData({...formData, email: e.target.value})}
                          className="w-full bg-gray-50 border-2 border-gray-100 rounded-[2rem] px-8 py-4 focus:outline-none focus:border-red-600/30 transition-all font-bold"
-                         placeholder="your@email.com"
+                         placeholder={t('about.contact.form.placeholderEmail')}
                        />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Subject</label>
+                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{t('about.contact.form.subject')}</label>
                      <input 
                        type="text" 
                        required
                        value={formData.subject}
                        onChange={(e) => setFormData({...formData, subject: e.target.value})}
                        className="w-full bg-gray-50 border-2 border-gray-100 rounded-[2rem] px-8 py-4 focus:outline-none focus:border-red-600/30 transition-all font-bold"
-                       placeholder="How can we help?"
+                       placeholder={t('about.contact.form.placeholderSubject')}
                      />
                   </div>
 
                   <div className="space-y-2">
-                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Message</label>
+                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{t('about.contact.form.message')}</label>
                      <textarea 
                        rows={4}
                        required
                        value={formData.message}
                        onChange={(e) => setFormData({...formData, message: e.target.value})}
                        className="w-full bg-gray-50 border-2 border-gray-100 rounded-[2rem] px-8 py-4 focus:outline-none focus:border-red-600/30 transition-all font-bold"
-                       placeholder="Tell us what's on your mind..."
+                       placeholder={t('about.contact.form.placeholderMessage')}
                      />
                   </div>
 
@@ -303,7 +305,7 @@ const About = () => {
                     disabled={isLoading}
                     className="w-full bg-gray-900 text-white py-6 rounded-[2rem] font-black uppercase text-[12px] tracking-[0.3em] flex items-center justify-center gap-4 hover:bg-red-600 transition-all shadow-xl active:scale-95 group disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isLoading ? 'Sending...' : 'Send Message'}
+                    {isLoading ? t('about.contact.form.sending') : t('about.contact.form.submit')}
                     <Send size={18} className="group-hover:translate-x-2 transition-transform" />
                   </button>
                 </form>

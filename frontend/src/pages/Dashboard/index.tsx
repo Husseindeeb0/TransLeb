@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, LayoutGrid, List, Search, AlertCircle } from 'lucide-react';
+import { Plus, Search, LayoutGrid, AlertCircle } from 'lucide-react';
 import { 
   useGetDayCardsQuery, 
   useCreateDayCardMutation, 
@@ -13,8 +13,10 @@ import type { DayCard as DayCardType, DayCardFormData, CreateDayCardRequest, Upd
 import toast from 'react-hot-toast';
 import { useAuth } from '../../hooks/useAuth';
 import Loader from '../../components/Loader';
+import { useTranslation } from 'react-i18next';
 
 const Dashboard = () => {
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const { data: cards, isLoading, isError, refetch } = useGetDayCardsQuery(user?._id || "");
   const [createCard, { isLoading: isCreating }] = useCreateDayCardMutation();
@@ -32,35 +34,35 @@ const Dashboard = () => {
           ...formData,
           dayCardId: editingCard.dayCardId
         } as UpdateDayCardRequest).unwrap();
-        toast.success('Successfully updated schedule');
+        toast.success(t('dashboard.toast.updateSuccess'));
       } else {
         await createCard({
           ...formData,
           driverId: user?._id || user?.id || ''
         } as CreateDayCardRequest).unwrap();
-        toast.success('Successfully created new schedule');
+        toast.success(t('dashboard.toast.createSuccess'));
       }
       setIsFormOpen(false);
       setEditingCard(null);
     } catch (err) {
-      toast.error('Something went wrong. Please try again.');
+      toast.error(t('dashboard.toast.error'));
       console.error(err);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this card?')) {
+    if (window.confirm(t('dashboard.confirmDelete'))) {
       try {
         await deleteCard(id).unwrap();
-        toast.success('Card deleted');
+        toast.success(t('dashboard.toast.deleteSuccess'));
       } catch (err) {
-        toast.error('Failed to delete card');
+        toast.error(t('dashboard.toast.deleteError'));
       }
     }
   };
 
   const filteredCards = cards?.filter(card => 
-    new Date(card.date).toLocaleDateString().toLowerCase().includes(searchQuery.toLowerCase())
+    new Date(card.date).toLocaleDateString(i18n.language).toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -70,10 +72,10 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">
-              Driver Dashboard
+              {t('dashboard.title')}
             </h1>
             <p className="text-gray-500 font-medium">
-              Manage your daily schedules and bus timers efficiently
+              {t('dashboard.subtitle')}
             </p>
           </div>
           
@@ -87,7 +89,7 @@ const Dashboard = () => {
             className="flex items-center justify-center gap-3 px-8 py-4 bg-gray-900 text-white rounded-[1.5rem] font-bold shadow-2xl shadow-gray-200 hover:shadow-gray-300 transition-all"
           >
             <Plus size={20} />
-            Add New Day
+            {t('dashboard.addNew')}
           </motion.button>
         </div>
       </div>
@@ -127,7 +129,7 @@ const Dashboard = () => {
                   </div>
                   <input
                     type="text"
-                    placeholder="Search by date..."
+                    placeholder={t('dashboard.searchPlaceholder')}
                     className="w-full pl-14 pr-6 py-4 bg-white border-2 border-transparent focus:border-red-600/20 rounded-2xl shadow-sm focus:outline-none transition-all font-bold placeholder:text-gray-400"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -142,13 +144,13 @@ const Dashboard = () => {
                 ) : isError ? (
                   <div className="bg-red-50 border-2 border-red-100 p-12 rounded-[2.5rem] flex flex-col items-center text-center">
                     <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
-                    <h3 className="text-2xl font-black text-gray-900 mb-2">Failed to load cards</h3>
-                    <p className="text-gray-500 mb-8 font-medium">We couldn't retrieve your schedule. Please try refreshing.</p>
+                    <h3 className="text-2xl font-black text-gray-900 mb-2">{t('dashboard.error.title')}</h3>
+                    <p className="text-gray-500 mb-8 font-medium">{t('dashboard.error.desc')}</p>
                     <button 
                       onClick={() => refetch()}
                       className="px-8 py-3 bg-red-600 text-white rounded-xl font-bold shadow-lg shadow-red-200"
                     >
-                      Retry Connection
+                      {t('dashboard.error.retry')}
                     </button>
                   </div>
                 ) : filteredCards && filteredCards.length > 0 ? (
@@ -175,15 +177,15 @@ const Dashboard = () => {
                       <div className="w-24 h-24 bg-gray-50 rounded-[2rem] flex items-center justify-center mb-6">
                         <LayoutGrid className="w-10 h-10 text-gray-300" />
                       </div>
-                      <h3 className="text-3xl font-black text-gray-900 mb-3 tracking-tight">No Schedules Yet</h3>
+                      <h3 className="text-3xl font-black text-gray-900 mb-3 tracking-tight">{t('dashboard.empty.title')}</h3>
                       <p className="text-gray-500 font-medium max-w-sm mb-10">
-                        You haven't created any day cards yet. Start by adding your first daily schedule.
+                        {t('dashboard.empty.desc')}
                       </p>
                       <button
                         onClick={() => setIsFormOpen(true)}
                         className="px-10 py-4 bg-gradient-to-r from-red-700 to-green-600 text-white rounded-[1.5rem] font-bold shadow-xl hover:shadow-2xl transition-all active:scale-95"
                       >
-                        Create My First Card
+                        {t('dashboard.empty.cta')}
                       </button>
                     </div>
                   </div>

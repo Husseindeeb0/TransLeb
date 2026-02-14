@@ -1,19 +1,22 @@
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Github, Twitter, Instagram, Facebook, ArrowRight, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const Footer = () => {
+  const { t, i18n } = useTranslation();
   const currentYear = new Date().getFullYear();
+  const currentLang = i18n.language || 'en';
 
   const footerLinks = {
     company: [
-      { name: 'About Us', path: '/about' },
-      { name: 'Contact Support', path: '/about#contact' },
-      { name: 'Terms of Service', path: '/' },
+      { name: t('footer.links.about'), path: `/${currentLang}/about` },
+      { name: t('footer.links.support'), path: `/${currentLang}/about#contact` },
+      { name: t('footer.links.terms'), path: `/${currentLang}/` },
     ],
     services: [
-      { name: 'Browse Drivers', path: '/home' },
-      { name: 'Profile Settings', path: '/profile' },
+      { name: t('footer.links.drivers'), path: `/${currentLang}/home` },
+      { name: t('footer.links.profile'), path: `/${currentLang}/profile` },
     ],
     social: [
       { icon: Facebook, href: '#', name: 'Facebook' },
@@ -34,7 +37,7 @@ const Footer = () => {
           
           {/* Brand Identity */}
           <div className="lg:col-span-4 space-y-8">
-            <Link to="/" className="flex items-center space-x-3 group">
+            <Link to={`/${currentLang}/`} className="flex items-center space-x-3 group">
               <div className="relative">
                 <div className="w-12 h-12 bg-gray-900 rounded-2xl flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500 shadow-xl shadow-gray-200">
                   <span className="text-white font-black text-2xl italic leading-none">T</span>
@@ -49,7 +52,7 @@ const Footer = () => {
             </Link>
             
             <p className="text-gray-500 font-bold leading-relaxed max-w-sm italic">
-              "Connecting commuters and drivers across Lebanon with a premium, reliable, and secure transportation network."
+              {t('footer.slogan')}
             </p>
 
             <div className="flex items-center gap-4">
@@ -68,7 +71,7 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div className="lg:col-span-2 space-y-8">
-            <h4 className="text-[11px] font-black text-gray-900 uppercase tracking-[0.3em]">Company</h4>
+            <h4 className="text-[11px] font-black text-gray-900 uppercase tracking-[0.3em]">{t('footer.sections.company')}</h4>
             <ul className="space-y-4">
               {footerLinks.company.map((link, index) => (
                 <li key={index}>
@@ -85,7 +88,7 @@ const Footer = () => {
           </div>
 
           <div className="lg:col-span-2 space-y-8">
-            <h4 className="text-[11px] font-black text-gray-900 uppercase tracking-[0.3em]">Services</h4>
+            <h4 className="text-[11px] font-black text-gray-900 uppercase tracking-[0.3em]">{t('footer.sections.services')}</h4>
             <ul className="space-y-4">
               {footerLinks.services.map((link, index) => (
                 <li key={index}>
@@ -103,14 +106,14 @@ const Footer = () => {
 
           {/* Contact Details */}
           <div className="lg:col-span-4 space-y-8">
-            <h4 className="text-[11px] font-black text-gray-900 uppercase tracking-[0.3em]">Contact Us</h4>
+            <h4 className="text-[11px] font-black text-gray-900 uppercase tracking-[0.3em]">{t('footer.sections.contact')}</h4>
             <div className="space-y-6">
               <div className="flex items-start gap-5 group">
                 <div className="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center text-green-600 group-hover:bg-green-600 group-hover:text-white transition-all duration-500 shadow-sm">
                   <Phone size={20} />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-2">Phone</p>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-2">{t('footer.contacts.phone')}</p>
                   <p className="text-gray-900 font-bold leadnig-tight">+961 70 063 612</p>
                 </div>
               </div>
@@ -120,7 +123,7 @@ const Footer = () => {
                   <Mail size={20} />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-2">Email</p>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-2">{t('footer.contacts.email')}</p>
                   <p className="text-gray-900 font-bold leading-tight">transleb84@gmail.com</p>
                 </div>
               </div>
@@ -131,23 +134,11 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-10 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-3 text-gray-400 font-bold text-sm italic">
-            <span>© {currentYear} TransLeb. All rights reserved.</span>
+            <span>© {currentYear} TransLeb. {t('footer.bottom.rights')}</span>
           </div>
-
-          <div className="flex items-center gap-2 text-gray-400 font-bold text-sm italic">
-            <span>Designed with</span>
-            <motion.div
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <Heart size={16} className="text-red-500 fill-red-500" />
-            </motion.div>
-            <span>in Lebanon</span>
-          </div>
-
           <div className="flex gap-8">
-            <Link to="/" className="text-[10px] font-black text-gray-400 hover:text-gray-900 uppercase tracking-widest transition-colors">Privacy Policy</Link>
-            <Link to="/" className="text-[10px] font-black text-gray-400 hover:text-gray-900 uppercase tracking-widest transition-colors">Cookie Policy</Link>
+            <Link to={`/${currentLang}/`} className="text-[10px] font-black text-gray-400 hover:text-gray-900 uppercase tracking-widest transition-colors">{t('footer.bottom.privacy')}</Link>
+            <Link to={`/${currentLang}/`} className="text-[10px] font-black text-gray-400 hover:text-gray-900 uppercase tracking-widest transition-colors">{t('footer.bottom.cookie')}</Link>
           </div>
         </div>
       </div>

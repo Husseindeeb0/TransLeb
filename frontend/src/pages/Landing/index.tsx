@@ -2,20 +2,24 @@ import { motion } from 'framer-motion';
 import { 
   ArrowRight, 
   Clock, 
-  ShieldCheck, 
   ShieldAlert, 
-  MessageCircle, 
-  Users, 
-  Calendar, 
   Smartphone, 
   TrendingUp, 
-  Target
+  Target,
+  Users,
+  Calendar,
+  MessageCircle,
+  ShieldCheck
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { useTranslation } from 'react-i18next';
 
 const Landing = () => {
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || 'en';
   const { isAuthenticated } = useAuth();
+  
   const fadeInUp = {
     initial: { opacity: 0, y: 30 },
     whileInView: { opacity: 1, y: 0 },
@@ -33,13 +37,13 @@ const Landing = () => {
             alt="Hero Background" 
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-gray-900/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-gray-900/40 to-transparent rtl:bg-gradient-to-l" />
         </div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
           <div className="max-w-3xl">
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
+              initial={{ opacity: 0, x: currentLang === 'ar' ? 50 : -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
@@ -48,29 +52,29 @@ const Landing = () => {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                 </span>
-                Connecting Lebanon
+                {t('landing.badge')}
               </div>
               <h1 className="text-6xl md:text-8xl font-black text-white leading-[0.9] mb-8 tracking-tighter">
-                TRANSIT MADE <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-green-500">SIMPLE.</span>
+                {t('landing.title')} <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-green-500">{t('landing.titleSimple')}</span>
               </h1>
               <p className="text-xl text-gray-300 font-medium mb-12 max-w-xl leading-relaxed">
-                Empowering passengers with real-time schedules and direct driver communication. Experience the next generation of Lebanese transportation.
+                {t('landing.subtitle')}
               </p>
               
               <div className="flex flex-wrap gap-6">
                 <Link 
-                  to={isAuthenticated ? "/home" : "/signup"} 
+                  to={isAuthenticated ? `/${currentLang}/home` : `/${currentLang}/signup`} 
                   className="px-10 py-5 bg-white text-gray-900 rounded-[1.5rem] font-black uppercase text-[12px] tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-2xl flex items-center gap-3 active:scale-95"
                 >
-                  Get Started Now
-                  <ArrowRight size={18} />
+                  {t('landing.getStarted')}
+                  <ArrowRight size={18} className="rtl:rotate-180" />
                 </Link>
                 <Link 
-                  to="/home" 
+                  to={`/${currentLang}/home`} 
                   className="px-10 py-5 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-[1.5rem] font-black uppercase text-[12px] tracking-widest hover:bg-white/20 transition-all active:scale-95"
                 >
-                  Browse Drivers
+                  {t('landing.browseDrivers')}
                 </Link>
               </div>
             </motion.div>
@@ -83,7 +87,7 @@ const Landing = () => {
           transition={{ repeat: Infinity, duration: 2 }}
           className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
         >
-          <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Scroll</span>
+          <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">{t('landing.scroll')}</span>
           <div className="w-1 h-12 bg-gradient-to-b from-red-600 to-transparent rounded-full" />
         </motion.div>
       </section>
@@ -93,27 +97,27 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-20 items-center">
             <motion.div {...fadeInUp}>
-              <h2 className="text-[12px] font-black text-red-600 uppercase tracking-widest mb-4">The Challenge</h2>
+              <h2 className="text-[12px] font-black text-red-600 uppercase tracking-widest mb-4">{t('landing.challenge.tag')}</h2>
               <h3 className="text-5xl font-black text-gray-900 leading-tight mb-8">
-                Frustrated with the <br />
-                <span className="text-gray-400 italic">Unknown?</span>
+                {t('landing.challenge.title')} <br />
+                <span className="text-gray-400 italic">{t('landing.challenge.titleUnknown')}</span>
               </h3>
               <div className="space-y-8">
                 {[
                   { 
                     icon: <Clock className="text-red-500" />, 
-                    title: "Endless Waiting", 
-                    desc: "Standing for hours not knowing when the next bus or van will pass." 
+                    title: t('landing.challenge.item1Title'), 
+                    desc: t('landing.challenge.item1Desc') 
                   },
                   { 
                     icon: <ShieldAlert className="text-red-500" />, 
-                    title: "Zero Predictability", 
-                    desc: "Traditional transit in Lebanon lacks established digital schedules." 
+                    title: t('landing.challenge.item2Title'), 
+                    desc: t('landing.challenge.item2Desc') 
                   },
                   { 
                     icon: <Smartphone className="text-red-500" />, 
-                    title: "Disconnected Service", 
-                    desc: "No easy way to reach drivers directly to check availability." 
+                    title: t('landing.challenge.item3Title'), 
+                    desc: t('landing.challenge.item3Desc') 
                   }
                 ].map((item, i) => (
                   <div key={i} className="flex gap-6">
@@ -141,9 +145,9 @@ const Landing = () => {
                   <div className="w-20 h-20 bg-red-50 rounded-3xl flex items-center justify-center mb-8">
                     <TrendingUp className="text-red-600" size={32} />
                   </div>
-                  <h4 className="text-2xl font-black text-gray-900 mb-4">Old Systems Are Failing</h4>
+                  <h4 className="text-2xl font-black text-gray-900 mb-4">{t('landing.systems.title')}</h4>
                   <p className="text-gray-500 font-medium leading-relaxed">
-                    Lebanon's transport infrastructure deserves more than just luck. It's time to bridge the gap between technology and the road.
+                    {t('landing.systems.desc')}
                   </p>
                 </div>
               </div>
@@ -159,10 +163,10 @@ const Landing = () => {
       <section className="py-32 relative">
         <div className="max-w-7xl mx-auto px-6 text-center mb-24">
           <motion.div {...fadeInUp}>
-            <h2 className="text-[12px] font-black text-green-600 uppercase tracking-widest mb-4">Our Purpose</h2>
+            <h2 className="text-[12px] font-black text-green-600 uppercase tracking-widest mb-4">{t('landing.purpose.tag')}</h2>
             <h3 className="text-5xl md:text-6xl font-black text-gray-900 leading-tight mb-8">
-              A Mission to Move <br />
-              <span className="bg-gradient-to-r from-red-600 to-green-600 bg-clip-text text-transparent">Every Lebanese Citzen.</span>
+              {t('landing.purpose.title')} <br />
+              <span className="bg-gradient-to-r from-red-600 to-green-600 bg-clip-text text-transparent">{t('landing.purpose.span')}</span>
             </h3>
           </motion.div>
         </div>
@@ -172,20 +176,20 @@ const Landing = () => {
             {
               icon: <Target className="text-white" />,
               bg: "bg-red-600",
-              title: "Transparency",
-              desc: "Providing clear, real-time data for every route and scheduled time."
+              title: t('landing.goals.transparency.title'),
+              desc: t('landing.goals.transparency.desc')
             },
             {
               icon: <Users className="text-white" />,
               bg: "bg-gray-900",
-              title: "Community",
-              desc: "Building a trust-based ecosystem between drivers and their passengers."
+              title: t('landing.goals.community.title'),
+              desc: t('landing.goals.community.desc')
             },
             {
               icon: <TrendingUp className="text-white" />,
               bg: "bg-green-600",
-              title: "Efficiency",
-              desc: "Reducing wait times and optimizing fuel for drivers through better planning."
+              title: t('landing.goals.efficiency.title'),
+              desc: t('landing.goals.efficiency.desc')
             }
           ].map((goal, i) => (
             <motion.div 
@@ -210,26 +214,26 @@ const Landing = () => {
 
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-24">
-            <h2 className="text-[12px] font-black text-red-500 uppercase tracking-widest mb-4">The Solution</h2>
-            <h3 className="text-5xl font-black mb-8 leading-tight">Everything You Need <br /> To Travel Smarter</h3>
+            <h2 className="text-[12px] font-black text-red-500 uppercase tracking-widest mb-4">{t('landing.solution.tag')}</h2>
+            <h3 className="text-5xl font-black mb-8 leading-tight">{t('landing.solution.title')}</h3>
           </div>
 
           <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-8">
             {[
               { 
                 icon: <Calendar />, 
-                title: "DayCards", 
-                desc: "Drivers publish their daily availability and scheduled timers instantly." 
+                title: t('landing.features.daycards.title'), 
+                desc: t('landing.features.daycards.desc') 
               },
               { 
                 icon: <MessageCircle />, 
-                title: "Direct Chat", 
-                desc: "One-click access to talk with your driver via WhatsApp for quick coordination." 
+                title: t('landing.features.chat.title'), 
+                desc: t('landing.features.chat.desc') 
               },
               { 
                 icon: <ShieldCheck />, 
-                title: "Verified Drivers", 
-                desc: "Each driver on our platform is vetted for safety and professional reliability." 
+                title: t('landing.features.verified.title'), 
+                desc: t('landing.features.verified.desc') 
               }
             ].map((feature, i) => (
               <motion.div 
@@ -259,19 +263,19 @@ const Landing = () => {
           <div className="relative z-10 py-24 px-8">
             <motion.div {...fadeInUp}>
               <h2 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter leading-[1] uppercase">
-                READY TO <br />
-                <span className="text-gray-400">Join the movement?</span>
+                {t('landing.cta.ready')} <br />
+                <span className="text-gray-400">{t('landing.cta.movement')}</span>
               </h2>
               <p className="text-gray-400 text-xl font-medium mb-12 max-w-2xl mx-auto leading-relaxed">
-                Whether you're a driver looking to reach more passengers or a passenger seeking a reliable schedule, TransLeb is built for you.
+                {t('landing.cta.desc')}
               </p>
               
               <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                 <Link 
-                  to={isAuthenticated ? "/home" : "/signup"} 
+                  to={isAuthenticated ? `/${currentLang}/home` : `/${currentLang}/signup`} 
                   className="w-full sm:w-auto px-12 py-6 bg-red-600 text-white rounded-2xl font-black uppercase text-[14px] tracking-widest hover:bg-red-700 hover:scale-105 transition-all shadow-2xl active:scale-95"
                 >
-                  {isAuthenticated ? "Go to Home" : "Create Your Account"}
+                  {isAuthenticated ? t('landing.cta.home') : t('landing.cta.signup')}
                 </Link>
               </div>
             </motion.div>

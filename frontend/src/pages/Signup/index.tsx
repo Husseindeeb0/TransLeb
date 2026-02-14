@@ -13,8 +13,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import type { ApiError } from '../../types/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Variants } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 const Signup = () => {
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || 'en';
   const navigate = useNavigate();
   const [signup, { isLoading, error: signupError }] = useSignupMutation();
   const error = signupError as ApiError | undefined;
@@ -31,7 +34,7 @@ const Signup = () => {
     setValidationError(null);
 
     if (password !== confirmPassword) {
-      setValidationError("Passwords don't match");
+      setValidationError(t('auth.signup.errors.passwordMismatch'));
       return;
     }
 
@@ -42,7 +45,7 @@ const Signup = () => {
         password,
         role,
       }).unwrap();
-      navigate('/home');
+      navigate(`/${currentLang}/home`);
     } catch (err) {
       console.error('Signup failed side-effect:', err);
     }
@@ -53,7 +56,7 @@ const Signup = () => {
     if (!error) return null;
 
     if (error.status && Number(error.status) >= 500) {
-      return 'Our servers are experiencing issues. Please try again later.';
+      return t('auth.signup.errors.server');
     }
 
     switch (error.data?.state) {
@@ -61,21 +64,21 @@ const Signup = () => {
         return (
           <div className="flex flex-col items-center gap-1 text-center font-sans">
             <span className="font-semibold text-gray-800">
-              Email already registered
+              {t('auth.signup.errors.emailExists')}
             </span>
             <span className="text-gray-500 text-xs mt-1 leading-relaxed">
-              Try signing in or use a different email.
+              {t('auth.signup.errors.emailExistsDetail')}
             </span>
           </div>
         );
       case 'MISSING_FIELDS':
-        return 'Please fill in all the required fields.';
+        return t('auth.signup.errors.missingFields');
       case 'INTERNAL_SERVER_ERROR':
-        return 'Something went wrong on our end. Please try again in a moment.';
+        return t('auth.signup.errors.internal');
       default:
         return (
           error.data?.message ||
-          'Signup failed. Please check your details and try again.'
+          t('auth.signup.errors.failed')
         );
     }
   };
@@ -131,10 +134,10 @@ const Signup = () => {
             </motion.div>
 
             <h1 className="text-3xl font-black text-gray-900 tracking-tight mb-2">
-              Create Account
+              {t('auth.signup.title')}
             </h1>
             <p className="text-gray-500 font-medium text-sm">
-              Join TransLeb for premium transportation services
+              {t('auth.signup.subtitle')}
             </p>
           </div>
 
@@ -160,7 +163,7 @@ const Signup = () => {
             {/* Role Selection */}
             <motion.div variants={itemVariants} className="space-y-2.5">
               <label className="text-[0.8rem] font-bold text-gray-700 ml-1 tracking-wide uppercase">
-                Register as
+                {t('auth.signup.registerAs')}
               </label>
               <div className="grid grid-cols-2 gap-4">
                 <button
@@ -178,7 +181,7 @@ const Signup = () => {
                       role === 'passenger' ? 'animate-bounce-short' : ''
                     }
                   />
-                  <span className="font-bold text-sm">Passenger</span>
+                  <span className="font-bold text-sm">{t('auth.signup.passenger')}</span>
                 </button>
                 <button
                   type="button"
@@ -193,7 +196,7 @@ const Signup = () => {
                     size={20}
                     className={role === 'driver' ? 'animate-bounce-short' : ''}
                   />
-                  <span className="font-bold text-sm">Driver</span>
+                  <span className="font-bold text-sm">{t('auth.signup.driver')}</span>
                 </button>
               </div>
             </motion.div>
@@ -201,7 +204,7 @@ const Signup = () => {
             {/* Full Name Input */}
             <motion.div variants={itemVariants} className="space-y-2">
               <label className="text-[0.8rem] font-bold text-gray-700 ml-1 tracking-wide uppercase">
-                Full Name
+                {t('auth.signup.nameLabel')}
               </label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-green-600 transition-all duration-300">
@@ -209,7 +212,7 @@ const Signup = () => {
                 </div>
                 <input
                   type="text"
-                  placeholder="John Doe"
+                  placeholder={t('auth.signup.namePlaceholder')}
                   className="w-full pl-12 pr-5 py-3.5 bg-gray-50/50 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-green-600/5 focus:border-green-600/30 focus:bg-white transition-all text-gray-900 font-medium placeholder:text-gray-400"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -221,7 +224,7 @@ const Signup = () => {
             {/* Email Input */}
             <motion.div variants={itemVariants} className="space-y-2">
               <label className="text-[0.8rem] font-bold text-gray-700 ml-1 tracking-wide uppercase">
-                Email Address
+                {t('auth.signup.emailLabel')}
               </label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-green-600 transition-all duration-300">
@@ -229,7 +232,7 @@ const Signup = () => {
                 </div>
                 <input
                   type="email"
-                  placeholder="name@example.com"
+                  placeholder={t('auth.signup.emailPlaceholder')}
                   className="w-full pl-12 pr-5 py-3.5 bg-gray-50/50 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-green-600/5 focus:border-green-600/30 focus:bg-white transition-all text-gray-900 font-medium placeholder:text-gray-400"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -243,7 +246,7 @@ const Signup = () => {
               {/* Password Input */}
               <motion.div variants={itemVariants} className="space-y-2">
                 <label className="text-[0.8rem] font-bold text-gray-700 ml-1 tracking-wide uppercase">
-                  Password
+                  {t('auth.signup.passwordLabel')}
                 </label>
                 <div className="relative group">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-green-600 transition-all duration-300">
@@ -263,7 +266,7 @@ const Signup = () => {
               {/* Confirm Password Input */}
               <motion.div variants={itemVariants} className="space-y-2">
                 <label className="text-[0.8rem] font-bold text-gray-700 ml-1 tracking-wide uppercase">
-                  Confirm
+                  {t('auth.signup.confirmLabel')}
                 </label>
                 <div className="relative group">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-green-600 transition-all duration-300">
@@ -304,7 +307,7 @@ const Signup = () => {
                     />
                   ) : (
                     <>
-                      <span>Create Account</span>
+                      <span>{t('auth.signup.submit')}</span>
                       <ArrowRight
                         size={20}
                         className="group-hover:translate-x-1 transition-transform"
@@ -322,12 +325,12 @@ const Signup = () => {
             className="mt-8 pt-8 border-t border-gray-100 text-center"
           >
             <p className="text-gray-500 font-medium">
-              Already have an account?{' '}
+              {t('auth.signup.hasAccount')}{' '}
               <Link
-                to="/signin"
+                to={`/${currentLang}/signin`}
                 className="font-bold text-gray-900 hover:text-green-600 transition-colors"
               >
-                Sign in instead
+                {t('auth.signup.signinLink')}
               </Link>
             </p>
           </motion.div>
@@ -339,7 +342,7 @@ const Signup = () => {
           transition={{ delay: 1 }}
           className="mt-8 text-center text-gray-400 text-xs font-medium tracking-widest uppercase"
         >
-          © 2026 TransLeb • Premium Transportation Services
+          {t('auth.copyright')}
         </motion.p>
       </motion.div>
     </div>

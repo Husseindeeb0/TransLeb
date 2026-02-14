@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Calendar, Clock, Trash2, Edit3, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { DayCard as DayCardType } from '../../types/dayCardTypes';
+import { useTranslation } from 'react-i18next';
 
 interface DayCardProps {
   card: DayCardType;
@@ -10,7 +11,8 @@ interface DayCardProps {
 }
 
 const DayCard: React.FC<DayCardProps> = ({ card, onEdit, onDelete }) => {
-  const formattedDate = new Date(card.date).toLocaleDateString('en-US', {
+  const { t, i18n } = useTranslation();
+  const formattedDate = new Date(card.date).toLocaleDateString(i18n.language, {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -40,7 +42,7 @@ const DayCard: React.FC<DayCardProps> = ({ card, onEdit, onDelete }) => {
               <button
                 onClick={() => onEdit(card)}
                 className="p-2 hover:bg-green-50 rounded-xl text-green-600 transition-colors"
-                title="Edit Card"
+                title={t('daycard.edit')}
               >
                 <Edit3 size={18} />
               </button>
@@ -49,7 +51,7 @@ const DayCard: React.FC<DayCardProps> = ({ card, onEdit, onDelete }) => {
               <button
                 onClick={() => onDelete(card.dayCardId)}
                 className="p-2 hover:bg-red-50 rounded-xl text-red-600 transition-colors"
-                title="Delete Card"
+                title={t('daycard.delete')}
               >
                 <Trash2 size={18} />
               </button>
@@ -65,7 +67,7 @@ const DayCard: React.FC<DayCardProps> = ({ card, onEdit, onDelete }) => {
           <div className="flex items-center gap-2 text-gray-500 mb-4">
             <Clock size={16} />
             <span className="text-sm font-medium">
-              {card.busTimers.length} Scheduled Times
+              {card.busTimers.length} {t('daycard.scheduledTimes')}
             </span>
           </div>
 
@@ -80,7 +82,7 @@ const DayCard: React.FC<DayCardProps> = ({ card, onEdit, onDelete }) => {
             ))}
             {card.busTimers.length > 3 && (
               <span className="px-3 py-1 bg-green-50 text-green-600 rounded-lg text-xs font-bold border border-green-100">
-                +{card.busTimers.length - 3} more
+                +{card.busTimers.length - 3} {t('daycard.more')}
               </span>
             )}
           </div>
@@ -90,7 +92,7 @@ const DayCard: React.FC<DayCardProps> = ({ card, onEdit, onDelete }) => {
         <div className="mt-auto pt-6 border-t border-gray-100 flex items-center justify-between">
           <div className="flex flex-col">
             <span className="text-[10px] uppercase tracking-widest text-gray-400 font-black">
-              Status
+              {t('daycard.status')}
             </span>
             <span className={`text-sm font-bold ${
               card.formState === 'scheduled' ? 'text-green-600' : 
@@ -98,21 +100,21 @@ const DayCard: React.FC<DayCardProps> = ({ card, onEdit, onDelete }) => {
               card.formState === 'open' ? 'text-blue-600' :
               'text-gray-500'
             }`}>
-              {card.formState.charAt(0).toUpperCase() + card.formState.slice(1)}
+              {t(`daycard.states.${card.formState}`)}
             </span>
           </div>
           <div className="flex gap-4">
             <Link 
-              to={`/day-card-stats/${card.dayCardId}`}
+              to={`/${i18n.language}/day-card-stats/${card.dayCardId}`}
               className="flex items-center gap-1 text-gray-400 hover:text-gray-900 font-black text-[10px] uppercase tracking-wider transition-colors"
             >
-              Stats
+              {t('daycard.statsButton')}
             </Link>
             <Link 
-              to={`/day-card/${card.dayCardId}`}
+              to={`/${i18n.language}/day-card/${card.dayCardId}`}
               className="flex items-center gap-1 text-red-600 font-black text-xs uppercase tracking-wider group/btn"
             >
-              View Details
+              {t('daycard.viewDetails')}
               <ChevronRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
             </Link>
           </div>
