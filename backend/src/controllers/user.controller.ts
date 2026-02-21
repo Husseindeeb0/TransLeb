@@ -4,7 +4,7 @@ import imagekit from "../config/imagekit";
 
 const getMe = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?._id;
+    const userId = req.userId;
     if (!userId) {
       return res.status(401).json({
         state: "AUTH_REQUIRED",
@@ -79,7 +79,7 @@ const getAllDrivers = async (req: Request, res: Response) => {
 
 const updateProfile = async (req: Request, res: Response) => {
   try {
-    const _id = req.user?._id;
+    const _id = req.userId;
     const {
       name,
       email,

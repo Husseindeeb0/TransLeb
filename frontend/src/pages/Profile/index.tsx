@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import { 
   Mail, Phone, MapPin, Loader2, 
   Camera, Edit3, Save, Briefcase, 
-  ShieldCheck, Calendar, Clock, ChevronRight
+  ShieldCheck, Calendar, Clock, ChevronRight,
+  Activity
 } from 'lucide-react';
 import { useGetMeQuery, useUpdateProfileMutation } from '../../state/services/user/userAPI';
 import { useGetDayCardsQuery } from '../../state/services/dayCard/dayCardAPI';
@@ -282,7 +283,7 @@ const Profile = () => {
                     type="tel" 
                     value={formData.phoneNumber}
                     onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
-                    placeholder="+961 XX XXX XXX"
+                    placeholder={t('profile.phoneNumberPlaceholder')}
                     className="flex-1 bg-gray-50 border-2 border-gray-100 rounded-xl py-3 px-4 focus:outline-none focus:border-green-600/30 font-bold text-sm"
                   />
                 ) : (
@@ -299,7 +300,7 @@ const Profile = () => {
                     type="text" 
                     value={formData.region}
                     onChange={(e) => setFormData({...formData, region: e.target.value})}
-                    placeholder="e.g. Beirut & Mount Lebanon"
+                    placeholder={t('profile.regionPlaceholder')}
                     className="flex-1 bg-gray-50 border-2 border-gray-100 rounded-xl py-3 px-4 focus:outline-none focus:border-amber-600/30 font-bold text-sm"
                   />
                 ) : (
@@ -411,13 +412,32 @@ const Profile = () => {
                               )}
                             </div>
 
-                            <Link 
-                              to={`/${i18n.language}/day-card/${card.dayCardId}`}
-                              className="flex items-center gap-1 text-red-600 font-black text-[10px] uppercase tracking-wider group/btn"
-                            >
-                              {t('profile.viewDetails')}
-                              <ChevronRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
-                            </Link>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <Link 
+                                  to={`/${i18n.language}/locationsbase/${card.dayCardId}`}
+                                  className="flex items-center gap-1 text-red-600 hover:text-red-700 font-black text-[10px] uppercase tracking-wider transition-colors group/drive"
+                                >
+                                  <Activity size={10} className="group-hover/drive:animate-pulse" />
+                                  {t('daycard.driveModeButton', 'Drive')}
+                                </Link>
+
+                                <Link 
+                                  to={`/${i18n.language}/day-card-stats/${card.dayCardId}`}
+                                  className="flex items-center gap-1 text-gray-400 hover:text-gray-900 font-black text-[10px] uppercase tracking-wider transition-colors"
+                                >
+                                  {t('daycard.statsButton')}
+                                </Link>
+                              </div>
+                              
+                              <Link 
+                                to={`/${i18n.language}/day-card/${card.dayCardId}`}
+                                className="flex items-center gap-1 text-red-600 font-black text-[10px] uppercase tracking-wider group/btn"
+                              >
+                                {t('profile.viewDetails')}
+                                <ChevronRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
+                              </Link>
+                            </div>
                           </div>
                         </motion.div>
                       );

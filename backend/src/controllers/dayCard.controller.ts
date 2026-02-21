@@ -130,7 +130,7 @@ export const deleteDayCard = async (req: Request, res: Response) => {
 
 export const getDayCards = async (req: Request, res: Response) => {
   try {
-    const driverId = req.params.driverId;
+    const driverId = req.userId;
 
     if (!driverId) {
       return res.status(400).json({

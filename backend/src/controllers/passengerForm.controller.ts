@@ -15,7 +15,7 @@ export const submitForm = async (req: Request, res: Response) => {
       desiredTime,
       passengerCount,
     }: SubmitRequestType = req.body;
-    const userId = req.user?._id;
+    const userId = req.userId;
 
     if (
       !dayCardId ||
@@ -65,7 +65,7 @@ export const updateForm = async (req: Request, res: Response) => {
       passengerCount,
       assignedBusTime,
     }: UpdateRequestType = req.body;
-    const userId = req.user?._id;
+    const userId = req.userId;
 
     if (!formId || !userId) {
       return res.status(400).json({
@@ -143,7 +143,7 @@ export const deleteForm = async (req: Request, res: Response) => {
 export const isFormExists = async (req: Request, res: Response) => {
   try {
     const { dayCardId } = req.params;
-    const userId = req.user?._id; // from auth middleware
+    const userId = req.userId; // from verifyJWT middleware
 
     if (!dayCardId) {
       return res.status(400).json({

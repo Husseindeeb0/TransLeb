@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Calendar, Clock, Trash2, Edit3, ChevronRight } from 'lucide-react';
+import { Calendar, Clock, Trash2, Edit3, ChevronRight, Activity } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { DayCard as DayCardType } from '../../types/dayCardTypes';
 import { useTranslation } from 'react-i18next';
@@ -8,9 +8,10 @@ interface DayCardProps {
   card: DayCardType;
   onEdit?: (card: DayCardType) => void;
   onDelete?: (id: string) => void;
+  showStats?: boolean;
 }
 
-const DayCard: React.FC<DayCardProps> = ({ card, onEdit, onDelete }) => {
+const DayCard: React.FC<DayCardProps> = ({ card, onEdit, onDelete, showStats = false }) => {
   const { t, i18n } = useTranslation();
   const formattedDate = new Date(card.date).toLocaleDateString(i18n.language, {
     weekday: 'long',
@@ -104,15 +105,30 @@ const DayCard: React.FC<DayCardProps> = ({ card, onEdit, onDelete }) => {
             </span>
           </div>
           <div className="flex gap-4">
-            <Link 
-              to={`/${i18n.language}/day-card-stats/${card.dayCardId}`}
-              className="flex items-center gap-1 text-gray-400 hover:text-gray-900 font-black text-[10px] uppercase tracking-wider transition-colors"
-            >
-              {t('daycard.statsButton')}
-            </Link>
+            {showStats && (
+              <>
+                <Link 
+                  to={`/${i18n.language}/locationsbase/${card.dayCardId}`}
+                  className="flex items-center gap-1 text-red-600 hover:text-red-700 font-black text-[10px] uppercase tracking-wider transition-colors group/drive"
+                  title={t('daycard.driveModeButton', 'Drive Mode')}
+                >
+                  <Activity size={12} className="group-hover/drive:animate-pulse" />
+                  {t('daycard.driveModeButton', 'Drive Mode')}
+                </Link>
+
+                <Link 
+                  to={`/${i18n.language}/day-card-stats/${card.dayCardId}`}
+                  className="flex items-center gap-1 text-gray-400 hover:text-gray-900 font-black text-[10px] uppercase tracking-wider transition-colors"
+                  title={t('daycard.statsButton')}
+                >
+                  {t('daycard.statsButton')}
+                </Link>
+              </>
+            )}
             <Link 
               to={`/${i18n.language}/day-card/${card.dayCardId}`}
               className="flex items-center gap-1 text-red-600 font-black text-xs uppercase tracking-wider group/btn"
+              title={t('daycard.viewDetails')}
             >
               {t('daycard.viewDetails')}
               <ChevronRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />

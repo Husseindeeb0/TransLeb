@@ -6,13 +6,13 @@ import {
   getDayCards,
   getDayCardById,
 } from "../controllers/dayCard.controller";
-import { checkAuth } from "../middleware";
+import { verifyJWT } from "../middleware";
 const router = express.Router();
 
-router.post("/create", checkAuth, createDayCard);
-router.patch("/update/:dayCardId", checkAuth, updateDayCard);
-router.delete("/delete/:dayCardId", checkAuth, deleteDayCard);
-router.get("/getDayCards/:driverId", checkAuth, getDayCards);
-router.get("/getDayCardById/:dayCardId", checkAuth, getDayCardById);
+router.post("/create", verifyJWT, createDayCard);
+router.patch("/update/:dayCardId", verifyJWT, updateDayCard);
+router.delete("/delete/:dayCardId", verifyJWT, deleteDayCard);
+router.get("/getDayCards", verifyJWT, getDayCards);
+router.get("/getDayCardById/:dayCardId", verifyJWT, getDayCardById);
 
 export default router;

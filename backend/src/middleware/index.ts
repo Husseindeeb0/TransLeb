@@ -1,14 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyToken } from "../utils";
-import { UserResponse } from "../types/userTypes";
 
-export async function checkAuth(
+export async function verifyJWT(
   req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<Response | void> {
   try {
-    // Extract access token from cookies (must match name in setTokenCookies)
     const accessToken = req.cookies.access_token;
 
     if (!accessToken) {
@@ -18,7 +16,6 @@ export async function checkAuth(
       });
     }
 
-    // Verify token
     const decoded = verifyToken(accessToken, "access");
 
     if (
@@ -33,16 +30,7 @@ export async function checkAuth(
       });
     }
 
-    // Return user data from token in UserResponse format
-    const userData: UserResponse = {
-      _id: decoded.id as string,
-      email: decoded.email as string,
-      role: decoded.role as string,
-      name: decoded.name as string,
-    };
-
-    // Attach user to request object
-    req.user = userData;
+    req.userId = decoded.id as string;
 
     next();
   } catch (error) {

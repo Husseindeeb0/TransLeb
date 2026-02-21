@@ -6,13 +6,13 @@ import {
   getCoordinates,
   getAllCoordinates,
 } from "../controllers/coordinates.controller";
-
+import { verifyJWT } from "../middleware";
 const coordinatesRouter = express.Router();
 
-coordinatesRouter.post("/addCoordinate", addCoordinate);
-coordinatesRouter.patch("/editCoordinate", editCoordinate);
-coordinatesRouter.delete("/deleteCoordinate", deleteCoordinate);
-coordinatesRouter.get("/getCoordinates/:userId", getCoordinates);
-coordinatesRouter.get("/getAllCoordinates", getAllCoordinates);
+coordinatesRouter.post("/addCoordinate", verifyJWT, addCoordinate);
+coordinatesRouter.patch("/editCoordinate", verifyJWT, editCoordinate);
+coordinatesRouter.delete("/deleteCoordinate", verifyJWT, deleteCoordinate);
+coordinatesRouter.get("/getCoordinates", verifyJWT, getCoordinates);
+coordinatesRouter.get("/getAllCoordinates/:dayCardId", verifyJWT, getAllCoordinates);
 
 export default coordinatesRouter;

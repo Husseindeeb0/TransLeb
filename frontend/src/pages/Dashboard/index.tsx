@@ -159,6 +159,7 @@ const Dashboard = () => {
                       <DayCard
                         key={card.dayCardId}
                         card={card}
+                        showStats={true}
                         onEdit={(card) => {
                           setEditingCard(card);
                           setIsFormOpen(true);

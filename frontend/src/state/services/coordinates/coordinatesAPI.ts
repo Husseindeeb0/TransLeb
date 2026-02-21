@@ -4,38 +4,38 @@ import { axiosBaseQuery } from '../../../lib/axios/axiosBaseQuery';
 export const coordinatesApi = createApi({
   reducerPath: 'coordinatesApi',
   baseQuery: axiosBaseQuery(),
+  tagTypes: ['Coordinates'],
   endpoints: (builder) => ({
     addCoordinate: builder.mutation<
       { success: boolean },
-      { lat: number; lng: number; userId: string }
+      { lat: number; lng: number; userId: string; dayCardId?: string }
     >({
       query: (coordinate) => ({
         url: '/coordinates/addCoordinate',
         method: 'POST',
         data: coordinate,
       }),
+      invalidatesTags: ['Coordinates'],
     }),
     editCoordinate: builder.mutation<
       { success: boolean },
-      { lat: number; lng: number; userId: string }
+      { lat: number; lng: number; userId: string; dayCardId?: string }
     >({
       query: (coordinate) => ({
         url: '/coordinates/editCoordinate',
         method: 'PATCH',
         data: coordinate,
       }),
+      invalidatesTags: ['Coordinates'],
     }),
-    deleteCoordinate: builder.mutation<
-      { success: boolean },
-      { userId: string }
-    >({
-      query: (userId) => ({
+    deleteCoordinate: builder.mutation<{ success: boolean }, void>({
+      query: () => ({
         url: '/coordinates/deleteCoordinate',
         method: 'DELETE',
-        data: userId,
       }),
+      invalidatesTags: ['Coordinates'],
     }),
-    getCoordinates: builder.mutation<
+    getCoordinates: builder.query<
       {
         message: string;
         data: {
@@ -46,15 +46,16 @@ export const coordinatesApi = createApi({
           startTimer?: string;
           duration?: number;
         };
-      },
-      { userId: string }
+      } | null,
+      void
     >({
-      query: ({ userId }) => ({
-        url: `/coordinates/getCoordinates/${userId}`,
+      query: () => ({
+        url: `/coordinates/getCoordinates`,
         method: 'GET',
       }),
+      providesTags: ['Coordinates'],
     }),
-    getAllCoordinates: builder.mutation<
+    getAllCoordinates: builder.query<
       {
         message: string;
         data: {
@@ -66,12 +67,19 @@ export const coordinatesApi = createApi({
           startTimer?: string;
         }[];
       },
-      void
+      string
     >({
-      query: () => ({
-        url: '/coordinates/getAllCoordinates',
+      query: (dayCardId) => ({
+        url: `/coordinates/getAllCoordinates/${dayCardId}`,
         method: 'GET',
       }),
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.data.map(({ userId }) => ({ type: 'Coordinates' as const, id: userId })),
+              { type: 'Coordinates', id: 'LIST' },
+            ]
+          : [{ type: 'Coordinates', id: 'LIST' }],
     }),
   }),
 });
@@ -80,6 +88,6 @@ export const {
   useAddCoordinateMutation,
   useEditCoordinateMutation,
   useDeleteCoordinateMutation,
-  useGetCoordinatesMutation,
-  useGetAllCoordinatesMutation,
+  useGetCoordinatesQuery,
+  useGetAllCoordinatesQuery,
 } = coordinatesApi;

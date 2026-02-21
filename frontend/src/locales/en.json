@@ -8,8 +8,8 @@
   },
   "nav": {
     "home": "Home",
-    "ride": "Ride",
-    "drive": "Drive",
+    "shareLocation": "Share Location",
+    "locationsBase": "Locations Base",
     "about": "About Us",
     "signin": "Sign In",
     "signup": "Sign Up",
@@ -322,6 +322,7 @@
       "editBtn": "Edit My Reservation",
       "editAgain": "Edit Again",
       "closed": "Reservations are currently closed for this card.",
+      "shareLocationBtn": "Share Live Location",
       "phoneError": "Please enter a valid phone number (at least 8 digits)",
       "lockedError": "This form is currently not accepting submissions.",
       "updateSuccess": "Your reservation has been updated!",
@@ -370,6 +371,8 @@
     "notSet": "Not set",
     "about": "About",
     "aboutPlaceholder": "Tell us about yourself and your services...",
+    "phoneNumberPlaceholder": "+961 XX XXX XXX",
+    "regionPlaceholder": "e.g. Beirut & Mount Lebanon",
     "noDescription": "No description yet.",
     "mySchedules": "My Schedules",
     "times": "times",
@@ -421,6 +424,70 @@
       "rights": "All rights reserved.",
       "privacy": "Privacy Policy",
       "cookie": "Cookie Policy"
+    }
+  },
+  "pshareLocation": {
+    "title": "Share Your Location",
+    "subtitle": "Let the driver know where to pick you up",
+    "toast": {
+      "sharedSuccess": "Your location is shared with the driver",
+      "sharedError": "Sharing location failed",
+      "timerEnded": "Timer ended",
+      "driverMarked": "A driver has marked your location! Timer extended.",
+      "driverUnmarked": "Driver cancelled picking you up!",
+      "locationFailed": "Setting location failed",
+      "geoNotSupported": "Geolocation not supported by this browser",
+      "locationNotSet": "Location is not set yet!",
+      "sessionNotFound": "User session not found",
+      "deleteSuccess": "Your location is deleted",
+      "deleteError": "Failed to delete location"
+    },
+    "deleteLocation": "Remove from Map",
+    "errorLoadingMaps": "Error loading maps",
+    "loadingMap": "Loading Map...",
+    "driverAssigned": "Driver Assigned",
+    "loading": "Loading...",
+    "guide": {
+      "title": "Quick Guide",
+      "step1": "Auto-locate your position or click the map.",
+      "step2": "Confirm the pin location is accurate.",
+      "step3": "Click \"Share Live Location\" for the driver."
+    },
+    "currentState": "Current State",
+    "locationReady": "Location Ready",
+    "awaitingSelection": "Awaiting Selection",
+    "live": "Live",
+    "autoLocate": "Auto Locate",
+    "shareLive": "Share Live",
+    "expiry": "Location Expiry",
+    "minutesLeft": "Minutes Left",
+    "onTheWay": "On The Way",
+    "yourDriver": "Your Driver",
+    "lovesTraveling": "Loves Traveling",
+    "callDriver": "Call Driver",
+    "dangerZone": "Danger Zone",
+    "readyToGo": "Ready to Go!",
+    "readySubtitle": "Ready to find nearby drivers?",
+    "findDrivers": "Find Drivers",
+    "clickMapPin": "Click on Map to Drop Pin"
+  },
+  "locationsBase": {
+    "title": "Active Drive Mode",
+    "stats": "{{count}} passengers sharing location",
+    "locating": "Locating...",
+    "locateMe": "My Location",
+    "optimize": "Optimize Route",
+    "passengerList": "Passengers on Route",
+    "noPassengers": "Waiting for passengers to share location...",
+    "autoShare": "Auto-Sharing Active",
+    "autoShareDesc": "Your location updates every 5 mins to passengers",
+    "you": "You",
+    "anonymous": "Anonymous Passenger",
+    "toast": {
+      "locationFailed": "Location failed",
+      "sharingAuto": "Updated your location on map",
+      "routeOptimized": "Route optimized for shortest path!",
+      "routeFailed": "Could not calculate optimized route"
     }
   }
 }

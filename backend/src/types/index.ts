@@ -1,7 +1,8 @@
 export interface CoordinatesType {
-  userId: { type: String };
+  userId: string;
   lat: number;
   lng: number;
+  dayCardId?: string;
   startTimer: Date;
   markedBy?: string | null;
   markedAt?: Date;

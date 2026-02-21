@@ -5,13 +5,13 @@ import {
   getAllDrivers,
   updateProfile,
 } from "../controllers/user.controller";
-import { checkAuth } from "../middleware";
+import { verifyJWT } from "../middleware";
 
 const userRouter = express.Router();
 
-userRouter.get("/me", checkAuth, getMe);
+userRouter.get("/me", verifyJWT, getMe);
 userRouter.get("/getDetails/:userId", getUserDetails);
 userRouter.get("/getAllDrivers", getAllDrivers);
-userRouter.patch("/updateProfile", checkAuth, updateProfile);
+userRouter.patch("/updateProfile", verifyJWT, updateProfile);
 
 export default userRouter;

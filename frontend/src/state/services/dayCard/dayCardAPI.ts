@@ -8,8 +8,8 @@ export const dayCardApi = createApi({
   tagTypes: ["DayCard"],
   endpoints: (builder) => ({
     getDayCards: builder.query<DayCard[], string>({
-      query: (driverId) => ({
-        url: `/dayCard/getDayCards/${driverId}`,
+      query: () => ({
+        url: `/dayCard/getDayCards`,
         method: "GET"
       }),
       providesTags: ["DayCard"]

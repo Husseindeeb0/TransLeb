@@ -8,8 +8,8 @@
   },
   "nav": {
     "home": "الرئيسية",
-    "ride": "ركوب",
-    "drive": "قيادة",
+    "shareLocation": "مشاركة الموقع",
+    "locationsBase": "قاعدة المواقع",
     "about": "من نحن",
     "signin": "تسجيل الدخول",
     "signup": "إنشاء حساب",
@@ -322,6 +322,7 @@
       "editBtn": "تعديل حجزي",
       "editAgain": "تعديل مرة أخرى",
       "closed": "الحجوزات مغلقة حالياً لهذه البطاقة.",
+      "shareLocationBtn": "مشاركة الموقع المباشر",
       "phoneError": "يرجى إدخال رقم هاتف صحيح (8 أرقام على الأقل)",
       "lockedError": "هذه الاستمارة لا تقبل التقديمات حالياً.",
       "updateSuccess": "تم تحديث حجزك بنجاح!",
@@ -370,6 +371,8 @@
     "notSet": "غير محدد",
     "about": "حول",
     "aboutPlaceholder": "أخبرنا عن نفسك وعن خدماتك...",
+    "phoneNumberPlaceholder": "+961 XX XXX XXX",
+    "regionPlaceholder": "مثلاً: بيروت وجبل لبنان",
     "noDescription": "لا يوجد وصف بعد.",
     "mySchedules": "جداولي",
     "times": "أوقات",
@@ -421,6 +424,70 @@
       "rights": "جميع الحقوق محفوظة.",
       "privacy": "سياسة الخصوصية",
       "cookie": "سياسة ملفات الارتباط"
+    }
+  },
+  "pshareLocation": {
+    "title": "شارك موقعك",
+    "subtitle": "دع السائق يعرف أين سيستلمك",
+    "toast": {
+      "sharedSuccess": "تمت مشاركة موقعك مع السائق",
+      "sharedError": "فشلت مشاركة الموقع",
+      "timerEnded": "انتهى الوقت",
+      "driverMarked": "لقد حدد السائق موقعك! تم تمديد الوقت.",
+      "driverUnmarked": "ألغى السائق استلامك!",
+      "locationFailed": "فشل تحديد الموقع",
+      "geoNotSupported": "تحديد الموقع الجغرافي غير مدعوم من قبل هذا المتصفح",
+      "locationNotSet": "الموقع لم يحدد بعد!",
+      "sessionNotFound": "جلسة المستخدم غير موجودة",
+      "deleteSuccess": "تم حذف موقعك",
+      "deleteError": "فشل حذف الموقع"
+    },
+    "deleteLocation": "إزالة من الخريطة",
+    "errorLoadingMaps": "خطأ في تحميل الخرائط",
+    "loadingMap": "جاري تحميل الخريطة...",
+    "driverAssigned": "تم تعيين السائق",
+    "loading": "جاري التحميل...",
+    "guide": {
+      "title": "دليل سريع",
+      "step1": "حدد موقعك تلقائياً أو انقر على الخريطة.",
+      "step2": "تأكد من أن دبوس الموقع دقيق.",
+      "step3": "انقر على \"مشاركة الموقع المباشر\" للسائق."
+    },
+    "currentState": "الحالة الحالية",
+    "locationReady": "الموقع جاهز",
+    "awaitingSelection": "في انتظار الاختيار",
+    "live": "مباشر",
+    "autoLocate": "تحديد تلقائي",
+    "shareLive": "مشاركة مباشرة",
+    "expiry": "انتهاء الموقع",
+    "minutesLeft": "دقائق متبقية",
+    "onTheWay": "في الطريق",
+    "yourDriver": "سائقك",
+    "lovesTraveling": "يحب السفر",
+    "callDriver": "اتصل بالسائق",
+    "dangerZone": "منطقة الخطر",
+    "readyToGo": "جاهز للانطلاق!",
+    "readySubtitle": "هل أنت جاهز للبحث عن سائقين قريبين؟",
+    "findDrivers": "البحث عن سائقين",
+    "clickMapPin": "انقر على الخريطة لإسقاط الدبوس"
+  },
+  "locationsBase": {
+    "title": "وضع القيادة النشط",
+    "stats": "{{count}} ركاب يشاركون موقعهم",
+    "locating": "جاري تحديد الموقع...",
+    "locateMe": "موقعي",
+    "optimize": "تحسين المسار",
+    "passengerList": "الركاب على المسار",
+    "noPassengers": "في انتظار مشاركة الركاب لموقعهم...",
+    "autoShare": "المشاركة التلقائية نشطة",
+    "autoShareDesc": "يتم تحديث موقعك كل 5 دقائق للركاب",
+    "you": "أنت",
+    "anonymous": "راكب مجهول",
+    "toast": {
+      "locationFailed": "فشل تحديد الموقع",
+      "sharingAuto": "تم تحديث موقعك على الخريطة",
+      "routeOptimized": "تم تحسين المسار لأقصر طريق!",
+      "routeFailed": "تعذر حساب المسار المحسن"
     }
   }
 }

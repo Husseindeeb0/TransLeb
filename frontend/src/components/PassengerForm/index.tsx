@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { User, Phone, MapPin, Clock, Users, Send, Loader2, CheckCircle2, Save } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { 
   useSubmitPassengerFormMutation, 
   useUpdatePassengerFormMutation, 
-  useIsFormExistsQuery
+  useIsFormExistsQuery,
+  useDeletePassengerFormMutation
 } from '../../state/services/passengerForm/passengerFormAPI';
 import type { SubmitPassengerFormRequest } from '../../types/passengerFormTypes';
 import toast from 'react-hot-toast';
+import { Trash2 } from 'lucide-react';
 
 import { useTranslation } from 'react-i18next';
 
@@ -17,10 +20,11 @@ interface PassengerFormProps {
 }
 
 const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, isLocked }) => {
-  const { t } = useTranslation();
-  const { data: existenceData, isLoading: isCheckingExists } = useIsFormExistsQuery(dayCardId);
+  const { t, i18n } = useTranslation();
+  const { data: existenceData, isLoading: isCheckingExists, refetch: refetchExists } = useIsFormExistsQuery(dayCardId);
   const [submitForm, { isLoading: isSubmitting }] = useSubmitPassengerFormMutation();
   const [updateForm, { isLoading: isUpdating }] = useUpdatePassengerFormMutation();
+  const [deleteForm, { isLoading: isDeleting }] = useDeletePassengerFormMutation();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [formId, setFormId] = useState<string | null>(null);
@@ -111,6 +115,28 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, isLocked }) =>
     }
   };
 
+  const handleDeleteReservation = async () => {
+    if (!formId) return;
+    if (window.confirm(t('daycard.passengerForm.confirmDelete', 'Are you sure you want to cancel your reservation?'))) {
+      try {
+        await deleteForm(formId).unwrap();
+        toast.success(t('daycard.passengerForm.deleteSuccess', 'Reservation cancelled'));
+        refetchExists();
+        setIsSubmitted(false);
+        setFormId(null);
+        setFormData({
+            fullName: '',
+            phoneNumber: '',
+            livingPlace: '',
+            desiredTime: '',
+            passengerCount: 1,
+        });
+      } catch (err) {
+        toast.error(t('daycard.passengerForm.deleteError', 'Failed to cancel reservation'));
+      }
+    }
+  };
+
   if (isCheckingExists) {
     return (
       <div className="bg-white rounded-[2.5rem] p-12 flex flex-col items-center justify-center h-full shadow-lg border-2 border-gray-50">
@@ -133,15 +159,34 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, isLocked }) =>
         <p className="text-gray-500 font-medium mb-8">
           {t('daycard.passengerForm.savedDesc')}
         </p>
-        <button
-          onClick={() => {
-            setIsEditing(true);
-            setIsSubmitted(false);
-          }}
-          className="px-8 py-4 bg-gray-900 text-white rounded-[1.5rem] font-bold hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto"
-        >
-          {formId ? t('daycard.passengerForm.editBtn') : t('daycard.passengerForm.editAgain')}
-        </button>
+        <div className="flex flex-col gap-3">
+          <Link
+            to={`/${i18n.language}/sharelocation/${dayCardId}`}
+            className="px-8 py-5 bg-gradient-to-r from-red-700 to-green-600 text-white rounded-[1.5rem] font-black uppercase tracking-widest text-xs hover:shadow-2xl transition-all active:scale-95 flex items-center justify-center gap-3 mx-auto w-full group"
+          >
+            <MapPin size={18} className="group-hover:animate-bounce" />
+            {t('daycard.passengerForm.shareLocationBtn', 'Share Live Location')}
+          </Link>
+
+          <button
+            onClick={() => {
+              setIsEditing(true);
+              setIsSubmitted(false);
+            }}
+            className="px-8 py-4 bg-gray-50 text-gray-400 border-2 border-gray-100 rounded-[1.5rem] font-bold hover:bg-white hover:text-gray-900 transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto w-full"
+          >
+            {formId ? t('daycard.passengerForm.editBtn') : t('daycard.passengerForm.editAgain')}
+          </button>
+
+          <button
+            onClick={handleDeleteReservation}
+            disabled={isDeleting}
+            className="px-8 py-4 bg-red-50 text-red-600 border-2 border-red-100 rounded-[1.5rem] font-bold hover:bg-red-600 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto w-full"
+          >
+            <Trash2 size={18} />
+            {t('daycard.passengerForm.deleteBtn', 'Cancel Reservation')}
+          </button>
+        </div>
       </motion.div>
     );
   }

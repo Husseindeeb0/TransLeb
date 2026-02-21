@@ -8,6 +8,7 @@ export interface PassengerForm {
     desiredTime: string;
     passengerCount: number;
     assignedBusTime?: string | null;
+    userId?: string | { _id: string; name?: string };
 }
 
 export interface SubmitPassengerFormRequest {

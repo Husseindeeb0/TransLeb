@@ -1,8 +1,8 @@
 import { Routes, Route, BrowserRouter, Navigate, useLocation } from 'react-router-dom';
 import { LanguageSync } from './helpers';
 import { useTranslation } from 'react-i18next';
-import Ride from './pages/Passenger';
-import Drive from './pages/Driver';
+import PshareLocation from './pages/PshareLocation';
+import LocationsBase from './pages/LocationsBase';
 import Signin from './pages/Signin';
 import Signup from './pages/Signup';
 
@@ -57,18 +57,18 @@ function App() {
 
             {/* Protected Routes */}
             <Route
-              path="ride"
+              path="sharelocation/:dayCardId"
               element={
                 <ProtectedRoute>
-                  <Ride />
+                  <PshareLocation />
                 </ProtectedRoute>
               }
             />
             <Route
-              path="drive"
+              path="locationsbase/:dayCardId"
               element={
                 <ProtectedRoute>
-                  <Drive />
+                  <LocationsBase />
                 </ProtectedRoute>
               }
             />
