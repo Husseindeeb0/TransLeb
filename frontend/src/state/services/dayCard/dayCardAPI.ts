@@ -19,7 +19,7 @@ export const dayCardApi = createApi({
         url: `/dayCard/getDayCardById/${dayCardId}`,
         method: "GET"
       }),
-      providesTags: (result, error, dayCardId) => [{ type: "DayCard", id: dayCardId }]
+      providesTags: (_result, _error, dayCardId) => [{ type: "DayCard", id: dayCardId }]
     }),
     createDayCard: builder.mutation<DayCard, CreateDayCardRequest>({
       query: (dayCard) => ({
@@ -35,7 +35,7 @@ export const dayCardApi = createApi({
         method: "PATCH",
         data: dayCard
       }),
-      invalidatesTags: (result, error, dayCard) => [{ type: "DayCard", id: dayCard.dayCardId }, "DayCard"]
+      invalidatesTags: (_result, _error, dayCard) => [{ type: "DayCard", id: dayCard.dayCardId }, "DayCard"]
     }),
     deleteDayCard: builder.mutation<string, string>({
       query: (dayCardId) => ({

@@ -1,5 +1,11 @@
 import { Request, Response, NextFunction } from "express";
-import { verifyToken } from "../utils";
+import {
+  verifyToken,
+  generateToken,
+  generateRefreshToken,
+  setTokenCookies,
+} from "../utils";
+import User from "../models/User";
 
 export async function verifyJWT(
   req: Request,
@@ -7,16 +13,38 @@ export async function verifyJWT(
   next: NextFunction,
 ): Promise<Response | void> {
   try {
-    const accessToken = req.cookies.access_token;
+    let accessToken = req.cookies.access_token;
+    const refreshToken = req.cookies.refresh_token;
 
-    if (!accessToken) {
+    if (!accessToken && !refreshToken) {
       return res.status(401).json({
         state: "AUTH_REQUIRED",
         message: "Authentication required",
       });
     }
 
-    const decoded = verifyToken(accessToken, "access");
+    let decoded = accessToken ? verifyToken(accessToken, "access") : null;
+
+    if (!decoded && refreshToken) {
+      const refreshDecoded = verifyToken(refreshToken, "refresh");
+
+      if (refreshDecoded) {
+        const user = await User.findById(refreshDecoded.id);
+
+        if (user && user.refreshToken === refreshToken) {
+          const newAccessToken = generateToken(user);
+          // Refresh token is generated every time to prevent reuse (security measure) this is called Refresh Token Rotation
+          const newRefreshToken = generateRefreshToken(user);
+
+          setTokenCookies(res, newAccessToken, newRefreshToken);
+          user.refreshToken = newRefreshToken;
+          await user.save();
+
+          accessToken = newAccessToken;
+          decoded = verifyToken(accessToken, "access");
+        }
+      }
+    }
 
     if (
       !decoded ||
@@ -26,12 +54,11 @@ export async function verifyJWT(
     ) {
       return res.status(401).json({
         state: "INVALID_TOKEN",
-        message: "Invalid or expired token",
+        message: "Invalid or expired session",
       });
     }
 
-    req.userId = decoded.id as string;
-
+    req.userId = decoded.id;
     next();
   } catch (error) {
     console.error("Auth middleware error:", error);

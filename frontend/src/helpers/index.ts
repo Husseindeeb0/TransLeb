@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Navigate, useLocation } from "react-router-dom";
 
 const beep = new Audio('beep.mp3');
 

@@ -1,5 +1,4 @@
-import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Github, Twitter, Instagram, Facebook, ArrowRight, Heart } from 'lucide-react';
+import { Mail, Phone, Github, Twitter, Instagram, Facebook, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
