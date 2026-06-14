@@ -10,6 +10,7 @@ const connectDB = async (): Promise<void> => {
     console.log("MongoDB connected");
   } catch (error) {
     console.log(`MongoDB connection error: ${error}`);
+    throw error;
   }
 };
 
