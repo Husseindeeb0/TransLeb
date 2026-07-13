@@ -121,8 +121,19 @@ const logout = async (req: Request, res: Response) => {
       });
     }
 
-    res.cookie("access_token", "", { httpOnly: true, maxAge: 0 });
-    res.cookie("refresh_token", "", { httpOnly: true, maxAge: 0 });
+    const isProd = process.env.NODE_ENV === "production";
+    res.cookie("access_token", "", {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+      maxAge: 0,
+    });
+    res.cookie("refresh_token", "", {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+      maxAge: 0,
+    });
 
     const user = await User.findOne({ refreshToken: cookies.refresh_token });
     if (user) {
