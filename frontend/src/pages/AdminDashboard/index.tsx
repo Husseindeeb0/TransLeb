@@ -25,7 +25,7 @@ const AdminDashboard = () => {
   const handleUpdateStatus = async (active: boolean) => {
     if (!selectedDriver) return;
     try {
-      const response = await updateStatus({ driverId: selectedDriver.id, active }).unwrap();
+      await updateStatus({ driverId: selectedDriver.id, active }).unwrap();
       toast.success(t("adminDashboard.toast.statusSuccess"));
       setSelectedDriver((prev) => (prev ? { ...prev, active } : null));
     } catch (err: any) {
@@ -36,7 +36,7 @@ const AdminDashboard = () => {
   const handleUpdateSubscription = async (start: string | null, end: string | null) => {
     if (!selectedDriver) return;
     try {
-      const response = await updateSubscription({
+      await updateSubscription({
         driverId: selectedDriver.id,
         subscriptionStart: start,
         subscriptionEnd: end,
@@ -59,7 +59,7 @@ const AdminDashboard = () => {
   const handleDeleteDriver = async () => {
     if (!selectedDriver) return;
     try {
-      const response = await deleteDriver(selectedDriver.id).unwrap();
+      await deleteDriver(selectedDriver.id).unwrap();
       toast.success(t("adminDashboard.toast.deleteSuccess"));
       setSelectedDriver(null);
       refetch();
