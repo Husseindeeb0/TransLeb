@@ -14,8 +14,62 @@
     "signin": "Sign In",
     "signup": "Sign Up",
     "dashboard": "Dashboard",
+    "dashboardInactive": "Dashboard (Inactive)",
     "profile": "Profile",
-    "logout": "Logout"
+    "logout": "Logout",
+    "subscriptionExpired": "Subscription expired/inactive. Please contact +961 70 063 612 to renew."
+  },
+  "adminDashboard": {
+    "title": "SaaS Driver Control Panel",
+    "badge": "Admin Dashboard",
+    "desc": "Activate, configure subscription periods, and manage driver accounts to control accessibility to their dashboard features.",
+    "stats": {
+      "registered": "Registered Drivers"
+    },
+    "error": {
+      "title": "Error Loading Drivers",
+      "desc": "Could not fetch driver accounts. Make sure you are logged in as an administrator.",
+      "retry": "Retry"
+    },
+    "list": {
+      "driverInfo": "Driver Info",
+      "email": "Email",
+      "phone": "Phone",
+      "status": "Status",
+      "subscription": "Subscription Period",
+      "actions": "Actions",
+      "noDrivers": "No drivers found.",
+      "noRegion": "No Region",
+      "active": "Active",
+      "inactive": "Inactive",
+      "configure": "Configure"
+    },
+    "edit": {
+      "back": "Back to list",
+      "activeAccount": "Active Account",
+      "inactiveAccount": "Inactive Account",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "deleteAccount": "Delete Account",
+      "deleteConfirm": "Are you sure you want to delete {{name}}'s account? This action is permanent.",
+      "configTitle": "Configure Driver Subscription",
+      "subStart": "Subscription Start",
+      "subEnd": "Subscription End",
+      "save": "Save Dates",
+      "rulesBadge": "SaaS Rules",
+      "rulesTitle": "Driver status",
+      "rulesDesc1": "Activating driver account allows them to access the driver dashboard, manage lists, and upload day cards.",
+      "rulesDesc2": "If subscription date is set, the system will automatically revoke access once the end date expires.",
+      "adminTool": "TransLeb Admin Tool"
+    },
+    "toast": {
+      "statusSuccess": "Status updated successfully",
+      "statusFail": "Failed to update status",
+      "subSuccess": "Subscription updated successfully",
+      "subFail": "Failed to update subscription",
+      "deleteSuccess": "Driver account deleted successfully",
+      "deleteFail": "Failed to delete driver"
+    }
   },
   "landing": {
     "badge": "Connecting Lebanon",

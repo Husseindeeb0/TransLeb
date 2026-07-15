@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  driver
+  passenger
+  admin
+}
+
+enum FormState {
+  open
+  planning
+  scheduled
+  archived
+}
+
+model User {
+  id             String   @id @default(uuid())
+  name           String
+  email          String   @unique
+  password       String
+  role           Role     @default(passenger)
+  refreshToken   String?
+  phoneNumber    String?
+  region         String?
+  description    String?
+  profileImage   String?
+  profileImageId String?
+  coverImage     String?
+  coverImageId   String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  active           Boolean  @default(false)
+  subscriptionStart DateTime?
+  subscriptionEnd   DateTime?
+
+  // Relations
+  coordinates    Coordinates?
+  dayCards       DayCard[]
+  passengerForms PassengerForm[]
+}
+
+model Coordinates {
+  id             String    @id @default(uuid())
+  userId         String    @unique
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lat            Float
+  lng            Float
+  dayCardId      String?
+  dayCard        DayCard?  @relation(fields: [dayCardId], references: [id], onDelete: SetNull)
+  startTimer     DateTime?
+  markedBy       String?
+  markedAt       DateTime?
+  extensionCount Int       @default(0)
+  duration       Int       @default(900000)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model DayCard {
+  id        String    @id @default(uuid())
+  driverId  String
+  driver    User      @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  date      DateTime
+  formState FormState @default(open)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  busTimers      BusTimer[]
+  passengerForms PassengerForm[]
+  coordinates    Coordinates[]
+
+  @@unique([driverId, date])
+}
+
+model BusTimer {
+  id        String  @id @default(uuid())
+  dayCardId String
+  dayCard   DayCard @relation(fields: [dayCardId], references: [id], onDelete: Cascade)
+  time      String
+  capacity  Int
+}
+
+model PassengerForm {
+  id              String   @id @default(uuid())
+  dayCardId       String
+  dayCard         DayCard  @relation(fields: [dayCardId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName        String
+  phoneNumber     String
+  livingPlace     String
+  desiredTime     String
+  passengerCount  Int      @default(1)
+  assignedBusTime String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([dayCardId, desiredTime])
+  @@index([livingPlace])
+}

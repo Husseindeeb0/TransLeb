@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
-import DayCard from "../models/DayCard";
-import User from "../models/User";
+import { prisma } from "../config/prisma";
 import type {
   DayCardResponse,
   CreateDayCardRequest,
@@ -19,7 +18,7 @@ export const createDayCard = async (req: Request, res: Response) => {
       });
     }
 
-    const user = await User.findById(driverId);
+    const user = await prisma.user.findUnique({ where: { id: driverId } });
     if (!user) {
       return res.status(404).json({
         state: "USER_NOT_FOUND",
@@ -27,18 +26,31 @@ export const createDayCard = async (req: Request, res: Response) => {
       });
     }
 
-    const dayCard = await DayCard.create({
-      driverId,
-      date,
-      busTimers: busTimers || [],
-      formState: formState || "open",
+    const dayCard = await prisma.dayCard.create({
+      data: {
+        driverId,
+        date: new Date(date),
+        formState: (formState || "open") as any,
+        busTimers: {
+          create: (busTimers || []).map((timer) => ({
+            time: timer.time,
+            capacity: parseInt(timer.capacity as any),
+          })),
+        },
+      },
+      include: {
+        busTimers: true,
+      },
     });
 
     const response: DayCardResponse = {
-      dayCardId: dayCard._id.toString(),
+      dayCardId: dayCard.id,
       driverId: dayCard.driverId,
       date: dayCard.date,
-      busTimers: dayCard.busTimers,
+      busTimers: dayCard.busTimers.map(timer => ({
+        time: timer.time,
+        capacity: timer.capacity
+      })),
       formState: dayCard.formState,
     };
 
@@ -65,12 +77,25 @@ export const updateDayCard = async (req: Request, res: Response) => {
     }
 
     const updateData: any = {};
-    if (date !== undefined) updateData.date = date;
-    if (busTimers !== undefined) updateData.busTimers = busTimers;
-    if (formState !== undefined) updateData.formState = formState;
+    if (date !== undefined) updateData.date = new Date(date);
+    if (formState !== undefined) updateData.formState = formState as any;
+    
+    if (busTimers !== undefined) {
+      updateData.busTimers = {
+        deleteMany: {},
+        create: busTimers.map((timer) => ({
+          time: timer.time,
+          capacity: parseInt(timer.capacity as any),
+        })),
+      };
+    }
 
-    const dayCard = await DayCard.findByIdAndUpdate(dayCardId, updateData, {
-      new: true,
+    const dayCard = await prisma.dayCard.update({
+      where: { id: dayCardId },
+      data: updateData,
+      include: {
+        busTimers: true,
+      },
     });
 
     if (!dayCard) {
@@ -81,10 +106,13 @@ export const updateDayCard = async (req: Request, res: Response) => {
     }
 
     const response: DayCardResponse = {
-      dayCardId: dayCardId,
+      dayCardId: dayCard.id,
       driverId: dayCard.driverId,
       date: dayCard.date,
-      busTimers: dayCard.busTimers,
+      busTimers: dayCard.busTimers.map(timer => ({
+        time: timer.time,
+        capacity: timer.capacity
+      })),
       formState: dayCard.formState,
     };
 
@@ -109,7 +137,9 @@ export const deleteDayCard = async (req: Request, res: Response) => {
       });
     }
 
-    const dayCard = await DayCard.findByIdAndDelete(dayCardId);
+    const dayCard = await prisma.dayCard.delete({
+      where: { id: dayCardId },
+    });
 
     if (!dayCard) {
       return res.status(404).json({
@@ -139,13 +169,21 @@ export const getDayCards = async (req: Request, res: Response) => {
       });
     }
 
-    const dayCards = await DayCard.find({ driverId: driverId });
+    const dayCards = await prisma.dayCard.findMany({
+      where: { driverId: driverId },
+      include: {
+        busTimers: true,
+      },
+    });
 
     const response: DayCardResponse[] = dayCards.map((card) => ({
-      dayCardId: card._id.toString(),
+      dayCardId: card.id,
       driverId: card.driverId,
       date: card.date,
-      busTimers: card.busTimers,
+      busTimers: card.busTimers.map(timer => ({
+        time: timer.time,
+        capacity: timer.capacity
+      })),
       formState: card.formState,
     }));
 
@@ -169,7 +207,12 @@ export const getDayCardById = async (req: Request, res: Response) => {
       });
     }
 
-    const dayCard = await DayCard.findById(dayCardId);
+    const dayCard = await prisma.dayCard.findUnique({
+      where: { id: dayCardId },
+      include: {
+        busTimers: true,
+      },
+    });
 
     if (!dayCard) {
       return res.status(404).json({
@@ -179,10 +222,13 @@ export const getDayCardById = async (req: Request, res: Response) => {
     }
 
     const response: DayCardResponse = {
-      dayCardId: dayCard._id.toString(),
+      dayCardId: dayCard.id,
       driverId: dayCard.driverId,
       date: dayCard.date,
-      busTimers: dayCard.busTimers,
+      busTimers: dayCard.busTimers.map(timer => ({
+        time: timer.time,
+        capacity: timer.capacity
+      })),
       formState: dayCard.formState,
     };
 

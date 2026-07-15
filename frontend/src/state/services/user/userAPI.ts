@@ -1,5 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { axiosBaseQuery } from '../../../lib/axios/axiosBaseQuery';
+import type { DriverDetailResponse } from '../../../types/adminTypes';
 
 export const userApi = createApi({
   reducerPath: 'userApi',
@@ -7,7 +8,7 @@ export const userApi = createApi({
   endpoints: (builder) => ({
     getMe: builder.query<
       {
-        _id: string;
+        id: string;
         name: string;
         email: string;
         role: string;
@@ -16,6 +17,7 @@ export const userApi = createApi({
         description?: string;
         profileImage?: string;
         coverImage?: string;
+        active?: boolean;
       },
       void
     >({
@@ -26,7 +28,7 @@ export const userApi = createApi({
     }),
     getUserDetails: builder.query<
       {
-        _id: string,
+        id: string,
         name: string,
         email: string,
         role: string,
@@ -35,6 +37,7 @@ export const userApi = createApi({
         description?: string,
         profileImage?: string,
         coverImage?: string,
+        active?: boolean,
       },
       string
     >({
@@ -44,17 +47,7 @@ export const userApi = createApi({
       }),
     }),
     getAllDrivers: builder.query<
-      {
-        _id: string;
-        name: string;
-        email: string;
-        role: string;
-        phoneNumber?: string;
-        region?: string;
-        description?: string;
-        profileImage?: string;
-        coverImage?: string;
-      }[],
+      DriverDetailResponse[],
       void
     >({
       query: () => ({
@@ -66,7 +59,7 @@ export const userApi = createApi({
       {
         message: string;
         user: {
-          _id: string;
+          id: string;
           name: string;
           email: string;
           phoneNumber?: string;

@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import connectDB from "./config/dbconnect";
+import { connectDB } from "./config/prisma";
 import coordinatesRoute from "./routes/coordinates.route";
 import userRouter from "./routes/user.route";
 import authRouter from "./routes/auth.route";
@@ -13,6 +13,7 @@ import cookieParser from "cookie-parser";
 import dayCardRouter from "./routes/dayCard.route";
 import passengerFormRouter from "./routes/passengerForm.route";
 import contactRouter from "./routes/contact.route";
+import adminRouter from "./routes/admin.route";
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ app.use("/auth", authRouter);
 app.use("/dayCard", dayCardRouter);
 app.use("/passengerForm", passengerFormRouter);
 app.use("/contact", contactRouter);
+app.use("/admin", adminRouter);
 
 // Create HTTP server and attach Socket.IO
 const server = http.createServer(app);

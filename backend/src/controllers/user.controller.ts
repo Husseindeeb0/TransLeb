@@ -1,6 +1,25 @@
 import type { Request, Response } from "express";
-import User from "../models/User";
+import { prisma } from "../config/prisma";
 import imagekit from "../config/imagekit";
+
+const userSelect = {
+  id: true,
+  name: true,
+  email: true,
+  role: true,
+  phoneNumber: true,
+  region: true,
+  description: true,
+  profileImage: true,
+  profileImageId: true,
+  coverImage: true,
+  coverImageId: true,
+  active: true,
+  subscriptionStart: true,
+  subscriptionEnd: true,
+  createdAt: true,
+  updatedAt: true,
+};
 
 const getMe = async (req: Request, res: Response) => {
   try {
@@ -12,8 +31,10 @@ const getMe = async (req: Request, res: Response) => {
       });
     }
 
-    // Fetch fresh user data from the database
-    const user = await User.findById(userId).select("-password -refreshToken");
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: userSelect,
+    });
 
     if (!user) {
       return res.status(404).json({
@@ -43,7 +64,10 @@ const getUserDetails = async (req: Request, res: Response) => {
       });
     }
 
-    const user = await User.findById(userId).select("-password -refreshToken");
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: userSelect,
+    });
 
     if (!user) {
       return res.status(404).json({
@@ -64,9 +88,10 @@ const getUserDetails = async (req: Request, res: Response) => {
 
 const getAllDrivers = async (req: Request, res: Response) => {
   try {
-    const drivers = await User.find({ role: "driver" }).select(
-      "-password -refreshToken",
-    );
+    const drivers = await prisma.user.findMany({
+      where: {  role: "driver" },
+      select: userSelect,
+    });
     return res.status(200).json(drivers);
   } catch (error) {
     console.error("GetAllDrivers error:", error);
@@ -79,7 +104,7 @@ const getAllDrivers = async (req: Request, res: Response) => {
 
 const updateProfile = async (req: Request, res: Response) => {
   try {
-    const _id = req.userId;
+    const id = req.userId;
     const {
       name,
       email,
@@ -90,14 +115,16 @@ const updateProfile = async (req: Request, res: Response) => {
       coverImage,
     } = req.body;
 
-    if (!_id) {
+    if (!id) {
       return res.status(401).json({
         state: "AUTH_REQUIRED",
         message: "Authentication required",
       });
     }
 
-    const user = await User.findById(_id);
+    const user = await prisma.user.findUnique({
+      where: { id },
+    });
 
     if (!user) {
       return res.status(404).json({
@@ -106,19 +133,19 @@ const updateProfile = async (req: Request, res: Response) => {
       });
     }
 
-    // Update fields if provided
-    if (name !== undefined) user.name = name;
-    if (email !== undefined) user.email = email;
-    if (phoneNumber !== undefined) user.phoneNumber = phoneNumber;
-    if (region !== undefined) user.region = region;
-    if (description !== undefined) user.description = description;
+    const updateData: any = {};
+    if (name !== undefined) updateData.name = name;
+    if (email !== undefined) updateData.email = email;
+    if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
+    if (region !== undefined) updateData.region = region;
+    if (description !== undefined) updateData.description = description;
 
     // Handle Image Uploads with ImageKit
     if (profileImage && profileImage.startsWith("data:image")) {
       try {
         const uploadResponse = await imagekit.upload({
           file: profileImage,
-          fileName: `profile_${_id}_${Date.now()}`,
+          fileName: `profile_${id}_${Date.now()}`,
           folder: "/profiles",
         });
 
@@ -130,8 +157,8 @@ const updateProfile = async (req: Request, res: Response) => {
             );
         }
 
-        user.profileImage = uploadResponse.url;
-        user.profileImageId = uploadResponse.fileId;
+        updateData.profileImage = uploadResponse.url;
+        updateData.profileImageId = uploadResponse.fileId;
       } catch (uploadError: any) {
         console.error(
           "Profile image upload failed:",
@@ -139,14 +166,14 @@ const updateProfile = async (req: Request, res: Response) => {
         );
       }
     } else if (profileImage !== undefined) {
-      user.profileImage = profileImage;
+      updateData.profileImage = profileImage;
     }
 
     if (coverImage && coverImage.startsWith("data:image")) {
       try {
         const uploadResponse = await imagekit.upload({
           file: coverImage,
-          fileName: `cover_${_id}_${Date.now()}`,
+          fileName: `cover_${id}_${Date.now()}`,
           folder: "/covers",
         });
 
@@ -158,8 +185,8 @@ const updateProfile = async (req: Request, res: Response) => {
             );
         }
 
-        user.coverImage = uploadResponse.url;
-        user.coverImageId = uploadResponse.fileId;
+        updateData.coverImage = uploadResponse.url;
+        updateData.coverImageId = uploadResponse.fileId;
       } catch (uploadError: any) {
         console.error(
           "Cover image upload failed:",
@@ -167,23 +194,26 @@ const updateProfile = async (req: Request, res: Response) => {
         );
       }
     } else if (coverImage !== undefined) {
-      user.coverImage = coverImage;
+      updateData.coverImage = coverImage;
     }
 
-    await user.save();
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: updateData,
+    });
 
     return res.status(200).json({
       message: "Profile updated successfully",
       user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-        region: user.region,
-        description: user.description,
-        profileImage: user.profileImage,
-        coverImage: user.coverImage,
-        role: user.role,
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        phoneNumber: updatedUser.phoneNumber,
+        region: updatedUser.region,
+        description: updatedUser.description,
+        profileImage: updatedUser.profileImage,
+        coverImage: updatedUser.coverImage,
+        role: updatedUser.role,
       },
     });
   } catch (error: any) {

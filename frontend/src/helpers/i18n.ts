@@ -17,7 +17,7 @@ i18n
         translation: arTranslations,
       },
     },
-    fallbackLng: 'en',
+    fallbackLng: 'ar',
     interpolation: {
       escapeValue: false, // react already safes from xss
     },
@@ -35,7 +35,7 @@ i18n.on('languageChanged', (lng) => {
 });
 
 // Initialize direction on load
-document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
-document.documentElement.lang = i18n.language;
+document.documentElement.dir = (i18n.language === 'ar' || !i18n.language) ? 'rtl' : 'ltr';
+document.documentElement.lang = i18n.language || 'ar';
 
 export default i18n;

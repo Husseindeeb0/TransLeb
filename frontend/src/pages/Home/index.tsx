@@ -77,7 +77,7 @@ const Home = () => {
                   placeholder={t('home.search.placeholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full py-6 text-lg text-white font-bold bg-transparent outline-none placeholder:text-gray-500 transition-all"
+                  className="w-full py-3 text-lg text-white font-bold bg-transparent outline-none placeholder:text-gray-500 transition-all"
                 />
               </div>
             </div>
@@ -89,8 +89,8 @@ const Home = () => {
       <div className="max-w-7xl mx-auto px-6 -mt-16">
         {/* Stats Section with sleek design */}
         <div className="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6 relative z-20">
-            <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl shadow-gray-200/50 border border-gray-50 flex items-center gap-6">
-                <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center border border-red-100/50 shadow-inner">
+            <div className="bg-white p-5 rounded-[2.5rem] shadow-2xl shadow-gray-200/50 border border-gray-50 flex items-center gap-6">
+                <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center border border-red-100/50 shadow-inner">
                     <Users className="w-8 h-8 text-red-600" />
                 </div>
                 <div>
@@ -120,7 +120,7 @@ const Home = () => {
           <AnimatePresence mode='popLayout'>
             {filteredDrivers?.map((driver, index) => (
               <motion.div
-                key={driver._id}
+                key={driver.id}
                 layout
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -212,7 +212,7 @@ const Home = () => {
 
                     <div className="mt-auto pt-2 border-t border-dashed border-gray-100 relative flex items-center justify-end">
                         <button 
-                          onClick={() => navigate(`/${currentLang}/profile/${driver._id}`)}
+                          onClick={() => navigate(`/${currentLang}/profile/${driver.id}`)}
                           className="flex items-center gap-4 group/btn cursor-pointer transition-transform duration-300 active:scale-95"
                         >
                             <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 opacity-0 group-hover/btn:opacity-100 transition-all duration-500 translate-x-2 group-hover/btn:translate-x-0">

@@ -5,7 +5,7 @@ import {
   Mail, Phone, MapPin, Loader2, 
   Camera, Edit3, Save, Briefcase, 
   ShieldCheck, Calendar, Clock, ChevronRight,
-  Activity
+  Activity, AlertTriangle
 } from 'lucide-react';
 import { useGetMeQuery, useUpdateProfileMutation } from '../../state/services/user/userAPI';
 import { useGetDayCardsQuery } from '../../state/services/dayCard/dayCardAPI';
@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 const Profile = () => {
   const { t, i18n } = useTranslation();
   const { data: user, isLoading, refetch } = useGetMeQuery();
-  const { data: dayCards, isLoading: isLoadingCards } = useGetDayCardsQuery(user?._id || "");
+  const { data: dayCards, isLoading: isLoadingCards } = useGetDayCardsQuery(user?.id || "");
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
   const [isEditing, setIsEditing] = useState(false);
 
@@ -192,7 +192,23 @@ const Profile = () => {
       </div>
 
       {/* Profile Content */}
-      <div className="max-w-7xl mx-auto px-6 relative -mt-24 z-10">
+      <div className="max-w-7xl mx-auto px-6 relative -mt-24 z-10 space-y-8">
+        {user?.role === 'driver' && !user?.active && (
+          <div className="bg-red-50 border-2 border-red-100 p-6 rounded-[2.5rem] text-red-800 flex items-start gap-4 shadow-xl">
+            <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-600 flex-shrink-0">
+              <AlertTriangle className="w-6 h-6 animate-bounce" />
+            </div>
+            <div>
+              <h4 className="font-black text-sm uppercase tracking-wide mb-1 text-red-900">Partner Account Inactive</h4>
+              <p className="text-xs font-semibold text-red-700 leading-relaxed">
+                Your driver account is currently inactive or your subscription period has ended. 
+                You will not be able to access the driver dashboard, view stats, or update active coordinates. 
+                To activate your account and start receiving ride requests, please subscribe and contact support at <span className="underline font-black text-red-900">961 70 063 612</span>.
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           
           {/* Left Column: Avatar & Info */}
@@ -230,8 +246,12 @@ const Profile = () => {
                   onChange={(e) => handleImageUpload(e, 'profile')}
                 />
                 
-                {/* Badge */}
-                <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center border-4 border-white shadow-xl text-white">
+                 {/* Badge */}
+                <div className={`absolute -bottom-2 -right-2 w-12 h-12 bg-gradient-to-br ${
+                  user?.role === 'driver' && !user?.active 
+                    ? 'from-red-500 to-red-600' 
+                    : 'from-green-500 to-green-600'
+                } rounded-2xl flex items-center justify-center border-4 border-white shadow-xl text-white`}>
                   <ShieldCheck size={24} />
                 </div>
               </div>
@@ -253,6 +273,16 @@ const Profile = () => {
                   <Briefcase size={12} className="text-red-600" />
                   {user?.role} {t('profile.partner')}
                 </div>
+                {user?.role === 'driver' && (
+                  <div className={`mt-3 inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                    user.active 
+                      ? 'bg-green-50 text-green-700 border border-green-200' 
+                      : 'bg-red-50 text-red-700 border border-red-200'
+                  }`}>
+                    <span className={`w-2 h-2 rounded-full ${user.active ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                    {user.active ? 'Active Partner' : 'Inactive Account'}
+                  </div>
+                )}
               </div>
             </div>
 

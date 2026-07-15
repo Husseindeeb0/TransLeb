@@ -1,8 +1,8 @@
 import { Server } from "socket.io";
-import Coordinates from "../models/Coordinates";
+import { prisma } from "../config/prisma";
 
 export async function deleteCoordinatesByUserId(userId: string) {
-  return Coordinates.findOneAndDelete({ userId });
+  return prisma.coordinates.delete({ where: { userId } }).catch(() => null);
 }
 
 interface TimeoutMap {
@@ -29,22 +29,24 @@ export default async function passengerTimerHandler(
     delete userTimeouts[userId];
   }
 
-  const record = await Coordinates.findOne({ userId });
+  let record = await prisma.coordinates.findUnique({ where: { userId } });
   if (!record) {
     console.error(`⚠️ No coordinate found for user ${userId}`);
     return;
   }
 
   if (!record.startTimer) {
-    record.startTimer = new Date();
-    await record.save();
+    record = await prisma.coordinates.update({
+      where: { userId },
+      data: { startTimer: new Date() },
+    });
     console.log(`🆕 New timer started for ${userId}`);
   } else {
     console.log(`🔁 Resuming timer for ${userId}`);
   }
 
   const duration = record.duration || 15 * 60 * 1000;
-  const startTime = record.startTimer.getTime();
+  const startTime = record.startTimer!.getTime();
   const now = Date.now();
   const elapsed = now - startTime;
   const remaining = Math.max(duration - elapsed, 0);

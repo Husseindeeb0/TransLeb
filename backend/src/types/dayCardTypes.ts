@@ -1,4 +1,3 @@
-import { Types } from "mongoose";
 import { UserType } from "./userTypes";
 
 export interface BusSchedule {
@@ -7,8 +6,8 @@ export interface BusSchedule {
 }
 
 export interface DayCardType {
-  _id: string;
-  driverId: Types.ObjectId | UserType;
+  id: string;
+  driverId: string | UserType;
   date: Date | string;
   busTimers: BusSchedule[];
   formState: string;
@@ -18,7 +17,7 @@ export interface DayCardType {
 
 export interface DayCardResponse {
   dayCardId: string;
-  driverId: Types.ObjectId | UserType;
+  driverId: string | UserType;
   date: Date | string;
   busTimers: BusSchedule[];
   formState: string;

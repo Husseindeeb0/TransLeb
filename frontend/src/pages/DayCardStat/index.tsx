@@ -260,7 +260,7 @@ const DayCardStat = () => {
               <AnimatePresence mode="popLayout">
                 {filteredPassengers.map((passenger, index) => (
                   <motion.div
-                    key={passenger._id || index}
+                    key={passenger.id || index}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
@@ -334,7 +334,7 @@ const DayCardStat = () => {
                                     : 'bg-gray-100 text-gray-500 border border-transparent hover:bg-gray-200'
                                  }`}
                                  value={passenger.assignedBusTime || 'unassigned'}
-                                 onChange={(e) => handleAssignBus(passenger._id || passenger.formId || '', e.target.value)}
+                                 onChange={(e) => handleAssignBus(passenger.id || passenger.formId || '', e.target.value)}
                                >
                                  <option value="unassigned">{t('daycard.stats.notAssigned')}</option>
                                  {uniqueBusTimes.map(time => (

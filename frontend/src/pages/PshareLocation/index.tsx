@@ -57,7 +57,7 @@ const PshareLocation: React.FC = () => {
   const { dayCardId } = useParams<{ dayCardId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const userId = user?._id;
+  const userId = user?.id;
 
   const [userLocation, setUserLocation] = useState<{
     lat: number;

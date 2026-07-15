@@ -1,5 +1,5 @@
 import { SigninRequest, SignupRequest, AuthResponse } from "../types/userTypes";
-import User from "../models/User";
+import { prisma } from "../config/prisma";
 import {
   generateToken,
   generateRefreshToken,
@@ -20,7 +20,7 @@ const signup = async (req: Request, res: Response) => {
       });
     }
 
-    const user = await User.findOne({ email });
+    const user = await prisma.user.findUnique({ where: { email } });
     if (user) {
       return res.status(400).json({
         state: "USER_ALREADY_EXISTS",
@@ -29,21 +29,32 @@ const signup = async (req: Request, res: Response) => {
     }
 
     const hashedPassword = hashPassword(password);
-    const newUser = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-      role,
+    
+    const newUser = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        role: role as any,
+      },
     });
 
-    const accessToken = generateToken(newUser);
-    const refreshToken = generateRefreshToken(newUser);
+    const userPayload = {
+      ...newUser,
+      coordinates: newUser.id,
+    } as any;
+
+    const accessToken = generateToken(userPayload);
+    const refreshToken = generateRefreshToken(userPayload);
     setTokenCookies(res, accessToken, refreshToken);
-    newUser.refreshToken = refreshToken;
-    await newUser.save();
+
+    await prisma.user.update({
+      where: { id: newUser.id },
+      data: { refreshToken },
+    });
 
     const response: AuthResponse = {
-      _id: newUser._id.toString(),
+      id: newUser.id,
       name: newUser.name,
       email: newUser.email,
       role: newUser.role,
@@ -71,7 +82,7 @@ const signin = async (req: Request, res: Response) => {
       });
     }
 
-    const user = await User.findOne({ email });
+    const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       return res.status(401).json({
         state: "USER_NOT_FOUND",
@@ -87,14 +98,22 @@ const signin = async (req: Request, res: Response) => {
       });
     }
 
-    const accessToken = generateToken(user);
-    const refreshToken = generateRefreshToken(user);
+    const userPayload = {
+      ...user,
+      coordinates: user.id,
+    } as any;
+
+    const accessToken = generateToken(userPayload);
+    const refreshToken = generateRefreshToken(userPayload);
     setTokenCookies(res, accessToken, refreshToken);
-    user.refreshToken = refreshToken;
-    await user.save();
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken },
+    });
 
     const response: AuthResponse = {
-      _id: user._id.toString(),
+      id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
@@ -135,10 +154,15 @@ const logout = async (req: Request, res: Response) => {
       maxAge: 0,
     });
 
-    const user = await User.findOne({ refreshToken: cookies.refresh_token });
+    const user = await prisma.user.findFirst({
+      where: { refreshToken: cookies.refresh_token },
+    });
+    
     if (user) {
-      user.refreshToken = "";
-      await user.save();
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { refreshToken: null },
+      });
     }
 
     res.status(200).json({ message: "User logged out successfully" });

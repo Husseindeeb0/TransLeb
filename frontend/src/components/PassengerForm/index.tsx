@@ -48,7 +48,7 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ dayCardId, isLocked }) =>
         desiredTime: form.desiredTime || "",
         passengerCount: form.passengerCount || 1,
       });
-      setFormId(form.formId || form._id || null);
+      setFormId(form.formId || form.id || null);
     }
   }, [existenceData]);
 

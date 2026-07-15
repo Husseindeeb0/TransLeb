@@ -1,4 +1,4 @@
-import PassengerForm from "../models/PassengerForm";
+import { prisma } from "../config/prisma";
 import { Request, Response } from "express";
 import {
   SubmitRequestType,
@@ -24,7 +24,7 @@ export const submitForm = async (req: Request, res: Response) => {
       !phoneNumber ||
       !livingPlace ||
       !desiredTime ||
-      !passengerCount
+      passengerCount === undefined
     ) {
       return res.status(400).json({
         state: "MISSING_FIELDS",
@@ -32,19 +32,21 @@ export const submitForm = async (req: Request, res: Response) => {
       });
     }
 
-    const newForm = await PassengerForm.create({
-      dayCardId,
-      userId,
-      fullName,
-      phoneNumber,
-      livingPlace,
-      desiredTime,
-      passengerCount,
+    const newForm = await prisma.passengerForm.create({
+      data: {
+        dayCardId,
+        userId,
+        fullName,
+        phoneNumber,
+        livingPlace,
+        desiredTime,
+        passengerCount: parseInt(passengerCount as any),
+      },
     });
 
     res.status(201).json({
       message: "Passenger form submitted successfully",
-      formId: newForm._id,
+      formId: newForm.id,
     });
   } catch (error) {
     console.error("Passenger form submission error:", error);
@@ -80,15 +82,14 @@ export const updateForm = async (req: Request, res: Response) => {
     if (livingPlace !== undefined) updateData.livingPlace = livingPlace;
     if (desiredTime !== undefined) updateData.desiredTime = desiredTime;
     if (passengerCount !== undefined)
-      updateData.passengerCount = passengerCount;
+      updateData.passengerCount = parseInt(passengerCount as any);
     if (assignedBusTime !== undefined)
       updateData.assignedBusTime = assignedBusTime;
 
-    const updatedForm = await PassengerForm.findByIdAndUpdate(
-      formId,
-      updateData,
-      { new: true },
-    );
+    const updatedForm = await prisma.passengerForm.update({
+      where: { id: formId },
+      data: updateData,
+    });
 
     if (!updatedForm) {
       return res.status(404).json({
@@ -99,7 +100,7 @@ export const updateForm = async (req: Request, res: Response) => {
 
     res.status(200).json({
       message: "Passenger form updated successfully",
-      formId: updatedForm._id,
+      formId: updatedForm.id,
     });
   } catch (error) {
     console.error("Passenger form update error:", error);
@@ -120,7 +121,9 @@ export const deleteForm = async (req: Request, res: Response) => {
       });
     }
 
-    const deletedForm = await PassengerForm.findByIdAndDelete(formId);
+    const deletedForm = await prisma.passengerForm.delete({
+      where: { id: formId },
+    });
 
     if (!deletedForm) {
       return res.status(404).json({
@@ -152,9 +155,17 @@ export const isFormExists = async (req: Request, res: Response) => {
       });
     }
 
-    const existingForm = await PassengerForm.findOne({
-      dayCardId,
-      userId,
+    if (!userId) {
+      return res.status(401).json({
+        message: "Unauthorized",
+      });
+    }
+
+    const existingForm = await prisma.passengerForm.findFirst({
+      where: {
+        dayCardId,
+        userId,
+      },
     });
 
     return res.status(200).json({
@@ -180,7 +191,9 @@ export const getForms = async (req: Request, res: Response) => {
       });
     }
 
-    const forms = await PassengerForm.find({ dayCardId: dayCardId });
+    const forms = await prisma.passengerForm.findMany({
+      where: { dayCardId: dayCardId },
+    });
 
     res.status(200).json({
       message: "Passenger forms fetched successfully",
@@ -205,7 +218,9 @@ export const getFormById = async (req: Request, res: Response) => {
       });
     }
 
-    const form = await PassengerForm.findById(formId);
+    const form = await prisma.passengerForm.findUnique({
+      where: { id: formId },
+    });
 
     if (!form) {
       return res.status(404).json({

@@ -1,10 +1,9 @@
-import { Types } from "mongoose";
 import { DayCardType } from "./dayCardTypes";
 
 export interface PassengerFormType {
-  _id: string;
-  dayCardId: Types.ObjectId | DayCardType;
-  userId: Types.ObjectId;
+  id: string;
+  dayCardId: string | DayCardType;
+  userId: string;
   fullName: string;
   phoneNumber: string;
   livingPlace: string;

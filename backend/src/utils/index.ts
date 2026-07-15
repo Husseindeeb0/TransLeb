@@ -24,7 +24,7 @@ const generateToken = (user: UserType) => {
 
   return jwt.sign(
     {
-      id: user._id,
+      id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
@@ -46,7 +46,7 @@ const generateRefreshToken = (user: UserType) => {
 
   return jwt.sign(
     {
-      id: user._id,
+      id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
@@ -62,7 +62,7 @@ const setTokenCookies = async (
   refreshToken: string,
 ): Promise<void> => {
   const isProd = process.env.NODE_ENV === "production";
-  
+
   res.cookie("access_token", accessToken, {
     httpOnly: true,
     secure: isProd,

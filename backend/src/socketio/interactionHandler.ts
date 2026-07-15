@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import Coordinates from "../models/Coordinates";
+import { prisma } from "../config/prisma";
 import passengerTimerHandler from "./passengerTimer";
 
 export default function interactionHandler(socket: Socket, io: Server) {
@@ -7,22 +7,26 @@ export default function interactionHandler(socket: Socket, io: Server) {
   socket.on("extendTimer", async (data: { userId: string }) => {
     const { userId } = data;
     console.log(`⏳ Extend request for ${userId}`);
-    const record = await Coordinates.findOne({ userId });
+
+    const record = await prisma.coordinates.findUnique({ where: { userId } });
     if (!record) return;
 
-    // Limit check? "Give passenger only limited number of times to extend time"
+    // Limit check: allow only 3 extensions
     if (record.extensionCount >= 3) {
-      // Example limit: 3 times
       socket.emit("error", { message: "Max extension limit reached" });
       return;
     }
 
-    record.duration += 10 * 60 * 1000;
-    record.extensionCount += 1;
-    await record.save();
+    const updatedRecord = await prisma.coordinates.update({
+      where: { userId },
+      data: {
+        duration: record.duration + 10 * 60 * 1000,
+        extensionCount: record.extensionCount + 1,
+      },
+    });
 
     await passengerTimerHandler(io, userId);
-    socket.emit("timerExtended", { newDuration: record.duration });
+    socket.emit("timerExtended", { newDuration: updatedRecord.duration });
   });
 
   // Driver: Mark Passenger
@@ -32,8 +36,9 @@ export default function interactionHandler(socket: Socket, io: Server) {
       const { passengerId, driverId } = data;
       console.log(`🚕 Driver ${driverId} marking passenger ${passengerId}`);
 
-      // Race condition check: use findOneAndUpdate with condition
-      const record = await Coordinates.findOne({ userId: passengerId });
+      const record = await prisma.coordinates.findUnique({
+        where: { userId: passengerId },
+      });
       if (!record) {
         socket.emit("error", { message: "Passenger not found" });
         return;
@@ -46,15 +51,14 @@ export default function interactionHandler(socket: Socket, io: Server) {
         return;
       }
 
-      // Update
-      record.markedBy = driverId;
-      // record.markedAt = new Date(); // If type issue, fix model or ignore
-      // Set duration to 30 mins (total) if it was 15?
-      // User: "extended to 30min"
-      // Let's set duration to Math.max(record.duration, 30 * 60 * 1000)
-      record.duration = Math.max(record.duration, 30 * 60 * 1000);
-
-      await record.save();
+      await prisma.coordinates.update({
+        where: { userId: passengerId },
+        data: {
+          markedBy: driverId,
+          markedAt: new Date(),
+          duration: Math.max(record.duration, 30 * 60 * 1000),
+        },
+      });
 
       await passengerTimerHandler(io, passengerId);
 
@@ -72,18 +76,20 @@ export default function interactionHandler(socket: Socket, io: Server) {
     async (data: { passengerId: string; driverId: string }) => {
       const { passengerId, driverId } = data;
 
-      const record = await Coordinates.findOne({ userId: passengerId });
+      const record = await prisma.coordinates.findUnique({
+        where: { userId: passengerId },
+      });
       if (!record) return;
 
       if (record.markedBy !== driverId) return; // Can't unmark others
 
-      record.markedBy = null; // Mongoose handles null if schema allows, or undefined
-      // Reset duration? "return the passenger timer to 15minutes"
-      // If it was extended by passenger, do we keep extension?
-      // "return the passenger timer to 15minutes"
-      record.duration = 15 * 60 * 1000;
-
-      await record.save();
+      await prisma.coordinates.update({
+        where: { userId: passengerId },
+        data: {
+          markedBy: null,
+          duration: 15 * 60 * 1000, // Reset to 15 minutes
+        },
+      });
 
       await passengerTimerHandler(io, passengerId);
 

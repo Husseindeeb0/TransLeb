@@ -7,7 +7,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -17,6 +17,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   if (!isAuthenticated) {
     // Redirect to landing page if not authenticated
     return <Navigate to="/signin" state={{ from: location }} replace />;
+  }
+
+  // Block inactive drivers from accessing other protected routes (like dashboard/scheduling)
+  if (user?.role === 'driver' && !user?.active) {
+    if (location.pathname.endsWith('/dashboard')) {
+      const lang = location.pathname.split('/')[1] || 'en';
+      return <Navigate to={`/${lang}/profile`} replace />;
+    }
   }
 
   return <>{children}</>;

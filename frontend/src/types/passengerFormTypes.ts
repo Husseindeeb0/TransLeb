@@ -1,5 +1,5 @@
 export interface PassengerForm {
-    _id?: string;
+    id?: string;
     formId?: string;
     dayCardId: string;
     fullName: string;
@@ -8,7 +8,7 @@ export interface PassengerForm {
     desiredTime: string;
     passengerCount: number;
     assignedBusTime?: string | null;
-    userId?: string | { _id: string; name?: string };
+    userId?: string | { id: string; name?: string };
 }
 
 export interface SubmitPassengerFormRequest {

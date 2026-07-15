@@ -5,6 +5,7 @@ import { authApi } from '../services/auth/authAPI';
 import { dayCardApi } from '../services/dayCard/dayCardAPI';
 import { passengerFormApi } from '../services/passengerForm/passengerFormAPI';
 import { contactApi } from '../services/contact/contactAPI';
+import { adminApi } from '../services/admin/adminAPI';
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     [dayCardApi.reducerPath]: dayCardApi.reducer,
     [passengerFormApi.reducerPath]: passengerFormApi.reducer,
     [contactApi.reducerPath]: contactApi.reducer,
+    [adminApi.reducerPath]: adminApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -23,6 +25,7 @@ export const store = configureStore({
       dayCardApi.middleware,
       passengerFormApi.middleware,
       contactApi.middleware,
+      adminApi.middleware,
     ),
 });
 

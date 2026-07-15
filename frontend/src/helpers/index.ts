@@ -37,7 +37,7 @@ export const LanguageSync = () => {
   }, [lang, i18n]);
 
   useEffect(() => {
-    const currentLang = i18n.language || 'en';
+    const currentLang = i18n.language || 'ar';
     document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
     document.documentElement.lang = currentLang;
   }, [i18n.language]);

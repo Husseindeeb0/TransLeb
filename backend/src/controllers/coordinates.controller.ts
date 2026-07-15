@@ -1,12 +1,12 @@
 import type { Request, Response } from "express";
-import Coordinates from "../models/Coordinates";
+import { prisma } from "../config/prisma";
 
 const addCoordinate = async (req: Request, res: Response) => {
   try {
     const { lat, lng, dayCardId } = req.body;
     const userId = req.userId;
 
-    if (!lat || !lng) {
+    if (lat === undefined || lng === undefined) {
       return res.status(500).json({ message: "Coordinates are Required" });
     }
 
@@ -14,15 +14,16 @@ const addCoordinate = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "User ID not found in token" });
     }
 
-    const newCoordinate = new Coordinates({
-      userId: userId,
-      lat: lat,
-      lng: lng,
-      dayCardId: dayCardId || null,
+    const newCoordinate = await prisma.coordinates.create({
+      data: {
+        userId: userId,
+        lat: parseFloat(lat),
+        lng: parseFloat(lng),
+        dayCardId: dayCardId || null,
+      },
     });
 
-    await newCoordinate.save();
-    res.status(201).json({ message: "Coordinates Saved" });
+    res.status(201).json({ message: "Coordinates Saved", data: newCoordinate });
   } catch (error) {
     if (error instanceof Error) {
       console.log("Error in add coordinate controller: ", error.message);
@@ -38,7 +39,7 @@ const editCoordinate = async (req: Request, res: Response) => {
     const { lat, lng, dayCardId } = req.body;
     const userId = req.userId;
 
-    if (!lat || !lng) {
+    if (lat === undefined || lng === undefined) {
       return res.status(400).json({ message: "Coordinates are required" });
     }
 
@@ -46,16 +47,20 @@ const editCoordinate = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "User ID not found in token" });
     }
 
-    const updatedCoordinate = await Coordinates.findOneAndUpdate(
-      { userId: userId },
-      {
-        userId: userId,
-        lat: lat,
-        lng: lng,
+    const updatedCoordinate = await prisma.coordinates.upsert({
+      where: { userId: userId },
+      update: {
+        lat: parseFloat(lat),
+        lng: parseFloat(lng),
         dayCardId: dayCardId || null,
       },
-      { new: true, upsert: true },
-    );
+      create: {
+        userId: userId,
+        lat: parseFloat(lat),
+        lng: parseFloat(lng),
+        dayCardId: dayCardId || null,
+      },
+    });
 
     res
       .status(200)
@@ -78,7 +83,13 @@ const deleteCoordinate = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "User ID not found in token" });
     }
 
-    await Coordinates.findOneAndDelete({ userId });
+    await prisma.coordinates
+      .delete({
+        where: { userId: userId },
+      })
+      .catch(() => {
+        // Ignore if not exists
+      });
 
     res.status(200).json({ message: "Coordinates deleted successfully" });
   } catch (error) {
@@ -98,10 +109,13 @@ const getCoordinates = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "User ID not found in token" });
     }
 
-    const coordinate = await Coordinates.findOne({ userId: userId });
+    const coordinate = await prisma.coordinates.findUnique({
+      where: { userId: userId },
+    });
+
     res.status(200).json({
       message: "Coordinate search completed",
-      data: coordinate || null,
+      data: coordinate,
     });
   } catch (error) {
     if (error instanceof Error) {
@@ -126,7 +140,10 @@ const getAllCoordinates = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Day card ID is required" });
     }
 
-    const coordinates = await Coordinates.find({ userId: userId, dayCardId: dayCardId });
+    const coordinates = await prisma.coordinates.findMany({
+      where: { userId: userId, dayCardId: dayCardId },
+    });
+
     res.status(200).json({ message: "Coordinates found", data: coordinates });
   } catch (error) {
     if (error instanceof Error) {

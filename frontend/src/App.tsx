@@ -13,6 +13,7 @@ import DayCardDetails from './pages/DayCardDetails';
 import DayCardStat from './pages/DayCardStat';
 import Profile from './pages/Profile';
 import DriverProfile from './pages/DriverProfile';
+import AdminDashboard from './pages/AdminDashboard';
 import { Toaster } from 'react-hot-toast';
 
 import { useAuth } from './hooks/useAuth';
@@ -27,8 +28,8 @@ import About from './pages/About';
 const RootRedirect = () => {
   const { i18n } = useTranslation();
   const location = useLocation();
-  const lang = i18n.language?.split('-')[0] || 'en';
-  const targetLang = ['en', 'ar'].includes(lang) ? lang : 'en';
+  const lang = i18n.language?.split('-')[0] || 'ar';
+  const targetLang = ['en', 'ar'].includes(lang) ? lang : 'ar';
   
   return <Navigate to={`/${targetLang}${location.pathname}`} replace />;
 };
@@ -112,8 +113,16 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="admin-dashboard"
+              element={
+                <ProtectedRoute>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
             {/* Fallback for the lang route itself */}
-            <Route path="*" element={<Navigate to={`/${i18n.language || 'en'}/home`} replace />} />
+            <Route path="*" element={<Navigate to={`/${i18n.language || 'ar'}/home`} replace />} />
           </Route>
           
           {/* Redirect root to default language */}

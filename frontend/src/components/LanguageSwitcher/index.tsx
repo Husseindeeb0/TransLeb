@@ -27,17 +27,19 @@ const LanguageSwitcher: React.FC = () => {
     navigate(`/${pathParts.join('/')}${location.search}${location.hash}`);
   };
 
+  const currentLang = i18n.language?.startsWith('ar') ? 'ar' : 'en';
+
   return (
     <div className="flex items-center p-1 bg-gray-100/50 backdrop-blur-sm rounded-2xl border border-gray-200">
       <button
         onClick={() => changeLanguage('en')}
         className={`relative px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all duration-300 ${
-          i18n.language === 'en'
+          currentLang === 'en'
             ? 'text-white'
             : 'text-gray-500 hover:text-gray-700'
         }`}
       >
-        {i18n.language === 'en' && (
+        {currentLang === 'en' && (
           <motion.div
             layoutId="activeLang"
             className="absolute inset-0 bg-gradient-to-br from-red-600 to-green-600 rounded-xl"
@@ -50,12 +52,12 @@ const LanguageSwitcher: React.FC = () => {
       <button
         onClick={() => changeLanguage('ar')}
         className={`relative px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all duration-300 ${
-          i18n.language === 'ar'
+          currentLang === 'ar'
             ? 'text-white'
             : 'text-gray-500 hover:text-gray-700'
         }`}
       >
-        {i18n.language === 'ar' && (
+        {currentLang === 'ar' && (
           <motion.div
             layoutId="activeLang"
             className="absolute inset-0 bg-gradient-to-br from-red-600 to-green-600 rounded-xl"

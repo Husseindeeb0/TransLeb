@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 const Dashboard = () => {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const { data: cards, isLoading, isError, refetch } = useGetDayCardsQuery(user?._id || "");
+  const { data: cards, isLoading, isError, refetch } = useGetDayCardsQuery(user?.id || "");
   const [createCard, { isLoading: isCreating }] = useCreateDayCardMutation();
   const [updateCard, { isLoading: isUpdating }] = useUpdateDayCardMutation();
   const [deleteCard] = useDeleteDayCardMutation();
@@ -38,7 +38,7 @@ const Dashboard = () => {
       } else {
         await createCard({
           ...formData,
-          driverId: user?._id || user?.id || ''
+          driverId: user?.id || ''
         } as CreateDayCardRequest).unwrap();
         toast.success(t('dashboard.toast.createSuccess'));
       }

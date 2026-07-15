@@ -14,7 +14,7 @@ export const passengerFormApi = createApi({
       }),
       providesTags: (result) => 
         result 
-          ? [...result.data.map(({ _id }) => ({ type: "PassengerForm" as const, id: _id })), { type: "PassengerForm", id: "LIST" }]
+          ? [...result.data.map(({ id }) => ({ type: "PassengerForm" as const, id: id })), { type: "PassengerForm", id: "LIST" }]
           : [{ type: "PassengerForm", id: "LIST" }]
     }),
     getPassengerFormById: builder.query<PassengerForm, string>({

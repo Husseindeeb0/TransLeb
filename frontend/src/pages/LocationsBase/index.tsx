@@ -90,9 +90,9 @@ const LocationsBase: React.FC = () => {
   const driverIdRef = useRef<string>('');
 
   useEffect(() => {
-    if (user?._id) {
-        driverIdRef.current = user._id;
-        connectSocket(user._id);
+    if (user?.id) {
+        driverIdRef.current = user.id;
+        connectSocket(user.id);
     }
   }, [user]);
 
@@ -105,7 +105,7 @@ const LocationsBase: React.FC = () => {
   const passengerData = useMemo(() => {
     return passengers.map(p => {
         const res = reservations?.data?.find(r => {
-            const rUserId = typeof r.userId === 'object' && r.userId !== null ? (r.userId as any)._id : r.userId;
+            const rUserId = typeof r.userId === 'object' && r.userId !== null ? (r.userId as any).id : r.userId;
             return rUserId === p.userId;
         });
         return {
@@ -132,11 +132,11 @@ const LocationsBase: React.FC = () => {
           setDriverLocation(newLoc);
           setIsLocating(false);
           
-          if (user?._id) {
+          if (user?.id) {
               editCoordinate({
                   lat: newLoc.lat,
                   lng: newLoc.lng,
-                  userId: user._id,
+                  userId: user.id,
                   dayCardId: dayCardId
               });
           }
@@ -153,12 +153,12 @@ const LocationsBase: React.FC = () => {
 
   // Automatic sharing every 5 minutes
   useEffect(() => {
-    if (driverLocation && user?._id && dayCardId) {
+    if (driverLocation && user?.id && dayCardId) {
         const shareInterval = setInterval(() => {
             editCoordinate({
                 lat: driverLocation.lat,
                 lng: driverLocation.lng,
-                userId: user._id,
+                userId: user.id,
                 dayCardId: dayCardId
             });
             toast.success(t('locationsBase.toast.sharingAuto', 'Updated your location on map'), { duration: 2000, icon: '📍' });

@@ -1,4 +1,4 @@
-import { Car, User, LogIn, LogOut, UserPlus, LayoutGrid, Home as HomeIcon, ChevronDown, Info } from 'lucide-react';
+import { Car, User, LogIn, LogOut, UserPlus, LayoutGrid, Home as HomeIcon, ChevronDown, Info, ShieldCheck } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
@@ -80,13 +80,28 @@ const Navbar: React.FC<NavbarProps> = () => {
               <span>{t('nav.about')}</span>
             </Link>
             {isAuthenticated && (
-              <Link
-                to={`/${currentLang}/dashboard`}
-                className="flex items-center space-x-2 px-5 py-2.5 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all duration-300 font-black uppercase text-[11px] tracking-widest border border-transparent hover:border-gray-200"
-              >
-                <LayoutGrid className="h-4 w-4" />
-                <span>{t('nav.dashboard')}</span>
-              </Link>
+              user?.role === 'driver' && !user?.active ? (
+                <div className="relative group/tooltip">
+                  <button
+                    disabled
+                    className="flex items-center space-x-2 px-5 py-2.5 rounded-xl text-gray-400 cursor-not-allowed opacity-60 font-black uppercase text-[11px] tracking-widest border border-transparent"
+                  >
+                    <LayoutGrid className="h-4 w-4" />
+                    <span>{t('nav.dashboard')}</span>
+                  </button>
+                  <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 bg-gray-900 text-white text-[10px] font-bold p-3 rounded-xl shadow-xl z-50 text-center normal-case tracking-normal border border-white/10 opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200">
+                    To access the dashboard, you need an active subscription. Please contact support at <br></br> +961 70 063 612 to subscribe.
+                  </div>
+                </div>
+              ) : (
+                <Link
+                  to={`/${currentLang}/dashboard`}
+                  className="flex items-center space-x-2 px-5 py-2.5 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all duration-300 font-black uppercase text-[11px] tracking-widest border border-transparent hover:border-gray-200"
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                  <span>{t('nav.dashboard')}</span>
+                </Link>
+              )
             )}
           </div>
 
@@ -150,6 +165,16 @@ const Navbar: React.FC<NavbarProps> = () => {
                              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Account</p>
                              <p className="text-xs font-bold text-gray-900 truncate">{user?.email}</p>
                         </div>
+                        {user?.role === 'admin' && (
+                          <Link
+                            to={`/${currentLang}/admin-dashboard`}
+                            onClick={() => setIsProfileOpen(false)}
+                            className="flex items-center space-x-3 px-5 py-3.5 rounded-2xl text-gray-600 hover:bg-green-50 hover:text-green-700 transition-all font-black uppercase text-[10px] tracking-widest"
+                          >
+                            <ShieldCheck className="h-4 w-4 text-green-600" />
+                            <span>Admin Panel</span>
+                          </Link>
+                        )}
                         <Link
                           to={`/${currentLang}/profile`}
                           onClick={() => setIsProfileOpen(false)}
@@ -231,16 +256,41 @@ const Navbar: React.FC<NavbarProps> = () => {
 
                 {isAuthenticated ? (
                   <>
-                    <Link
-                      to={`/${currentLang}/dashboard`}
-                      className="flex items-center space-x-3 px-5 py-4 rounded-2xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-black uppercase text-[10px] tracking-widest"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <LayoutGrid className="h-4 w-4" />
-                      <span>{t('nav.dashboard')}</span>
-                    </Link>
+                    {user?.role === 'driver' && !user?.active ? (
+                      <div className="px-5 py-4 bg-red-50/50 rounded-2xl border border-red-100/50">
+                        <button
+                          disabled
+                          className="flex items-center space-x-3 text-gray-400 cursor-not-allowed opacity-60 font-black uppercase text-[10px] tracking-widest"
+                        >
+                          <LayoutGrid className="h-4 w-4" />
+                          <span>{t('nav.dashboardInactive')}</span>
+                        </button>
+                        <p className="mt-2 text-[9px] font-semibold text-red-600/80 leading-normal">
+                          {t('nav.subscriptionExpired')}
+                        </p>
+                      </div>
+                    ) : (
+                      <Link
+                        to={`/${currentLang}/dashboard`}
+                        className="flex items-center space-x-3 px-5 py-4 rounded-2xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-black uppercase text-[10px] tracking-widest"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <LayoutGrid className="h-4 w-4" />
+                        <span>{t('nav.dashboard')}</span>
+                      </Link>
+                    )}
 
                     <div className="pt-4 mt-2 border-t border-gray-100 flex flex-col space-y-2">
+                      {user?.role === 'admin' && (
+                        <Link
+                          to={`/${currentLang}/admin-dashboard`}
+                          className="flex items-center space-x-3 px-5 py-4 rounded-2xl text-gray-600 hover:bg-green-50 hover:text-green-700 transition-all font-black uppercase text-[10px] tracking-widest"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <ShieldCheck className="h-4 w-4 text-green-600" />
+                          <span>Admin Panel</span>
+                        </Link>
+                      )}
                       <Link
                         to={`/${currentLang}/profile`}
                         className="flex items-center space-x-3 px-5 py-4 rounded-2xl text-gray-600 hover:bg-red-50 hover:text-red-700 transition-all font-black uppercase text-[10px] tracking-widest"

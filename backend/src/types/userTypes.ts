@@ -1,14 +1,13 @@
-import { Types } from "mongoose";
 import { CoordinatesType } from "./index";
 
 export interface UserType {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   password: string;
   refreshToken: string;
   role: string;
-  coordinates: Types.ObjectId | CoordinatesType;
+  coordinates?: string | CoordinatesType;
   createdAt: Date;
   updatedAt: Date;
   phoneNumber?: string;
@@ -25,7 +24,7 @@ export interface SignupRequest {
   email: string;
   password: string;
   role: string;
-  coordinates?: Types.ObjectId | CoordinatesType;
+  coordinates?: string | CoordinatesType;
   phoneNumber?: string;
   region?: string;
 }
@@ -36,11 +35,11 @@ export interface SigninRequest {
 }
 
 export interface UserResponse {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   role: string;
-  coordinates?: Types.ObjectId | CoordinatesType;
+  coordinates?: string | CoordinatesType;
   phoneNumber?: string;
   region?: string;
   description?: string;

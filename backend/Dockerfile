@@ -11,11 +11,13 @@ RUN npm install
 # Copy source files
 COPY . .
 
+# Generate Prisma Client
+RUN npx prisma generate
+
 # Build TypeScript
 RUN npm run build
 
 # Expose the port your backend listens on (e.g., 5000)
 EXPOSE 5000
 
-# Start the server
-CMD ["npm", "run", "start"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run start"]
